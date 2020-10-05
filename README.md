@@ -30,8 +30,11 @@ systems in the future but... *let me show you some code first, yes?*
 
 ## status
 
-**development just started, stay tuned ᕕ( ᐛ )ᕗ**
+**development just started, please see**
+[apkg design wiki page](https://gitlab.nic.cz/packaging/apkg/-/wikis/design) -
+comments welcome!
 
+**ᕕ( ᐛ )ᕗ**
 
 ## contact
 
