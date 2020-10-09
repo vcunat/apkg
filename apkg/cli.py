@@ -57,7 +57,7 @@ def apkg(*cargs):
     """
     # print full help when no commands/options are supplied
     if len(cargs) == 0:
-        cargs.append('--help')
+        cargs = cargs + ('--help',)
 
     args = docopt(__doc__,
                   argv=cargs,

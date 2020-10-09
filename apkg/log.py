@@ -6,7 +6,7 @@ from apkg import terminal
 WARN = logging.WARN
 INFO = logging.INFO
 # between info and debug
-VERBOSE = (logging.INFO + logging.DEBUG) / 2
+VERBOSE = int((logging.INFO + logging.DEBUG) / 2)
 DEBUG = logging.DEBUG
 
 logging.basicConfig(format='%(message)s', level=logging.INFO)
