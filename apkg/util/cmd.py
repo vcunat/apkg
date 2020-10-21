@@ -1,5 +1,4 @@
 # -*- encoding: utf-8 -*-
-import six
 import subprocess
 
 from apkg import exception
@@ -34,8 +33,8 @@ def run(cmd, *params, **kwargs):
     env = kwargs.get('env', None)
 
     cmd = [cmd]
-    cmd.extend(p if isinstance(p, six.string_types) else six.text_type(p)
-               for p in params)
+    cmd.extend(params)
+    # TODO: escape parameters with whitespace
     cmd_str = ' '.join(cmd)
 
     if log_cmd:
@@ -65,21 +64,26 @@ def run(cmd, *params, **kwargs):
         raise exception.CommandNotFound(cmd=cmd[0])
     out, err = prc.communicate(input=input)
 
+    if type(out) == bytes:
+        out = out.decode('utf-8')
+    if type(err) == bytes:
+        err = err.decode('utf-8')
+
     if out:
         out = out.rstrip()
         if print_stdout:
             log.info(out)
     else:
-        out = b''
+        out = ''
 
     if err:
         err = err.rstrip()
         if print_stderr:
             log.info(err)
     else:
-        err = b''
+        err = ''
 
-    cout = _CommandOutput(out.decode('utf-8'))
+    cout = _CommandOutput(out)
     cout.stderr = err
     cout.return_code = prc.returncode
     cout.cmd = cmd_str
