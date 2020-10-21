@@ -1,0 +1,3 @@
+[project]
+make_archive_script = "scripts/make-dev-archive.sh"
+upstream_archive_url = "https://some.place"

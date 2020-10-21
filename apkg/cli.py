@@ -6,9 +6,9 @@ Usage: apkg <command> [<args>...]
 
 Commands:
   status                 WIP: Show status of current project
-  make-archive          TODO: Create source archive from current commit
+  make-archive                Create dev archive from current project state
   get-archive           TODO: Download upstream source archive
-  make-package-source   TODO: Create package source (files to build package from)
+  make-source-package   TODO: Create source package (files to build package from)
   build-local           TODO: Build package locally
 
 Options:

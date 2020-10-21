@@ -31,6 +31,11 @@ class InvalidFormat(ApkgException):
     exit_code = 18
 
 
+class MissingRequiredConfigOption(ApkgException):
+    msg_fmt = "Missing required config option: %(opt)s"
+    exit_code = 22
+
+
 class HTTPRequestFailed(ApkgException):
     msg_fmt = "HTTP request failed with code %(code)s: %(request)s"
     exit_code = 44
@@ -44,3 +49,8 @@ class CommandNotFound(ApkgException):
 class CommandFailed(ApkgException):
     msg_fmt = "Command failed: %(cmd)s"
     exit_code = 62
+
+
+class UnexpectedCommandOutput(ApkgException):
+    msg_fmt = "Unexpected command output: %(out)s"
+    exit_code = 66
