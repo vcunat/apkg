@@ -22,21 +22,28 @@ def run_command(cargs):
     # project status
     proj = Project()
 
-    msg = "Project base path:        {t.bold}{path}{t.normal}"
-    print(msg.format(path=proj.path, t=log.T))
+    msg = "project base path:        {t.bold}{path}{t.normal}"
+    print(msg.format(path=proj.path.resolve(), t=log.T))
 
-    msg = "Packaging templates path: {t.bold}{path}{t.normal}"
+    msg = "project config:           {t.bold}{path}{t.normal}"
+    if proj.config_path.exists():
+        msg += " ({t.green}exists{t.normal})"
+    else:
+        msg += " ({t.warn}doesn't exist{t.normal})"
+    print(msg.format(path=proj.config_path, t=log.T))
+
+    msg = "packaging templates path: {t.bold}{path}{t.normal}"
     if proj.package_templates_path.exists():
         msg += " ({t.green}exists{t.normal})"
     else:
         msg += " ({t.red}doesn't exist{t.normal})"
     print(msg.format(path=proj.package_templates_path, t=log.T))
 
-    print("Packaging templates:")
+    print("packaging templates:")
     if proj.package_templates:
         msg_lines = []
         for path, style in proj.package_templates:
-            short_path = os.path.join(*list(path.parts)[-2:])
+            short_path = os.path.join(*list(path.parts)[-3:])
             msg_lines.append("    {t.bold}%s{t.normal}: {t.green}%s{t.normal}"
                     % (short_path, style))
         msg = "\n".join(msg_lines)
@@ -46,7 +53,7 @@ def run_command(cargs):
 
     print()
     # distro status
-    msg = "Current distro: {t.cyan}{full}{t.normal} ({t.cyan}{id}{t.normal})"
+    msg = "current distro: {t.cyan}{full}{t.normal} ({t.cyan}{id}{t.normal})"
     distro_full = " ".join(distro.linux_distribution()).rstrip()
     distro_id = distro.id()
     print(msg.format(full=distro_full, id=distro_id, t=log.T))
