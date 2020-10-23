@@ -2,6 +2,7 @@
 
 Usage: apkg <command> [<args>...]
        apkg <command> --help
+       apkg [--debug | --verbose | --quiet] <command> [<args>...]
        apkg [--help | --version]
 
 Commands:
@@ -29,17 +30,6 @@ from . import exception
 from . import log
 
 
-def cmd2mod(command):
-    """Translate command name to module name"""
-    return command.replace('-', '_')
-
-
-def run_command(command, cargs):
-    modname = 'apkg.commands.%s' % cmd2mod(command)
-    mod = __import__(modname, fromlist=[''])
-    return mod.run_command(cargs)
-
-
 def apkg(*cargs):
     """
     apkg CLI interface
@@ -55,14 +45,20 @@ def apkg(*cargs):
 
     Individual commands map to functions in commands module.
     """
-    # print full help when no commands/options are supplied
     if len(cargs) == 0:
+        # print full help when no commands/options are supplied
         cargs = cargs + ('--help',)
+    else:
+        # parse global arguments manually
+        cargs, global_opts = parse_global_options(cargs)
 
+    # parse arguments using docopt (see __doc__ comment at the top of this file)
     args = docopt(__doc__,
                   argv=cargs,
                   version=__version__,
                   options_first=True)
+
+    setup_logging(**global_opts)
 
     code = 1
     try:
@@ -77,6 +73,55 @@ def apkg(*cargs):
         code = ex.exit_code
 
     return code
+
+
+def run_command(command, cargs):
+    """
+    load apkg.commands.command and run its run_command() entry point
+    """
+    modname = 'apkg.commands.%s' % cmd2mod(command)
+    mod = __import__(modname, fromlist=[''])
+    return mod.run_command(cargs)
+
+
+def cmd2mod(command):
+    """Translate command name to module name"""
+    return command.replace('-', '_')
+
+
+APKG_LOG_OPTIONS = {
+    'debug': log.DEBUG,
+    'verbose': log.VERBOSE,
+    'quiet': log.ERROR,
+}
+
+
+def parse_global_options(cargs):
+    """
+    Parse and remove global options from command arguments.
+
+    Return (options_as_dict, new_command_args).
+    """
+    bool_opts = APKG_LOG_OPTIONS.keys()
+    global_opts = {}
+    args = list(cargs)
+
+    for opt in bool_opts:
+        arg = "--%s" % opt
+        while arg in args:
+            args.remove(arg)
+            global_opts[opt] = True
+
+    return tuple(args), global_opts
+
+
+def setup_logging(*args, **kwargs):
+    log_level = 'default'
+    for opt, log_level in APKG_LOG_OPTIONS.items():
+        if kwargs.get(opt):
+            log.log.setLevel(log_level)
+            log.info("log level: %s (%s)" % (opt, log_level))
+            break
 
 
 def main():

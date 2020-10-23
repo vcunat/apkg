@@ -70,9 +70,11 @@ class Project:
 
     def load_config(self):
         if self.config_path.exists():
+            log.verbose("loading project config: %s" % self.config_path)
             self.config = toml.load(self.config_path)
             return True
         else:
+            log.verbose("project config not found: %s" % self.config_path)
             return False
 
     @cached_property

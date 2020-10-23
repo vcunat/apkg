@@ -3,13 +3,15 @@ import logging
 from apkg import terminal
 
 
+ERROR = logging.ERROR
 WARN = logging.WARN
 INFO = logging.INFO
 # between info and debug
 VERBOSE = int((logging.INFO + logging.DEBUG) / 2)
 DEBUG = logging.DEBUG
 
-logging.basicConfig(format='%(message)s', level=logging.INFO)
+logging.basicConfig(format='%(message)s', level=INFO)
+# global log instance
 log = logging.getLogger()
 
 
