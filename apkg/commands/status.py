@@ -2,9 +2,6 @@
 Show status of current project
 
 Usage: apkg status
-
-Options:
-    TODO
 """
 
 from docopt import docopt
@@ -18,8 +15,10 @@ from apkg import pkgstyle
 
 def run_command(cargs):
     args = docopt(__doc__, argv=cargs)
+    print_status()
 
-    # project status
+
+def print_status():
     proj = Project()
 
     msg = "project base path:        {t.bold}{path}{t.normal}"
