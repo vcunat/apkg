@@ -49,5 +49,5 @@ def make_archive():
     log.info("copying archive to: %s" % out_path)
     os.makedirs(proj.dev_archive_path, exist_ok=True)
     shutil.copy(archive_path, out_path)
-    log.info(log.T.green("archive ready ✓"))
+    log.success("archive ready ")
     print(out_path)

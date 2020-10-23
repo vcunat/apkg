@@ -120,7 +120,7 @@ def setup_logging(*args, **kwargs):
     for opt, log_level in APKG_LOG_OPTIONS.items():
         if kwargs.get(opt):
             log.log.setLevel(log_level)
-            log.info("log level: %s (%s)" % (opt, log_level))
+            log.verbose("log level: --%s (%s)" % (opt, log_level))
             break
 
 

@@ -61,39 +61,50 @@ def set_colors(colors):
 
 def error(*args, **kwargs):
     if args:
-        largs = list(args)
-        largs[0] = T.error(args[0])
-        args = tuple(largs)
+        msg, *rest = args
+        args = [T.error('E %s' % msg)] + rest
     log.error(*args, **kwargs)
 
 
 def warn(*args, **kwargs):
     if args:
-        largs = list(args)
-        largs[0] = T.warn(args[0])
-        args = tuple(largs)
+        msg, *rest = args
+        args = [T.warn('W %s' % msg)] + rest
     log.warning(*args, **kwargs)
 
 
 def success(*args, **kwargs):
     if args:
-        largs = list(args)
-        largs[0] = T.good(args[0])
-        args = tuple(largs)
+        msg, *rest = args
+        # NOTE: change prefix to S if ✓ proves to be troublesome
+        #       but I thought we're in 2020+ with unicode support ¯\_(ツ)_/¯
+        args = [T.good('✓ %s' % msg)] + rest
     log.info(*args, **kwargs)
 
 
 def info(*args, **kwargs):
+    if args:
+        msg, *rest = args
+        args = ['I %s' % msg] + rest
     log.info(*args, **kwargs)
 
 
 def verbose(*args, **kwargs):
+    if args:
+        msg, *rest = args
+        args = ['V %s' % msg] + rest
     log.log(VERBOSE, *args, **kwargs)
 
 
 def debug(*args, **kwargs):
+    if args:
+        msg, *rest = args
+        args = ['D %s' % msg] + rest
     log.debug(*args, **kwargs)
 
 
 def command(*args, **kwargs):
+    if args:
+        msg, *rest = args
+        args = [T.cmd('$ %s' % msg)] + rest
     log.info(*args, **kwargs)
