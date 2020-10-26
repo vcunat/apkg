@@ -1,12 +1,13 @@
 from functools import cached_property
+import glob
 from pathlib import Path
 import sys
 import os
 import toml
 
-from . import exception
-from . import log
-from . import pkgstyle
+from apkg import exception
+from apkg import log
+from apkg import pkgstyle
 
 
 INPUT_BASE_DIR = 'distro'
@@ -83,6 +84,16 @@ class Project:
             return load_package_templates(self.package_templates_path)
         else:
             return []
+
+    def find_archives_by_name(self, name, upstream=False):
+        """
+        find archive files with supplied name in expected project paths
+        """
+        if upstream:
+            ar_path = self.upstream_archive_path
+        else:
+            ar_path = self.dev_archive_path
+        return glob.glob("%s/%s*" % (ar_path, name))
 
 
 def load_package_templates(path):

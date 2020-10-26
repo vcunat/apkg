@@ -16,6 +16,11 @@ class ApkgException(Exception):
         super(ApkgException, self).__init__(msg)
 
 
+class InvalidInput(ApkgException):
+    msg_fmt = "Invalid input: %(fail)s"
+    exit_code = 12
+
+
 class InvalidType(ApkgException):
     msg_fmt = "Invalid type: $(var) must be %(desired)s but is %(type)s"
     exit_code = 14
@@ -31,14 +36,29 @@ class InvalidFormat(ApkgException):
     exit_code = 18
 
 
+class MissingRequiredArgument(ApkgException):
+    msg_fmt = "Missing required argument: %(arg)s"
+    exit_code = 20
+
+
 class MissingRequiredConfigOption(ApkgException):
     msg_fmt = "Missing required config option: %(opt)s"
     exit_code = 22
 
 
+class ParsingFailed(ApkgException):
+    msg_fmt = "Unable to parse: %(fail)s"
+    exit_code = 30
+
+
+class InvalidVersion(ApkgException):
+    msg_fmt = "Invalid version: %(ver)s"
+    exit_code = 40
+
+
 class HTTPRequestFailed(ApkgException):
     msg_fmt = "HTTP request failed with code %(code)s: %(request)s"
-    exit_code = 44
+    exit_code = 54
 
 
 class CommandNotFound(ApkgException):
@@ -54,3 +74,13 @@ class CommandFailed(ApkgException):
 class UnexpectedCommandOutput(ApkgException):
     msg_fmt = "Unexpected command output: %(out)s"
     exit_code = 66
+
+
+class ArchiveNotFound(ApkgException):
+    msg_fmt = "%(type)s archive not found: %(ar)s"
+    exit_code = 80
+
+
+class NotImplemented(ApkgException):
+    msg_fmt = "Feature not implemented: %(feature)s"
+    exit_code = 99
