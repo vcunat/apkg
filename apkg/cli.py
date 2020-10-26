@@ -43,7 +43,8 @@ def apkg(*cargs):
 
         $> apkg command argument
 
-    Individual commands map to functions in commands module.
+    This is a CLI wrapper around run_command() which returns actual command
+    output instead of return code.
     """
     if len(cargs) == 0:
         # print full help when no commands/options are supplied
@@ -63,7 +64,8 @@ def apkg(*cargs):
     code = 1
     try:
         if args['<command>']:
-            return run_command(args['<command>'], cargs)
+            run_command(cargs)
+            code = 0
     except exception.CommandFailed as ex:
         # this was logged already
         code = ex.exit_code
@@ -75,13 +77,27 @@ def apkg(*cargs):
     return code
 
 
-def run_command(command, cargs):
+def run_command(cargs):
     """
     load apkg.commands.command and run its run_command() entry point
+    with supplied arguments.
     """
+    command = cargs[0]
     modname = 'apkg.commands.%s' % cmd2mod(command)
     mod = __import__(modname, fromlist=[''])
     return mod.run_command(cargs)
+
+
+def run_alias(new_command, cargs):
+    """
+    helper function to run command using an alias
+
+    changes cargs (with alias) to use new_command
+    """
+    alias, *rest = cargs
+    new_cargs = [new_command] + rest
+    log.verbose("alias: %s -> %s", alias, new_command)
+    return run_command(new_cargs)
 
 
 def cmd2mod(command):

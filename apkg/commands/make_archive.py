@@ -17,7 +17,9 @@ from apkg.util.cmd import run
 
 def run_command(cargs):
     args = docopt(__doc__, argv=cargs)
-    return make_archive()
+    out_path = make_archive()
+    print(out_path)
+    return out_path
 
 
 def make_archive():
@@ -49,5 +51,5 @@ def make_archive():
     log.info("copying archive to: %s" % out_path)
     os.makedirs(proj.dev_archive_path, exist_ok=True)
     shutil.copy(archive_path, out_path)
-    log.success("archive ready ")
-    print(out_path)
+    log.success("archive ready")
+    return out_path
