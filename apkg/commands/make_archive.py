@@ -1,7 +1,7 @@
 """
 Create dev archive from current project state
 
-Usage: apkg make-archive
+usage: apkg make-archive
 """
 
 from docopt import docopt

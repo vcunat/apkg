@@ -1,7 +1,7 @@
 """
-Show status of current project
+show status of current project
 
-Usage: apkg status
+usage: apkg status
 """
 
 from docopt import docopt

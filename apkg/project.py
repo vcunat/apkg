@@ -17,7 +17,7 @@ CONFIG_FN = 'apkg.toml'
 class Project:
     """
     Project class serves as high level interface to projecs in need of
-    packaging.
+    packaging
     """
     config = {}
     package_templates = []
@@ -40,7 +40,7 @@ class Project:
 
     def construct_paths(self):
         """
-        Fill in projects paths based on current self.path and self.config
+        fill in projects paths based on current self.path and self.config
         """
         # package templates: distro/pkg
         self.package_templates_path = self.path / INPUT_BASE_DIR / 'pkg'
@@ -61,7 +61,7 @@ class Project:
 
     def load(self):
         """
-        Load project config and update its attributes
+        load project config and update its attributes
         """
         self.config_base_path = self.path / INPUT_BASE_DIR / 'config'
         self.config_path = self.config_base_path / CONFIG_FN
