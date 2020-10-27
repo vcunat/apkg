@@ -1,4 +1,5 @@
 docopt
 distro
+jinja2
 pbr
 toml

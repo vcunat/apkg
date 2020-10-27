@@ -46,6 +46,11 @@ class MissingRequiredConfigOption(ApkgException):
     exit_code = 22
 
 
+class MissingPackagingTemplate(ApkgException):
+    msg_fmt = "Missing package template: %(temp)s"
+    exit_code = 24
+
+
 class ParsingFailed(ApkgException):
     msg_fmt = "Unable to parse: %(fail)s"
     exit_code = 30
@@ -54,6 +59,11 @@ class ParsingFailed(ApkgException):
 class InvalidVersion(ApkgException):
     msg_fmt = "Invalid version: %(ver)s"
     exit_code = 40
+
+
+class DistroNotSupported(ApkgException):
+    msg_fmt = "Distro not supported: %(distro)s"
+    exit_code = 44
 
 
 class HTTPRequestFailed(ApkgException):

@@ -1,4 +1,4 @@
-"""apkg the packaging automation tool
+"""apkg the cross-distro packaging automation tool
 
 Usage: apkg <command> [<args>...]
        apkg <command> --help
@@ -6,11 +6,11 @@ Usage: apkg <command> [<args>...]
        apkg [--help | --version]
 
 Commands:
-  status                 WIP: show status of current project
+  status                      show status of current project
   make-archive                create dev archive from current project state
   get-archive           TODO: download upstream source archive
-  make-source-package    WIP: create source package (files to build package from)
-  build-local           TODO: build package locally
+  make-source-package         create source package (files to build package from)
+  build                 TODO: build package
 
 Options:
   -h --help     show help screen, can be used after a command

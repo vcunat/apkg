@@ -7,7 +7,7 @@ import toml
 
 from apkg import exception
 from apkg import log
-from apkg import pkgstyle
+from apkg import pkgtemplate
 
 
 INPUT_BASE_DIR = 'distro'
@@ -21,7 +21,7 @@ class Project:
     packaging
     """
     config = {}
-    package_templates = []
+    package_templates = {}
 
     path = None
     package_templates_path = None
@@ -30,6 +30,11 @@ class Project:
     archives_path = None
     dev_archive_path = None
     upstream_archive_path = None
+    build_path = None
+    package_build_path = None
+    source_package_build_path = None
+    package_out_path = None
+    source_package_out_path = None
 
     def __init__(self, path=None, autoload=True):
         if path:
@@ -45,19 +50,17 @@ class Project:
         """
         # package templates: distro/pkg
         self.package_templates_path = self.path / INPUT_BASE_DIR / 'pkg'
-        if not self.package_templates_path.exists():
-            # TODO: This is a temporary backward compat bridge.
-            #       Remove this as soon as knot projects use distro/pkg.
-            legacy_path = self.path / INPUT_BASE_DIR
-            if legacy_path.exists():
-                log.warn("package templates path doesn't exist: %s\n"
-                         "using legacy templates path (TO BE REMOVED): %s"
-                         % (self.package_templates_path, legacy_path))
-                self.package_templates_path = legacy_path
         # archives: pkg/archives
         self.archive_path = self.path / OUTPUT_BASE_DIR / 'archives'
         self.dev_archive_path = self.archive_path / 'dev'
         self.upstream_archive_path = self.archive_path / 'upstream'
+        # build: pkg/build
+        self.build_path = self.path / OUTPUT_BASE_DIR / 'build'
+        self.package_build_path = self.build_path / 'pkgs'
+        self.source_package_build_path = self.build_path / 'srcpkgs'
+        # output: pkg/{src-,}package
+        self.package_out_path = self.path / OUTPUT_BASE_DIR / 'pkgs'
+        self.source_package_out_path = self.path / OUTPUT_BASE_DIR / 'srcpkgs'
 
 
     def load(self):
@@ -85,6 +88,16 @@ class Project:
         else:
             return []
 
+    def get_package_template_for_distro(self, distro):
+        # NOTE: this is very simplistic, more complex mechanism TBD
+        ldistro = distro.lower()
+        for t in self.package_templates:
+            ps = t.package_style
+            for d in ps.SUPPORTED_DISTROS:
+                if d in ldistro:
+                    return t
+        return None
+
     def find_archives_by_name(self, name, upstream=False):
         """
         find archive files with supplied name in expected project paths
@@ -98,12 +111,11 @@ class Project:
 
 def load_package_templates(path):
     package_templates = []
-    for entry in os.scandir(path):
-        if entry.is_dir():
-            template_path = Path(entry)
-            style, _ = pkgstyle.detect_packaging_template_style(template_path)
-            if style:
-                package_templates.append((template_path, style))
+    for entry_path in os.scandir(path):
+        if entry_path.is_dir():
+            template = pkgtemplate.PackageTemplate(entry_path)
+            if template.package_style:
+                package_templates.append(template)
             else:
-                log.verbose("ignoring unknown packaging style in %s", template_path)
+                log.verbose("ignoring unknown package style in %s", template_path)
     return package_templates
