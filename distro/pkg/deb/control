@@ -1,0 +1,26 @@
+Source: apkg
+Section: python
+Priority: optional
+Maintainer: Jakub Ružička <jakub.ruzicka@nic.cz>
+Uploaders:
+ Jakub Ružička <jakub.ruzicka@nic.cz>,
+Build-Depends:
+ debhelper-compat (= 10),
+ dh-python,
+ python3-all,
+ python3-pbr,
+ python3-setuptools,
+Build-Depends-Indep:
+ python3-blessings
+Homepage: https://gitlab.nic.cz/packaging/apkg
+
+Package: python3-apkg
+Architecture: all
+Depends:
+ python3-pbr,
+ python3-docopt,
+ python3-blessings,
+ python3-jinja2,
+ ${misc:Depends},
+ ${python3:Depends},
+Description: cross-distro packaging automation tool
