@@ -11,7 +11,7 @@ from apkg import log
 from apkg import pkgstyle
 from apkg.project import Project
 from apkg.lib import ar
-from apkg.util.cmd import run
+from apkg.util.run import run
 
 
 def make_source_package(
@@ -40,7 +40,7 @@ def make_source_package(
         distro = adistro.distro2idver(distro)
     else:
         # use current distro by default
-        distro = adistro.id()
+        distro = adistro.idver()
     log.info("target distro: %s" % distro)
 
     # fetch correct package template
@@ -52,40 +52,48 @@ def make_source_package(
         raise exception.MissingPackagingTemplate(msg=msg)
     ps = template.package_style
     log.info("package style: %s", ps.name)
-    log.info("package template path: %s", template.path)
+    log.info("package template: %s", template.path)
+    log.info("package archive: %s", ar_path)
+
     # get needed paths
     pkg_name = ps.get_package_name(template.path)
     nvr = "%s-%s-%s" % (pkg_name, version, release)
     build_path = proj.source_package_build_path / distro / nvr
     out_path = proj.source_package_out_path / distro / nvr
-    log.info("source package: %s", nvr)
+    log.info("package name: %s", nvr)
     log.info("build dir: %s", build_path)
-    log.info("output dir: %s", out_path)
+    log.info("result dir: %s", out_path)
+
+    # prepare new build dir
+    if build_path.exists():
+        log.info("removing existing build dir: %s" % build_path)
+        shutil.rmtree(build_path)
+    os.makedirs(build_path, exist_ok=True)
+    # ensure output dir doesn't exist
+    if out_path.exists():
+        log.info("removing existing result dir: %s" % out_path)
+        shutil.rmtree(out_path)
 
     # prepare vars accessible from templates
     vars = {
+        'name': pkg_name,
         'version': version,
         'release': release,
-        'distro': distro,
         'nvr': nvr,
+        'distro': distro,
     }
-    # render package template
-    template.render(build_path, vars=vars)
-
     # create source package using desired package style
-    log.info("building source package using style: %s",
-             template.package_style.name)
     template.package_style.build_source_package(
         build_path,
+        out_path,
         archive_path=ar_path,
+        package_template=template,
         vars=vars)
 
-    # prepare output dir and copy result
     if out_path.exists():
-        log.info("removing existing output dir: %s" % out_path)
-        shutil.rmtree(out_path)
-    log.info("copying source package to: %s" % out_path)
-    os.makedirs(out_path.parent, exist_ok=True)
-    shutil.copytree(build_path, out_path)
-    log.success("made source package: %s", out_path)
+        log.success("made source package: %s", out_path)
+    else:
+        msg = ("source package build reported success but there are "
+               "no results:\n\n%s" % out_path)
+        raise exception.UnexpectedCommandOutput(msg=msg)
     return out_path

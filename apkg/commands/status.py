@@ -5,9 +5,9 @@ usage: apkg status
 """
 
 from docopt import docopt
-import distro
 import os
 
+from apkg import adistro
 from apkg import log
 from apkg.project import Project
 from apkg import pkgstyle
@@ -52,15 +52,20 @@ def print_status():
 
     print()
     # distro status
-    msg = "current distro: {t.cyan}{full}{t.normal} ({t.cyan}{id}{t.normal})"
-    distro_full = " ".join(distro.linux_distribution()).rstrip()
-    distro_id = distro.id()
-    print(msg.format(full=distro_full, id=distro_id, t=log.T))
+    msg = "current distro: {t.cyan}{id}{t.normal} / {t.cyan}{full}{t.normal}"
+    print(msg.format(full=adistro.fullname(), id=adistro.idver(), t=log.T))
 
+    template = proj.get_package_template_for_distro(adistro.idver())
     msg = "    package style: "
-    style = pkgstyle.get_package_style_for_distro(distro_id)
-    if style:
-        msg += "{t.green}%s{t.normal}" % style.name
+    if template:
+        style = template.package_style.name
+        msg += "{t.green}%s{t.normal}" % style
+    else:
+        msg += "{t.warn}unsupported{t.normal}"
+    print(msg.format(t=log.T))
+    msg = "    package template: "
+    if template:
+        msg += "{t.green}%s{t.normal}" % template.path
     else:
         msg += "{t.warn}unsupported{t.normal}"
     print(msg.format(t=log.T))

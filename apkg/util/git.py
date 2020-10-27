@@ -3,8 +3,8 @@ import contextlib
 import os
 
 from apkg import exception
-from apkg.util.cmd import run
-from apkg.util.cmd import ShellCommand
+from apkg.util.run import run
+from apkg.util.run import ShellCommand
 
 
 @contextlib.contextmanager

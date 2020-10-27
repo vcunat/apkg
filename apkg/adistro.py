@@ -37,8 +37,7 @@ def fullname():
     global _fullname
     parts = [
         name(),
-        version(),
-        distro.codename(),
+        distro.version(pretty=True),
     ]
     return " ".join([p for p in parts if p])
 
@@ -67,7 +66,7 @@ def codename():
 def version():
     global _version
     if _version is None:
-        _version = distro.version(pretty=True)
+        _version = distro.version()
     return _version
 
 

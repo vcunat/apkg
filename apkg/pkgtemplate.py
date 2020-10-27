@@ -26,19 +26,24 @@ class PackageTemplate:
         """
         render package template into specified output directory
         """
-        if out_path.exists():
-            log.info("removing existing build dir: %s" % out_path)
-            shutil.rmtree(out_path)
         log.info("renderding package template: %s -> %s", self.path, out_path)
-        os.makedirs(out_path)
+        if out_path.exists():
+            log.verbose("template render dir exists: %s" % out_path)
+        else:
+            os.makedirs(out_path, exist_ok=True)
 
-        for inf in os.scandir(self.path):
-            inf_path = Path(inf)
-            outf_path = out_path / inf_path.name
-            log.info("rendering file: %s -> %s", inf_path, outf_path)
+        # recursively render all files
+        for dir, subdirs, files in os.walk(self.path):
+            rel_dir = Path(dir).relative_to(self.path)
+            dst_dir = out_path / rel_dir
+            os.makedirs(dst_dir, exist_ok=True)
 
-            t = None
-            with inf_path.open('r') as inf:
-                t = jinja2.Template(inf.read())
-            with outf_path.open('w') as outf:
-                outf.write(t.render(**vars))
+            for fn in files:
+                dst = out_path / rel_dir / fn
+                src = Path(dir) / fn
+                log.verbose("rendering file: %s -> %s", src, dst)
+                t = None
+                with src.open('r') as srcf:
+                    t = jinja2.Template(srcf.read())
+                with dst.open('w') as dstf:
+                    dstf.write(t.render(**vars) + '\n')

@@ -3,40 +3,13 @@ apkg lib for handling source archives
 """
 import os
 from pathlib import Path
-import re
 import shutil
 
 from apkg import exception
 from apkg import log
+from apkg.parse import split_archive_fn
 from apkg.project import Project
-from apkg.util.cmd import run
-
-
-# subgroups:
-# 1) name
-# 2) name-version separator ('-' or '_')
-# 3) version (including release)
-RE_NVR = r'^(.+?)([-_])(\d+(?:\.\d+)+(?:.+?)?)$'
-
-
-def split_archive_fn(archive_fn):
-    """
-    split archive file name into individual parts
-       
-    return (name, separator, version, extension)
-    """
-    nvr, _, ext = archive_fn.rpartition('.')
-    ext = '.%s' % ext
-    if nvr.endswith('.tar'):
-        nvr, _, _ = nvr.rpartition('.')
-        ext = '.tar%s' % ext
-
-    r = re.match(RE_NVR, nvr)
-    if r:
-        return r.groups() + (ext,)
-
-    msg = "unable to parse version from archive file name: %s" % archive_fn
-    raise exception.ParsingFailed(msg=msg)
+from apkg.util.run import run
 
 
 def make_archive(version=None, project=None):

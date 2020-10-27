@@ -1,11 +1,13 @@
 # -*- encoding: utf-8 -*-
+from contextlib import contextmanager
+import os
 import subprocess
 
 from apkg import exception
 from apkg import log
 
 
-def log_cmd_fail(cmd, cout, fail_log_fun=log.warn, out_log_fun=log.info):
+def log_cmd_fail(cmd, cout, fail_log_fun=log.error, out_log_fun=log.info):
     fail_log_fun('{t.error}command failed: {t.normal}{t.cmd}{cmd}{t.normal}'
                  .format(t=log.T, cmd=cmd))
     nl = False
@@ -21,7 +23,7 @@ def log_cmd_fail(cmd, cout, fail_log_fun=log.warn, out_log_fun=log.info):
         out_log_fun('')
 
 
-def run(cmd, *params, **kwargs):
+def run(*cmd, **kwargs):
     fatal = kwargs.get('fatal', True)
     direct = kwargs.get('direct', False)
     log_cmd = kwargs.get('log_cmd', True)
@@ -32,9 +34,8 @@ def run(cmd, *params, **kwargs):
     print_output = kwargs.get('print_output', False)
     env = kwargs.get('env', None)
 
-    cmd = [cmd]
-    cmd.extend(params)
     # TODO: escape parameters with whitespace
+    cmd = [str(c) for c in cmd]
     cmd_str = ' '.join(cmd)
 
     if log_cmd:
@@ -83,7 +84,7 @@ def run(cmd, *params, **kwargs):
     else:
         err = ''
 
-    cout = _CommandOutput(out)
+    cout = CommandOutput(out)
     cout.stderr = err
     cout.return_code = prc.returncode
     cout.cmd = cmd_str
@@ -95,13 +96,17 @@ def run(cmd, *params, **kwargs):
     return cout
 
 
-class _CommandOutput(str):
+@contextmanager
+def cd(newdir):
     """
-    Just a string subclass with attribute access.
+    Temporarily change current directory.
     """
-    @property
-    def success(self):
-        return self.return_code == 0
+    olddir = os.getcwd()
+    os.chdir(os.path.expanduser(newdir))
+    try:
+        yield
+    finally:
+        os.chdir(olddir)
 
 
 class ShellCommand(object):
@@ -113,3 +118,12 @@ class ShellCommand(object):
 
     def __call__(self, *params, **kwargs):
         return run(self.command, *params, **kwargs)
+
+
+class CommandOutput(str):
+    """
+    Just a string subclass with attribute access.
+    """
+    @property
+    def success(self):
+        return self.return_code == 0

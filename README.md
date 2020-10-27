@@ -47,7 +47,8 @@ for now please use the source.
 
 Python module requirements are listed in [requirements.txt](requirements.txt).
 
-They are installed automatically by `setup.py`.
+Once you have `pbr` (`python3-pbr`) installed, rest of requirements can be
+automatically installed by `setup.py`.
 
 
 ### user development install
