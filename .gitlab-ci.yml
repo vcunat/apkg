@@ -1,0 +1,20 @@
+variables:
+  LC_ALL: C.UTF-8
+
+stages:
+  - sanity
+  - test
+
+.debian: &debian
+  # TODO: consider using custom docker image for easier addition of dependencies
+  image: $CI_REGISTRY/knot/knot-resolver/ci/debian-buster:knot-3.0
+  tags:
+    - docker
+    - linux
+    - amd64
+
+flake8:
+  <<: *debian
+  stage: sanity
+  script:
+    - python3 -m flake8 --max-line-length=100 . && echo "OK, no flake8 errors detected"
