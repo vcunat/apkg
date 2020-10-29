@@ -19,7 +19,6 @@ SUPPORTED_DISTROS = [
     "debian",
     "linuxmint",
     "raspbian",
-    "scientific",
 ]
 
 

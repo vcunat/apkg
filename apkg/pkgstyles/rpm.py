@@ -13,6 +13,7 @@ SUPPORTED_DISTROS = [
     "opensuse",
     "oracle",
     "pidora",
+    "scientific",
 ]
 
 
