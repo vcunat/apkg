@@ -11,7 +11,7 @@ def distro2idver(distro):
     """
     convert generic distro string into idver format
     """
-    return re.sub('\s+', '-', distro.strip().lower())
+    return re.sub(r'\s+', '-', distro.strip().lower())
 
 
 def idver():

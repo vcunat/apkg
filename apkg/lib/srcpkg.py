@@ -2,16 +2,13 @@
 apkg lib for handling source archives
 """
 import os
-from pathlib import Path
 import shutil
 
 from apkg import adistro
 from apkg import exception
 from apkg import log
-from apkg import pkgstyle
 from apkg.project import Project
 from apkg.lib import ar
-from apkg.util.run import run
 
 
 def make_source_package(

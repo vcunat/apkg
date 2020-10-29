@@ -8,6 +8,7 @@ from pathlib import Path
 import re
 import shutil
 
+from apkg import exception
 from apkg import log
 from apkg import parse
 from apkg.util.run import run, cd
@@ -39,7 +40,7 @@ def get_package_name(path):
             return m.group(1)
 
     raise exception.ParsingFailed(
-            msg="unable to determine Source from: %s" % pkgbuild)
+            msg="unable to determine Source from: %s" % control)
 
 
 def build_source_package(
@@ -57,7 +58,7 @@ def build_source_package(
     if not source_path.exists():
         # NOTE: if this happens oftern (it shouldn't), consider using
         #       atool's --save-outdir option above
-        msg = ("archive unpack didn't result in expected dir: %s" % source_path)
+        msg = "archive unpack didn't result in expected dir: %s" % source_path
         raise exception.UnexpectedCommandOutput(msg=msg)
     # render template
     debian_path = source_path / 'debian'

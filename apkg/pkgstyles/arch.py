@@ -5,6 +5,7 @@ import os
 import re
 import shutil
 
+from apkg import exception
 from apkg import log
 
 

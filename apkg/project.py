@@ -4,11 +4,9 @@ except ImportError:
     from cached_property import cached_property
 import glob
 from pathlib import Path
-import sys
 import os
 import toml
 
-from apkg import exception
 from apkg import log
 from apkg import pkgtemplate
 
@@ -65,7 +63,6 @@ class Project:
         self.package_out_path = self.path / OUTPUT_BASE_DIR / 'pkgs'
         self.source_package_out_path = self.path / OUTPUT_BASE_DIR / 'srcpkgs'
 
-
     def load(self):
         """
         load project config and update its attributes
@@ -120,5 +117,5 @@ def load_package_templates(path):
             if template.package_style:
                 package_templates.append(template)
             else:
-                log.verbose("ignoring unknown package style in %s", template_path)
+                log.warn("ignoring unknown package style in %s", entry_path)
     return package_templates

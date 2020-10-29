@@ -5,7 +5,7 @@ usage: apkg make-archive [-v <ver>]
 
 options:
   -v <ver>, --version <ver>  rename archive to match specified version if needed
-"""
+""" # noqa
 
 from docopt import docopt
 

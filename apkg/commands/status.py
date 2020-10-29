@@ -4,17 +4,14 @@ show status of current project
 usage: apkg status
 """
 
-from docopt import docopt
 import os
 
 from apkg import adistro
 from apkg import log
 from apkg.project import Project
-from apkg import pkgstyle
 
 
 def run_command(cargs):
-    args = docopt(__doc__, argv=cargs)
     print_status()
 
 
@@ -44,7 +41,7 @@ def print_status():
         for template in proj.package_templates:
             short_path = os.path.join(*list(template.path.parts)[-3:])
             msg_lines.append("    {t.green}%s{t.normal}: {t.bold}%s{t.normal}"
-                    % (template.package_style.name, short_path))
+                             % (template.package_style.name, short_path))
         msg = "\n".join(msg_lines)
     else:
         msg = "    {t.red}no package templates found{t.normal}"

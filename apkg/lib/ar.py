@@ -21,10 +21,10 @@ def make_archive(version=None, project=None):
         script = proj.config['project']['make_archive_script']
     except KeyError:
         msg = ("make-archive requires project.make_archive_script option to\n"
-        "be set in project config to a script that creates project\n"
-        "archive and prints path to it on last stdout line.\n\n"
-        "Please update project config with required information:\n\n"
-        "%s" % proj.config_path)
+               "be set in project config to a script that creates project\n"
+               "archive and prints path to it on last stdout line.\n\n"
+               "Please update project config with required information:\n\n"
+               "%s" % proj.config_path)
         raise exception.MissingRequiredConfigOption(msg=msg)
 
     log.info("running make_archive_script: %s" % script)

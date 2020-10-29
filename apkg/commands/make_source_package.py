@@ -11,13 +11,10 @@ options:
   -r <rls>, --release <rls>       set package release
   -d <distro>, --distro <distro>  set target distro
                                   default: current distro
-"""
+""" # noqa
 
 from docopt import docopt
 
-from apkg import exception
-from apkg import log
-from apkg.project import Project
 from apkg.lib import srcpkg
 
 

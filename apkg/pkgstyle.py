@@ -4,7 +4,6 @@ dynamically added because apkg.pkgstyles is PEP 420 namespace package.
 """
 import importlib
 import pkgutil
-from pathlib import Path
 
 import apkg.pkgstyles
 

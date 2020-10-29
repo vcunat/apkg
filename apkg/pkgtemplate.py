@@ -4,9 +4,7 @@ module for handling and rendering apkg package templates
 import jinja2
 from pathlib import Path
 import os
-import shutil
 
-from apkg import exception
 from apkg import log
 from apkg import pkgstyle
 
