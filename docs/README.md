@@ -1,40 +1,20 @@
-# apkg
+# apkg - packaging automation tool
 
 apkg is **going to be** Free and Open Source minimalist cross-distro packaging
-automation tool aimed at producing **high quality packages** for many different OS
-distributions/packaging systems with minimum overhead.
-
-
-## why?
-
-There are *many* different packaging tools, but none of them provided me with
-satisfactory packaging automation that allows creating high quality packages
-for different distros such as Debian, Arch or Fedora directly from upstream
-repos with ease.
-
-I've already created
-[rdopkg](https://github.com/softwarefactory-project/rdopkg) that tackles
-automated packaging of hundreds of RPM packages across different projects,
-distros, versions, and releases but it's bound to RPM packaging only and thus
-it's useless outside of Fedora/CentOS/RHEL.
-
-`apkg` is going to inherit good features and principles of `rdopkg`
-(determined and refined after > 5 years in production) without the accumulated
-bloat and more importantly without the chains of a specific platform.
-
-I'd much prefer to use an established tool that already exists, but to my
-knowledge and experience, there is simply no such tool in existence at this
-time. I hope to describe flaws of various existing packaging tools and
-systems in the future but... *let me show you some code first, yes?*
+automation tool aimed at producing **high quality native packages** for many
+different OS distributions/packaging systems with minimum overhead.
 
 
 ## status
 
-**development just started, please see**
-[apkg design wiki page](https://gitlab.nic.cz/packaging/apkg/-/wikis/design) -
-comments welcome!
+**development started recently**
 
-**ᕕ( ᐛ )ᕗ**
+* [apkg design](design.md)
+* [source code](https://gitlab.nic.cz/packaging/apkg)
+* [merge requests](https://gitlab.nic.cz/packaging/apkg/-/merge_requests)
+* [issues](https://gitlab.nic.cz/packaging/apkg/-/issues)
+
+patches, issues, comments and other contributions are welcome **ᕕ( ᐛ )ᕗ**
 
 
 ## installation
@@ -45,7 +25,7 @@ for now please use the source.
 
 ### requirements
 
-Python module requirements are listed in [requirements.txt](requirements.txt).
+Python module requirements are listed in `requirements.txt`.
 
 Once you have `pbr` (`python3-pbr`) installed, rest of requirements can be
 automatically installed by `setup.py`.
@@ -121,7 +101,7 @@ to communicate anything you have in mind. Feedback is most appreciated!
 
 ## planned features
 
-* docs
-* tests
+* tests & CI
+* more docs
 * packaging
 * much more
