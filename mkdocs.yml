@@ -1,0 +1,5 @@
+site_name: apkg
+theme: readthedocs
+nav:
+  - README.md
+  - design.md

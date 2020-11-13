@@ -4,6 +4,8 @@ variables:
 stages:
   - sanity
   - test
+  - deploy
+
 
 .debian: &debian
   # TODO: consider using custom docker image for easier addition of dependencies
@@ -18,3 +20,17 @@ flake8:
   stage: sanity
   script:
     - python3 -m flake8 --max-line-length=100 . && echo "OK, no flake8 errors detected"
+
+pages:
+  stage: deploy
+  image: python:3.8-buster # python required
+  before_script:
+    - pip install mkdocs
+  script:
+    - mkdocs build
+    - mv site public
+  artifacts:
+    paths:
+    - public
+  only:
+    - master
