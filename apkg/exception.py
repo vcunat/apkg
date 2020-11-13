@@ -13,7 +13,7 @@ class ApkgException(Exception):
                 msg = self.msg_fmt
         if exit_code is not None:
             self.exit_code = exit_code
-        super(ApkgException, self).__init__(msg)
+        super().__init__(msg)
 
 
 class InvalidInput(ApkgException):
@@ -89,8 +89,3 @@ class UnexpectedCommandOutput(ApkgException):
 class ArchiveNotFound(ApkgException):
     msg_fmt = "%(type)s archive not found: %(ar)s"
     exit_code = 80
-
-
-class NotImplemented(ApkgException):
-    msg_fmt = "Feature not implemented: %(feature)s"
-    exit_code = 99

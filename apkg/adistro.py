@@ -3,15 +3,16 @@ distro-specific apkg helpers related to current distro
 
 current distro info isn't going to change during run so cache that
 """
-import distro
 import re
 
+import distro
 
-def distro2idver(distro):
+
+def distro2idver(distro_name):
     """
     convert generic distro string into idver format
     """
-    return re.sub(r'\s+', '-', distro.strip().lower())
+    return re.sub(r'\s+', '-', distro_name.strip().lower())
 
 
 def idver():
@@ -42,7 +43,7 @@ def fullname():
     return " ".join([p for p in parts if p])
 
 
-def id():
+def id():  # pylint: disable=redefined-builtin
     global _id
     if _id is None:
         _id = distro.id()

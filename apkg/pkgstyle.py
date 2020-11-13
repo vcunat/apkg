@@ -16,7 +16,7 @@ def iter_package_styles():
 
 def import_package_styles():
     styles = {}
-    for finder, modname, ispkg in iter_package_styles():
+    for _, modname, _ in iter_package_styles():
         _, _, name = modname.rpartition('.')
         module = importlib.import_module(modname)
         # insert package style name into module for convenience

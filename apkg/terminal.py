@@ -11,7 +11,7 @@ class NullCallableString(str):
         return arg
 
 
-class PlainTerminal(object):
+class PlainTerminal:
     """
     Mock of blessings Terminal that ignores formatting
     """

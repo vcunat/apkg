@@ -1,9 +1,9 @@
 """
 module for handling and rendering apkg package templates
 """
-import jinja2
-from pathlib import Path
 import os
+from pathlib import Path
+import jinja2
 
 from apkg import log
 from apkg import pkgstyle
@@ -20,7 +20,7 @@ class PackageTemplate:
             self.style = pkgstyle.get_package_template_style(self.path)
         return self.style
 
-    def render(self, out_path, vars):
+    def render(self, out_path, env):
         """
         render package template into specified output directory
         """
@@ -31,8 +31,8 @@ class PackageTemplate:
             os.makedirs(out_path, exist_ok=True)
 
         # recursively render all files
-        for dir, subdirs, files in os.walk(self.path):
-            rel_dir = Path(dir).relative_to(self.path)
+        for d, _, files in os.walk(self.path):
+            rel_dir = Path(d).relative_to(self.path)
             dst_dir = out_path / rel_dir
             os.makedirs(dst_dir, exist_ok=True)
 
@@ -44,4 +44,4 @@ class PackageTemplate:
                 with src.open('r') as srcf:
                     t = jinja2.Template(srcf.read())
                 with dst.open('w') as dstf:
-                    dstf.write(t.render(**vars) + '\n')
+                    dstf.write(t.render(**env) + '\n')
