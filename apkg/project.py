@@ -16,19 +16,20 @@ OUTPUT_BASE_DIR = 'pkg'
 CONFIG_FN = 'apkg.toml'
 
 
+# pylint: disable=too-many-instance-attributes
+# TODO: consider moving paths to project.path.* to address this warning
 class Project:
     """
     Project class serves as high level interface to projecs in need of
     packaging
     """
     config = {}
-    package_templates = {}
 
     path = None
     package_templates_path = None
     config_base_path = None
     config_path = None
-    archives_path = None
+    archive_path = None
     dev_archive_path = None
     upstream_archive_path = None
     build_path = None

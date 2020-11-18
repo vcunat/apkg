@@ -21,8 +21,8 @@ Options:
 #       A script for updating the __doc__ string here that is run
 #       when dev adds a new command might be a decent compromise.
 
-from docopt import docopt
 import sys
+from docopt import docopt
 
 from . import __version__
 from . import commands  # noqa: F401 (dynamic import)
@@ -132,7 +132,7 @@ def parse_global_options(cargs):
     return tuple(args), global_opts
 
 
-def setup_logging(*args, **kwargs):
+def setup_logging(**kwargs):
     log_level = 'default'
     for opt, log_level in APKG_LOG_OPTIONS.items():
         if kwargs.get(opt):

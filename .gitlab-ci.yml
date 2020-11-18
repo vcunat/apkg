@@ -2,30 +2,52 @@ variables:
   LC_ALL: C.UTF-8
 
 stages:
-  - sanity
   - test
+  - test-py35
   - deploy
 
 
-.debian: &debian
-  # TODO: consider using custom docker image for easier addition of dependencies
-  image: $CI_REGISTRY/knot/knot-resolver/ci/debian-buster:knot-3.0
-  tags:
-    - docker
-    - linux
-    - amd64
+image: $CI_REGISTRY/packaging/apkg/ci/python-current:apkg
+
 
 flake8:
-  <<: *debian
-  stage: sanity
+  stage: test
   script:
-    - python3 -m flake8 --max-line-length=100 . && echo "OK, no flake8 errors detected"
+    - tox -e flake8
 
+pylint:
+  stage: test
+  script:
+    - tox -e pylint
+
+unit:
+  stage: test
+  script:
+    - tox -e unit
+
+self:
+  stage: test
+  script:
+    - tox -e self
+
+unit-py35:
+  image: $CI_REGISTRY/packaging/apkg/ci/python-3.5:apkg
+  stage: test-py35
+  script:
+    # use py.test directly to test system packages
+    - py.test-3 tests/unit
+
+self-py35:
+  image: $CI_REGISTRY/packaging/apkg/ci/python-3.5:apkg
+  stage: test-py35
+  script:
+    # use py.test directly to test system packages
+    - py.test-3 tests/self
+
+
+# docs published to GitLab Pages: https://packaging.pages.nic.cz/apkg/
 pages:
   stage: deploy
-  image: python:3.8-buster # python required
-  before_script:
-    - pip install mkdocs
   script:
     - mkdocs build
     - mv site public

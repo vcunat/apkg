@@ -1,0 +1,21 @@
+[MESSAGES CONTROL]
+disable=
+    broad-except,
+    fixme,
+    global-statement,
+    invalid-name,
+    line-too-long,  # checked by flake8
+    missing-docstring,
+    no-else-return,
+    too-few-public-methods,
+    unused-import,  # checked by flake8
+
+
+[SIMILARITIES]
+min-similarity-lines=6
+ignore-comments=yes
+ignore-docstrings=yes
+ignore-imports=no
+
+[DESIGN]
+max-parents=10
