@@ -38,8 +38,7 @@ def make_archive(version=None, project=None):
                "(indicated by last script stdout line) doesn't exist:\n\n"
                "%s" % archive_path)
         raise exception.UnexpectedCommandOutput(msg=msg)
-    else:
-        log.info("archive created: %s" % archive_path)
+    log.info("archive created: %s" % archive_path)
 
     archive_fn = archive_path.name
     if version:
@@ -58,7 +57,7 @@ def make_archive(version=None, project=None):
 
 
 def get_archive(version=None, project=None):
-    raise exception.NotImplemented(
+    raise exception.ApkgException(
             msg="TODO: get_archive: download upstream archive")
 
 

@@ -39,7 +39,7 @@ class PackageTemplate:
 
             for fn in files:
                 dst = out_path / rel_dir / fn
-                src = Path(dir) / fn
+                src = Path(d) / fn
                 log.verbose("rendering file: %s -> %s", src, dst)
                 t = None
                 with src.open('r') as srcf:

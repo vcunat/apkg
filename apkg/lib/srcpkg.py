@@ -73,7 +73,7 @@ def make_source_package(
         shutil.rmtree(out_path)
 
     # prepare vars accessible from templates
-    vars = {
+    env = {
         'name': pkg_name,
         'version': version,
         'release': release,
@@ -86,7 +86,7 @@ def make_source_package(
         out_path,
         archive_path=ar_path,
         package_template=template,
-        vars=vars)
+        env=env)
 
     if out_path.exists():
         log.success("made source package: %s", out_path)

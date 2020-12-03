@@ -43,13 +43,14 @@ def get_package_name(path):
             msg="unable to determine Source from: %s" % control)
 
 
+# pylint: disable=too-many-locals
 def build_source_package(
         build_path,
         out_path,
         archive_path,
         package_template,
-        vars):
-    nv = "%s-%s" % (vars['name'], vars['version'])
+        env):
+    nv = "%s-%s" % (env['name'], env['version'])
     source_path = build_path / nv
     log.info("building deb source package: %s" % nv)
     log.info("unpacking archive: %s" % archive_path)
@@ -62,10 +63,10 @@ def build_source_package(
         raise exception.UnexpectedCommandOutput(msg=msg)
     # render template
     debian_path = source_path / 'debian'
-    package_template.render(debian_path, vars)
+    package_template.render(debian_path, env)
     # copy archive with debian .orig name
     _, _, _, ext = parse.split_archive_fn(archive_path.name)
-    debian_ar = "%s_%s.orig%s" % (vars['name'], vars['version'], ext)
+    debian_ar = "%s_%s.orig%s" % (env['name'], env['version'], ext)
     debian_ar_path = build_path / debian_ar
     log.info("copying archive into source package: %s", debian_ar_path)
     shutil.copyfile(py35path(archive_path), py35path(debian_ar_path))
