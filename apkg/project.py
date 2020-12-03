@@ -76,7 +76,7 @@ class Project:
     def load_config(self):
         if self.config_path.exists():
             log.verbose("loading project config: %s" % self.config_path)
-            self.config = toml.load(self.config_path)
+            self.config = toml.load(self.config_path.open())
             return True
         else:
             log.verbose("project config not found: %s" % self.config_path)
@@ -112,8 +112,8 @@ class Project:
 
 def load_package_templates(path):
     package_templates = []
-    for entry_path in os.scandir(path):
-        if entry_path.is_dir():
+    for entry_path in glob.glob('%s/*' % path):
+        if os.path.isdir(entry_path):
             template = pkgtemplate.PackageTemplate(entry_path)
             if template.package_style:
                 package_templates.append(template)

@@ -8,6 +8,7 @@ from pathlib import Path
 import re
 import shutil
 
+from apkg.compat import py35path
 from apkg import exception
 from apkg import log
 from apkg import parse
@@ -52,7 +53,7 @@ def build_source_package(
     source_path = build_path / nv
     log.info("building deb source package: %s" % nv)
     log.info("unpacking archive: %s" % archive_path)
-    os.makedirs(source_path)
+    os.makedirs(py35path(source_path))
     run('aunpack', '-X', build_path, archive_path)
     if not source_path.exists():
         # NOTE: if this happens oftern (it shouldn't), consider using
@@ -67,7 +68,7 @@ def build_source_package(
     debian_ar = "%s_%s.orig%s" % (vars['name'], vars['version'], ext)
     debian_ar_path = build_path / debian_ar
     log.info("copying archive into source package: %s", debian_ar_path)
-    shutil.copyfile(archive_path, debian_ar_path)
+    shutil.copyfile(py35path(archive_path), py35path(debian_ar_path))
 
     log.info("building deb source-only package...")
     direct = bool(log.log.level <= log.INFO)
@@ -75,11 +76,11 @@ def build_source_package(
         run('dpkg-buildpackage', '-S', '-d', '-nc', '-sa', direct=direct)
 
     log.info("copying source package to result dir: %s", out_path)
-    os.makedirs(out_path)
+    os.makedirs(py35path(out_path))
     for f in glob.iglob("%s/*" % build_path):
         src = Path(f)
         if not src.is_file():
             continue
         dst = out_path / src.relative_to(build_path)
         log.verbose("copying file to result dir: %s", dst)
-        shutil.copyfile(src, dst)
+        shutil.copyfile(py35path(src), py35path(dst))

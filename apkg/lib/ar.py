@@ -7,6 +7,7 @@ import shutil
 
 from apkg import exception
 from apkg import log
+from apkg.compat import py35path
 from apkg.parse import split_archive_fn
 from apkg.project import Project
 from apkg.util.run import run
@@ -50,8 +51,8 @@ def make_archive(version=None, project=None):
             log.info(msg, archive_fn)
     out_path = proj.dev_archive_path / archive_fn
     log.info("copying archive to: %s" % out_path)
-    os.makedirs(proj.dev_archive_path, exist_ok=True)
-    shutil.copy(archive_path, out_path)
+    os.makedirs(py35path(proj.dev_archive_path), exist_ok=True)
+    shutil.copy(py35path(archive_path), py35path(out_path))
     log.success("made archive: %s", out_path)
     return out_path
 
