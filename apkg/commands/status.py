@@ -11,7 +11,7 @@ from apkg import log
 from apkg.project import Project
 
 
-def run_command(cargs):
+def run_command(_):
     print_status()
 
 

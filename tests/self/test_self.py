@@ -19,7 +19,7 @@ def test_apkg_archive(tmpdir, capsys):
     assert repo_dir.endswith('apkg')
     with cd(repo_dir):
         apkg('make-archive')
-    out, err = capsys.readouterr()
+    out, _ = capsys.readouterr()
     # last stdout line should be resulting archive
     assert re.search(r"pkg/archives/dev/apkg-.*\.tar\.gz$", out)
 
@@ -30,6 +30,6 @@ def test_apkg_srcpkg(tmpdir, capsys):
     assert repo_dir.endswith('apkg')
     with cd(repo_dir):
         apkg('srcpkg')
-    out, err = capsys.readouterr()
+    out, _ = capsys.readouterr()
     # last stdout line should be resulting source package
     assert re.search(r"pkg/srcpkgs/\S+/apkg-\S+$", out)

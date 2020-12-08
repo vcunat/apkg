@@ -93,7 +93,7 @@ def get_archive_version(archive_path, version=None):
     if version is specified, ensure it matches archive version
     """
     archive_path = Path(archive_path)
-    name, sep, ver, ext = split_archive_fn(archive_path.name)
+    _, _, ver, _ = split_archive_fn(archive_path.name)
     if version:
         # optional version check requested
         if ver == version:
