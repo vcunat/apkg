@@ -1,3 +1,7 @@
 [project]
+# optional - is guessed from project dir name by default
+name = "apkg"
+# needed for make-archive
 make_archive_script = "scripts/make-dev-archive.sh"
-upstream_archive_url = "https://some.place"
+# needed for get-archive
+upstream_archive_url = "https://gitlab.nic.cz/packaging/{{ project.name }}/-/archive/v{{ version }}/{{ project.name }}-v{{ version }}.tar.gz"

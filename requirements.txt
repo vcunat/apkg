@@ -4,4 +4,5 @@ distro
 cached_property # for python <= 3.7
 jinja2
 pbr
+requests
 toml

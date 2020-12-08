@@ -8,7 +8,7 @@ Usage: apkg <command> [<args>...]
 Commands:
   status                      show status of current project
   make-archive                create dev archive from current project state
-  get-archive           TODO: download upstream source archive
+  get-archive                 download upstream source archive
   srcpkg                      create source package (files to build package from)
   build                 TODO: build package
 
