@@ -35,6 +35,7 @@ unit-py35:
   stage: test-py35
   script:
     # use py.test directly to test system packages
+    - python3 setup.py develop --user
     - py.test-3 tests/unit
 
 self-py35:
@@ -42,6 +43,7 @@ self-py35:
   stage: test-py35
   script:
     # use py.test directly to test system packages
+    - python3 setup.py develop --user
     - py.test-3 tests/self
 
 

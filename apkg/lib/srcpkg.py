@@ -5,6 +5,7 @@ import os
 import shutil
 
 from apkg import adistro
+from apkg.compat import py35path
 from apkg import exception
 from apkg import log
 from apkg.project import Project
@@ -65,14 +66,14 @@ def make_source_package(
     if build_path.exists():
         log.info("removing existing build dir: %s" % build_path)
         shutil.rmtree(build_path)
-    os.makedirs(build_path, exist_ok=True)
+    os.makedirs(py35path(build_path), exist_ok=True)
     # ensure output dir doesn't exist
     if out_path.exists():
         log.info("removing existing result dir: %s" % out_path)
         shutil.rmtree(out_path)
 
     # prepare vars accessible from templates
-    vars = {
+    env = {
         'name': pkg_name,
         'version': version,
         'release': release,
@@ -85,7 +86,7 @@ def make_source_package(
         out_path,
         archive_path=ar_path,
         package_template=template,
-        vars=vars)
+        env=env)
 
     if out_path.exists():
         log.success("made source package: %s", out_path)

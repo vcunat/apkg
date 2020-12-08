@@ -3,6 +3,7 @@ from contextlib import contextmanager
 import os
 import subprocess
 
+from apkg.compat import py35path
 from apkg import exception
 from apkg import log
 
@@ -102,7 +103,7 @@ def cd(newdir):
     Temporarily change current directory.
     """
     olddir = os.getcwd()
-    os.chdir(os.path.expanduser(newdir))
+    os.chdir(os.path.expanduser(py35path(newdir)))
     try:
         yield
     finally:

@@ -39,10 +39,10 @@ def build_source_package(
         out_path,
         archive_path,
         package_template,
-        vars):
+        env):
     in_pkgbuild = build_path / 'PKGBUILD'
     log.info("building arch source package: %s" % in_pkgbuild)
-    package_template.render(build_path, vars or {})
+    package_template.render(build_path, env or {})
     os.makedirs(out_path)
     log.info("copying PKGBUILD and archive to: %s" % out_path)
     shutil.copyfile(in_pkgbuild, out_path / 'PKGBUILD')
