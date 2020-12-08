@@ -9,7 +9,7 @@ Commands:
   status                      show status of current project
   make-archive                create dev archive from current project state
   get-archive           TODO: download upstream source archive
-  make-source-package         create source package (files to build package from)
+  srcpkg                      create source package (files to build package from)
   build                 TODO: build package
 
 Options:
