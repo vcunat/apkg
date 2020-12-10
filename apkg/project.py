@@ -54,7 +54,7 @@ class Project:
         self.name = self.config.get('project', {}).get('name')
         if self.name:
             log.verbose("project name from config: %s" % self.name)
-        if not self.name:
+        else:
             self.name = self.path.resolve().name
             log.verbose("project name not in config - "
                         "guessing from path: %s", self.name)
