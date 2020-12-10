@@ -93,6 +93,27 @@ def get_archive(version=None, project=None):
     os.makedirs(py35path(proj.upstream_archive_path), exist_ok=True)
     archive_path.open('wb').write(r.content)
     log.success('downloaded archive: %s', archive_path)
+
+    try:
+        upstream_signature_url = \
+                proj.config['project']['upstream_signature_url']
+    except KeyError:
+        log.verbose("project.upstream_signature_url not set"
+                    " - skipping signature download")
+        return archive_path
+    signature_t = jinja2.Template(upstream_signature_url)
+    signature_url = signature_t.render(**env)
+    log.info('downloading signature: %s', signature_url)
+    r = requests.get(signature_url, allow_redirects=True)
+    if not r.ok:
+        raise exception.FileDownloadFailed(
+                code=r.status_code, url=signature_url)
+    _, _, signature_name = signature_url.rpartition('/')
+    signature_path = proj.upstream_archive_path / signature_name
+    log.info('saving signature to: %s', signature_path)
+    signature_path.open('wb').write(r.content)
+    log.success('downloaded signature: %s', signature_path)
+
     return archive_path
 
 
