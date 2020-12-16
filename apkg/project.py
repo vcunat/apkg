@@ -25,6 +25,7 @@ class Project:
     """
     config = {}
 
+    name = None
     path = None
     package_templates_path = None
     config_base_path = None
@@ -46,7 +47,19 @@ class Project:
         if autoload:
             self.load()
 
-    def construct_paths(self):
+    def update_attrs(self):
+        """
+        update project attributes based on current config
+        """
+        self.name = self.config.get('project', {}).get('name')
+        if self.name:
+            log.verbose("project name from config: %s" % self.name)
+        else:
+            self.name = self.path.resolve().name
+            log.verbose("project name not in config - "
+                        "guessing from path: %s", self.name)
+
+    def update_paths(self):
         """
         fill in projects paths based on current self.path and self.config
         """
@@ -71,7 +84,8 @@ class Project:
         self.config_base_path = self.path / INPUT_BASE_DIR / 'config'
         self.config_path = self.config_base_path / CONFIG_FN
         self.load_config()
-        self.construct_paths()
+        self.update_attrs()
+        self.update_paths()
 
     def load_config(self):
         if self.config_path.exists():

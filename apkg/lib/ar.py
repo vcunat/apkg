@@ -4,6 +4,8 @@ apkg lib for handling source archives
 import os
 from pathlib import Path
 import shutil
+import jinja2
+import requests
 
 from apkg import exception
 from apkg import log
@@ -57,8 +59,62 @@ def make_archive(version=None, project=None):
 
 
 def get_archive(version=None, project=None):
-    raise exception.ApkgException(
-            msg="TODO: get_archive: download upstream archive")
+    """
+    download archive for current project
+    """
+    if not version:
+        raise exception.ApkgException(
+            "TODO: automatic latest version detection\n\n"
+            "For now please select using --version/-v.")
+    proj = project or Project()
+    try:
+        upstream_archive_url = proj.config['project']['upstream_archive_url']
+    except KeyError:
+        msg = ("get-archive requires project.upstream_archive_url option to\n"
+               "be set in project config:\n\n"
+               "%s" % proj.config_path)
+        raise exception.MissingRequiredConfigOption(msg=msg)
+
+    # variables available during templating
+    env = {
+        'project': proj,
+        'version': version,
+    }
+
+    archive_t = jinja2.Template(upstream_archive_url)
+    archive_url = archive_t.render(**env)
+    log.info('downloading archive: %s', archive_url)
+    r = requests.get(archive_url, allow_redirects=True)
+    if not r.ok:
+        raise exception.FileDownloadFailed(code=r.status_code, url=archive_url)
+    _, _, archive_name = archive_url.rpartition('/')
+    archive_path = proj.upstream_archive_path / archive_name
+    log.info('saving archive to: %s', archive_path)
+    os.makedirs(py35path(proj.upstream_archive_path), exist_ok=True)
+    archive_path.open('wb').write(r.content)
+    log.success('downloaded archive: %s', archive_path)
+
+    try:
+        upstream_signature_url = \
+                proj.config['project']['upstream_signature_url']
+    except KeyError:
+        log.verbose("project.upstream_signature_url not set"
+                    " - skipping signature download")
+        return archive_path
+    signature_t = jinja2.Template(upstream_signature_url)
+    signature_url = signature_t.render(**env)
+    log.info('downloading signature: %s', signature_url)
+    r = requests.get(signature_url, allow_redirects=True)
+    if not r.ok:
+        raise exception.FileDownloadFailed(
+                code=r.status_code, url=signature_url)
+    _, _, signature_name = signature_url.rpartition('/')
+    signature_path = proj.upstream_archive_path / signature_name
+    log.info('saving signature to: %s', signature_path)
+    signature_path.open('wb').write(r.content)
+    log.success('downloaded signature: %s', signature_path)
+
+    return archive_path
 
 
 def find_archive(archive, upstream=False, project=None):
@@ -93,7 +149,7 @@ def get_archive_version(archive_path, version=None):
     if version is specified, ensure it matches archive version
     """
     archive_path = Path(archive_path)
-    name, sep, ver, ext = split_archive_fn(archive_path.name)
+    _, _, ver, _ = split_archive_fn(archive_path.name)
     if version:
         # optional version check requested
         if ver == version:

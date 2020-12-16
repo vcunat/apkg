@@ -71,6 +71,11 @@ class HTTPRequestFailed(ApkgException):
     exit_code = 54
 
 
+class FileDownloadFailed(ApkgException):
+    msg_fmt = "Failed to download file with code %(code)s:\n%(url)s"
+    exit_code = 56
+
+
 class CommandNotFound(ApkgException):
     msg_fmt = "Command not found: %(cmd)s"
     exit_code = 60

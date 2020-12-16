@@ -8,8 +8,8 @@ Usage: apkg <command> [<args>...]
 Commands:
   status                      show status of current project
   make-archive                create dev archive from current project state
-  get-archive           TODO: download upstream source archive
-  make-source-package         create source package (files to build package from)
+  get-archive                 download upstream source archive
+  srcpkg                      create source package (files to build package from)
   build                 TODO: build package
 
 Options:
@@ -24,10 +24,10 @@ Options:
 import sys
 from docopt import docopt
 
-from . import __version__
-from . import commands  # noqa: F401 (dynamic import)
-from . import exception
-from . import log
+from apkg import __version__
+from apkg import commands  # noqa: F401 (dynamic import)
+from apkg import exception
+from apkg import log
 
 
 def apkg(*cargs):

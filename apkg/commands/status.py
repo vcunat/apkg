@@ -11,13 +11,15 @@ from apkg import log
 from apkg.project import Project
 
 
-def run_command(cargs):
+def run_command(_):
     print_status()
 
 
 def print_status():
     proj = Project()
 
+    msg = "project name:            {t.bold}{name}{t.normal}"
+    print(msg.format(name=proj.name, t=log.T))
     msg = "project base path:       {t.bold}{path}{t.normal}"
     print(msg.format(path=proj.path.resolve(), t=log.T))
 

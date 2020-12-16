@@ -30,6 +30,11 @@ self:
   script:
     - tox -e self
 
+integration:
+  stage: test
+  script:
+    - tox -e integration
+
 unit-py35:
   image: $CI_REGISTRY/packaging/apkg/ci/python-3.5:apkg
   stage: test-py35
