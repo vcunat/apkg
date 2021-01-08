@@ -21,5 +21,6 @@ RUN apt-get install -y -qqq dpkg-dev dh-python
 RUN apt-get install -y -qqq tox python3-pytest python3-pytest-sugar python3-pytest-cov
 # linting deps
 RUN apt-get install -y -qqq python3-flake8 pylint3
-# documentation dependecies
-RUN apt-get install -y -qqq mkdocs
+# doc deps
+RUN apt-get install -y -qqq python3-pip
+RUN pip3 install mkdocs
