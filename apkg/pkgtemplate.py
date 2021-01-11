@@ -7,7 +7,7 @@ import jinja2
 
 from apkg.compat import py35path
 from apkg import log
-from apkg import pkgstyle
+from apkg import pkgstyle as _pkgstyle
 
 
 class PackageTemplate:
@@ -16,9 +16,9 @@ class PackageTemplate:
         self.style = style
 
     @property
-    def package_style(self):
+    def pkgstyle(self):
         if not self.style:
-            self.style = pkgstyle.get_package_style_for_template(self.path)
+            self.style = _pkgstyle.get_pkgstyle_for_template(self.path)
         return self.style
 
     def render(self, out_path, env):

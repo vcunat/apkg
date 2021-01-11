@@ -107,7 +107,7 @@ class Project:
         # NOTE: this is very simplistic, more complex mechanism TBD
         ldistro = distro.lower()
         for t in self.templates:
-            ps = t.package_style
+            ps = t.pkgstyle
             for d in ps.SUPPORTED_DISTROS:
                 if d in ldistro:
                     return t
@@ -129,7 +129,7 @@ def load_templates(path):
     for entry_path in glob.glob('%s/*' % path):
         if os.path.isdir(entry_path):
             template = pkgtemplate.PackageTemplate(entry_path)
-            if template.package_style:
+            if template.pkgstyle:
                 templates.append(template)
             else:
                 log.warn("ignoring unknown package style in %s", entry_path)

@@ -48,7 +48,7 @@ def make_srcpkg(
         msg = ("missing package template for distro: %s\n\n"
                "you can add it into: %s" % (distro, tdir))
         raise exception.MissingPackagingTemplate(msg=msg)
-    ps = template.package_style
+    ps = template.pkgstyle
     log.info("package style: %s", ps.name)
     log.info("package template: %s", template.path)
     log.info("package archive: %s", ar_path)
@@ -81,7 +81,7 @@ def make_srcpkg(
         'distro': distro,
     }
     # create source package using desired package style
-    template.package_style.build_srcpkg(
+    template.pkgstyle.build_srcpkg(
         build_path,
         out_path,
         archive_path=ar_path,

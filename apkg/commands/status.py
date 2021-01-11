@@ -43,7 +43,7 @@ def print_status():
         for template in proj.templates:
             short_path = os.path.join(*list(template.path.parts)[-3:])
             msg_lines.append("    {t.green}%s{t.normal}: {t.bold}%s{t.normal}"
-                             % (template.package_style.name, short_path))
+                             % (template.pkgstyle.name, short_path))
         msg = "\n".join(msg_lines)
     else:
         msg = "    {t.red}no package templates found{t.normal}"
@@ -57,7 +57,7 @@ def print_status():
     template = proj.get_template_for_distro(adistro.idver())
     msg = "    package style: "
     if template:
-        style = template.package_style.name
+        style = template.pkgstyle.name
         msg += "{t.green}%s{t.normal}" % style
     else:
         msg += "{t.warn}unsupported{t.normal}"
