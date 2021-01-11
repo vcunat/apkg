@@ -42,9 +42,9 @@ def make_srcpkg(
     log.info("target distro: %s" % distro)
 
     # fetch correct package template
-    template = proj.get_package_template_for_distro(distro)
+    template = proj.get_template_for_distro(distro)
     if not template:
-        tdir = proj.package_templates_path
+        tdir = proj.templates_path
         msg = ("missing package template for distro: %s\n\n"
                "you can add it into: %s" % (distro, tdir))
         raise exception.MissingPackagingTemplate(msg=msg)
@@ -85,7 +85,7 @@ def make_srcpkg(
         build_path,
         out_path,
         archive_path=ar_path,
-        package_template=template,
+        template=template,
         env=env)
 
     if out_path.exists():

@@ -26,7 +26,7 @@ SUPPORTED_DISTROS = [
 RE_PKG_NAME = r'Source:\s*(\S+)'
 
 
-def is_valid_package_template(path):
+def is_valid_template(path):
     deb_files = ['rules', 'control', 'changelog']
     return all((path / f).exists() for f in deb_files)
 
@@ -48,7 +48,7 @@ def build_srcpkg(
         build_path,
         out_path,
         archive_path,
-        package_template,
+        template,
         env):
     nv = "%s-%s" % (env['name'], env['version'])
     source_path = build_path / nv
@@ -63,7 +63,7 @@ def build_srcpkg(
         raise exception.UnexpectedCommandOutput(msg=msg)
     # render template
     debian_path = source_path / 'debian'
-    package_template.render(debian_path, env)
+    template.render(debian_path, env)
     # copy archive with debian .orig name
     _, _, _, ext = parse.split_archive_fn(archive_path.name)
     debian_ar = "%s_%s.orig%s" % (env['name'], env['version'], ext)

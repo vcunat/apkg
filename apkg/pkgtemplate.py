@@ -11,14 +11,14 @@ from apkg import pkgstyle
 
 
 class PackageTemplate:
-    def __init__(self, path, package_style=None):
+    def __init__(self, path, style=None):
         self.path = Path(path)
-        self.style = package_style
+        self.style = style
 
     @property
     def package_style(self):
         if not self.style:
-            self.style = pkgstyle.get_package_template_style(self.path)
+            self.style = pkgstyle.get_package_style_for_template(self.path)
         return self.style
 
     def render(self, out_path, env):

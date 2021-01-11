@@ -25,9 +25,9 @@ def import_package_styles():
     return styles
 
 
-def get_package_template_style(path):
+def get_package_style_for_template(path):
     for style in PACKAGE_STYLES.values():
-        if style.is_valid_package_template(path):
+        if style.is_valid_template(path):
             return style
     return None
 

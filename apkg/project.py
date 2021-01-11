@@ -27,7 +27,7 @@ class Project:
 
     name = None
     path = None
-    package_templates_path = None
+    templates_path = None
     config_base_path = None
     config_path = None
     archive_path = None
@@ -64,7 +64,7 @@ class Project:
         fill in projects paths based on current self.path and self.config
         """
         # package templates: distro/pkg
-        self.package_templates_path = self.path / INPUT_BASE_DIR / 'pkg'
+        self.templates_path = self.path / INPUT_BASE_DIR / 'pkg'
         # archives: pkg/archives
         self.archive_path = self.path / OUTPUT_BASE_DIR / 'archives'
         self.dev_archive_path = self.archive_path / 'dev'
@@ -97,16 +97,16 @@ class Project:
             return False
 
     @cached_property
-    def package_templates(self):
-        if self.package_templates_path.exists():
-            return load_package_templates(self.package_templates_path)
+    def templates(self):
+        if self.templates_path.exists():
+            return load_templates(self.templates_path)
         else:
             return []
 
-    def get_package_template_for_distro(self, distro):
+    def get_template_for_distro(self, distro):
         # NOTE: this is very simplistic, more complex mechanism TBD
         ldistro = distro.lower()
-        for t in self.package_templates:
+        for t in self.templates:
             ps = t.package_style
             for d in ps.SUPPORTED_DISTROS:
                 if d in ldistro:
@@ -124,13 +124,13 @@ class Project:
         return glob.glob("%s/%s*" % (ar_path, name))
 
 
-def load_package_templates(path):
-    package_templates = []
+def load_templates(path):
+    templates = []
     for entry_path in glob.glob('%s/*' % path):
         if os.path.isdir(entry_path):
             template = pkgtemplate.PackageTemplate(entry_path)
             if template.package_style:
-                package_templates.append(template)
+                templates.append(template)
             else:
                 log.warn("ignoring unknown package style in %s", entry_path)
-    return package_templates
+    return templates
