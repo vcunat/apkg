@@ -35,9 +35,9 @@ class Project:
     upstream_archive_path = None
     build_path = None
     package_build_path = None
-    source_package_build_path = None
+    srcpkg_build_path = None
     package_out_path = None
-    source_package_out_path = None
+    srcpkg_out_path = None
 
     def __init__(self, path=None, autoload=True):
         if path:
@@ -72,10 +72,10 @@ class Project:
         # build: pkg/build
         self.build_path = self.path / OUTPUT_BASE_DIR / 'build'
         self.package_build_path = self.build_path / 'pkgs'
-        self.source_package_build_path = self.build_path / 'srcpkgs'
+        self.srcpkg_build_path = self.build_path / 'srcpkgs'
         # output: pkg/{src-,}package
         self.package_out_path = self.path / OUTPUT_BASE_DIR / 'pkgs'
-        self.source_package_out_path = self.path / OUTPUT_BASE_DIR / 'srcpkgs'
+        self.srcpkg_out_path = self.path / OUTPUT_BASE_DIR / 'srcpkgs'
 
     def load(self):
         """

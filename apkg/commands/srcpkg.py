@@ -20,7 +20,7 @@ from apkg.lib import srcpkg
 
 def run_command(cargs):
     args = docopt(__doc__, argv=cargs)
-    out_srcpkg = srcpkg.make_source_package(
+    out_srcpkg = srcpkg.make_srcpkg(
             upstream=args['--upstream'],
             archive=args['--archive'],
             version=args['--version'],

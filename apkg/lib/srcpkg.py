@@ -12,7 +12,7 @@ from apkg.project import Project
 from apkg.lib import ar
 
 
-def make_source_package(
+def make_srcpkg(
         archive=None, version=None, release=None,
         distro=None, upstream=False):
     log.verbose('creating source package')
@@ -56,8 +56,8 @@ def make_source_package(
     # get needed paths
     pkg_name = ps.get_package_name(template.path)
     nvr = "%s-%s-%s" % (pkg_name, version, release)
-    build_path = proj.source_package_build_path / distro / nvr
-    out_path = proj.source_package_out_path / distro / nvr
+    build_path = proj.srcpkg_build_path / distro / nvr
+    out_path = proj.srcpkg_out_path / distro / nvr
     log.info("package name: %s", nvr)
     log.info("build dir: %s", build_path)
     log.info("result dir: %s", out_path)
@@ -81,7 +81,7 @@ def make_source_package(
         'distro': distro,
     }
     # create source package using desired package style
-    template.package_style.build_source_package(
+    template.package_style.build_srcpkg(
         build_path,
         out_path,
         archive_path=ar_path,

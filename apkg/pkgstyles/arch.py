@@ -34,7 +34,7 @@ def get_package_name(path):
             msg="unable to determine pkgname from: %s" % pkgbuild)
 
 
-def build_source_package(
+def build_srcpkg(
         build_path,
         out_path,
         archive_path,
