@@ -19,6 +19,7 @@ def make_archive(version=None, project=None):
     """
     create archive from current project state
     """
+    log.bold("creating dev archive")
     proj = project or Project()
     try:
         script = proj.config['project']['make_archive_script']

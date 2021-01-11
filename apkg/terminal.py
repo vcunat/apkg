@@ -25,7 +25,10 @@ class PlainTerminal:
 COLOR_TERMINAL = False
 try:
     import blessings
-    COLOR_TERMINAL = True
+    # this can throw _curses.error: setupterm: could not find terminal
+    # better find out now
+    blessings.Terminal()
     Terminal = blessings.Terminal
-except ImportError:
+    COLOR_TERMINAL = True
+except Exception:
     Terminal = PlainTerminal

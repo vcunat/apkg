@@ -65,15 +65,15 @@ class Project:
         """
         # package templates: distro/pkg
         self.templates_path = self.path / INPUT_BASE_DIR / 'pkg'
-        # archives: pkg/archives
+        # archives: pkg/archives/{dev,upstream}
         self.archive_path = self.path / OUTPUT_BASE_DIR / 'archives'
         self.dev_archive_path = self.archive_path / 'dev'
         self.upstream_archive_path = self.archive_path / 'upstream'
-        # build: pkg/build
+        # build: pkg/build/{src-,}pkg
         self.build_path = self.path / OUTPUT_BASE_DIR / 'build'
         self.package_build_path = self.build_path / 'pkgs'
         self.srcpkg_build_path = self.build_path / 'srcpkgs'
-        # output: pkg/{src-,}package
+        # output: pkg/{src-,}pkg
         self.package_out_path = self.path / OUTPUT_BASE_DIR / 'pkgs'
         self.srcpkg_out_path = self.path / OUTPUT_BASE_DIR / 'srcpkgs'
 

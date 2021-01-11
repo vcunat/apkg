@@ -1,12 +1,15 @@
 """
 This is 'arch' apkg package style for Arch linux
 """
+import glob
+from pathlib import Path
 import os
-import re
 import shutil
 
 from apkg import exception
 from apkg import log
+from apkg.compat import py35path
+from apkg.util.run import cd, run
 
 
 SUPPORTED_DISTROS = [
@@ -22,16 +25,17 @@ def is_valid_template(path):
     return pkgbuild.exists()
 
 
-def get_package_name(path):
-    pkgbuild = path / "PKGBUILD"
+def get_template_name(path):
+    return _parse_pkgbuild(path / 'PKGBUILD', '$pkgname')
 
-    for line in pkgbuild.open():
-        m = re.match(RE_PKG_NAME, line)
-        if m:
-            return m.group(1)
 
-    raise exception.ParsingFailed(
-            msg="unable to determine pkgname from: %s" % pkgbuild)
+def get_srcpkg_nvr(path):
+    return _parse_pkgbuild(path, '$pkgname-$pkgver-$pkgrel')
+
+
+def _parse_pkgbuild(pkgbuild, bash):
+    return run('bash', '-c', '. "%s" && echo "%s"'
+               % (pkgbuild, bash), log_cmd=False)
 
 
 def build_srcpkg(
@@ -41,9 +45,36 @@ def build_srcpkg(
         template,
         env):
     in_pkgbuild = build_path / 'PKGBUILD'
+    out_pkgbuild = out_path / 'PKGBUILD'
     log.info("building arch source package: %s" % in_pkgbuild)
     template.render(build_path, env or {})
     os.makedirs(out_path)
     log.info("copying PKGBUILD and archive to: %s" % out_path)
-    shutil.copyfile(in_pkgbuild, out_path / 'PKGBUILD')
+    shutil.copyfile(in_pkgbuild, out_pkgbuild)
     shutil.copyfile(archive_path, out_path / archive_path.name)
+    return out_pkgbuild
+
+
+def build_packages(
+        build_path,
+        out_path,
+        srcpkg_path):
+    if srcpkg_path.name != 'PKGBUILD':
+        raise exception.InvalidSourcePackageFormat(
+            fmt='arch source package format is PKGBUILD but got: %s'
+            % srcpkg_path.name)
+    log.info("copying source package to build dir: %s" % build_path)
+    shutil.copytree(py35path(srcpkg_path.parent), py35path(build_path))
+    # build package using makepkg
+    with cd(build_path):
+        run('makepkg', direct=True)
+    log.info("copying built packages to result dir: %s" % out_path)
+    os.makedirs(py35path(out_path), exist_ok=True)
+    pkgs = []
+    # find and copy resulting packages
+    for src_pkg in glob.iglob('%s/*.zst' % build_path):
+        dst_pkg = out_path / Path(src_pkg).name
+        shutil.copyfile(py35path(src_pkg), py35path(dst_pkg))
+        pkgs.append(dst_pkg)
+
+    return pkgs

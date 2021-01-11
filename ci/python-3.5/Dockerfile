@@ -16,6 +16,6 @@ RUN apt-get install -y -qqq python3-pbr python3-jinja2 python3-docopt python3-bl
 # non-python deps
 RUN apt-get install -y -qqq git atool
 # packaging deps
-RUN apt-get install -y -qqq dpkg-dev dh-python
+RUN apt-get install -y -qqq dpkg-dev debhelper dh-python python3-all
 # testing deps
 RUN apt-get install -y -qqq tox python3-pytest python3-pytest-cov

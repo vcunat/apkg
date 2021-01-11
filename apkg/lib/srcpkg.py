@@ -15,7 +15,7 @@ from apkg.lib import ar
 def make_srcpkg(
         archive=None, version=None, release=None,
         distro=None, upstream=False):
-    log.verbose('creating source package')
+    log.bold('creating source package')
 
     proj = Project()
     if not release:
@@ -54,18 +54,18 @@ def make_srcpkg(
     log.info("package archive: %s", ar_path)
 
     # get needed paths
-    pkg_name = ps.get_package_name(template.path)
+    pkg_name = ps.get_template_name(template.path)
     nvr = "%s-%s-%s" % (pkg_name, version, release)
     build_path = proj.srcpkg_build_path / distro / nvr
     out_path = proj.srcpkg_out_path / distro / nvr
-    log.info("package name: %s", nvr)
+    log.info("package NVR: %s", nvr)
     log.info("build dir: %s", build_path)
     log.info("result dir: %s", out_path)
 
     # prepare new build dir
     if build_path.exists():
         log.info("removing existing build dir: %s" % build_path)
-        shutil.rmtree(build_path)
+        shutil.rmtree(py35path(build_path))
     os.makedirs(py35path(build_path), exist_ok=True)
     # ensure output dir doesn't exist
     if out_path.exists():
@@ -81,17 +81,17 @@ def make_srcpkg(
         'distro': distro,
     }
     # create source package using desired package style
-    template.pkgstyle.build_srcpkg(
+    srcpkg_path = template.pkgstyle.build_srcpkg(
         build_path,
         out_path,
         archive_path=ar_path,
         template=template,
         env=env)
 
-    if out_path.exists():
-        log.success("made source package: %s", out_path)
+    if srcpkg_path.exists():
+        log.success("made source package: %s", srcpkg_path)
     else:
         msg = ("source package build reported success but there are "
-               "no results:\n\n%s" % out_path)
+               "no results:\n\n%s" % srcpkg_path)
         raise exception.UnexpectedCommandOutput(msg=msg)
-    return out_path
+    return srcpkg_path

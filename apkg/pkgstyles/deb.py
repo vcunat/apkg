@@ -31,7 +31,7 @@ def is_valid_template(path):
     return all((path / f).exists() for f in deb_files)
 
 
-def get_package_name(path):
+def get_template_name(path):
     control = path / 'control'
 
     for line in control.open():
@@ -41,6 +41,18 @@ def get_package_name(path):
 
     raise exception.ParsingFailed(
             msg="unable to determine Source from: %s" % control)
+
+
+def get_srcpkg_nvr(path):
+    nvr, _, _ = str(path.name).rpartition('.')
+    return nvr
+
+
+def _copy_srcpkg_files(src_path, dst_path):
+    for pattern in ['*.dsc', '*.debian.tar.*', '*.orig.tar.*']:
+        for f in glob.iglob('%s/%s' % (src_path, pattern)):
+            srcp = Path(f)
+            shutil.copyfile(py35path(f), py35path(dst_path / srcp.name))
 
 
 # pylint: disable=too-many-locals
@@ -74,14 +86,94 @@ def build_srcpkg(
     log.info("building deb source-only package...")
     direct = bool(log.log.level <= log.INFO)
     with cd(source_path):
-        run('dpkg-buildpackage', '-S', '-d', '-nc', '-sa', direct=direct)
+        run('dpkg-buildpackage',
+            '-S',   # source-only, no binary files
+            '-sa',  # source includes orig, always
+            '-d',   # do not check build dependencies and conflicts
+            '-nc',  # do not pre clean source tree
+            '-us',  # unsigned source package.
+            '-uc',  # unsigned .changes file.
+            direct=direct)
 
     log.info("copying source package to result dir: %s", out_path)
     os.makedirs(py35path(out_path))
-    for f in glob.iglob("%s/*" % build_path):
-        src = Path(f)
-        if not src.is_file():
-            continue
-        dst = out_path / src.relative_to(build_path)
-        log.verbose("copying file to result dir: %s", dst)
-        shutil.copyfile(py35path(src), py35path(dst))
+    _copy_srcpkg_files(build_path, out_path)
+    try:
+        return Path(glob.glob('%s/*.dsc' % out_path)[0])
+    except KeyError:
+        raise exception.UnexpectedCommandOutput(
+            msg="no *.dsc found after moving built source package")
+
+
+def build_packages(
+        build_path,
+        out_path,
+        srcpkg_path,
+        **kwargs):
+    os.makedirs(py35path(build_path))
+    os.makedirs(py35path(out_path))
+    isolated = kwargs.get('isolated')
+    if isolated:
+        log.info("starting isolated build using pbuilder")
+        # TODO: ensure pbuilder's base image exists (pbuilder create)
+        run('sudo', '-E',  # preserve env including DEB_BUILD_OPTIONS
+            'pbuilder', 'build',
+            '--buildresult', build_path,
+            srcpkg_path,
+            direct=True)
+    else:
+        log.info("preparing direct build using dpkg-buildpackage")
+        nvr, _ = os.path.splitext(py35path(srcpkg_path.name))
+        nv, _, _ = nvr.rpartition('-')
+        # find orig source archive
+        try:
+            orig_glob = '%s/%s.orig.*' % (srcpkg_path.parent, nv)
+            orig_ar = Path(glob.glob(orig_glob)[0])
+        except IndexError:
+            msg = "orig source archive not found in source package: %s"
+            raise exception.UnexpectedCommandOutput(msg=msg % orig_glob)
+        # find debian source archive
+        try:
+            debian_glob = '%s/%s.debian.*' % (srcpkg_path.parent, nvr)
+            debian_ar = Path(glob.glob(debian_glob)[0])
+        except IndexError:
+            msg = "debian source archive not found in source package: %s"
+            raise exception.UnexpectedCommandOutput(msg % debian_glob)
+
+        log.info("unpacking source package for build")
+        # copy archives
+        shutil.copyfile(py35path(orig_ar),
+                        py35path(build_path / orig_ar.name))
+        shutil.copyfile(py35path(debian_ar),
+                        py35path(build_path / debian_ar.name))
+        # unpack source dir
+        run('aunpack', '-X', build_path, orig_ar, log_cmd=False)
+        # find unpacked source dir
+        try:
+            source_glob = '%s/*/' % build_path
+            source_path = Path(glob.glob(source_glob)[0])
+        except IndexError:
+            msg = "failed to find unpacked source dir: %s"
+            raise exception.UnexpectedCommandOutput(msg % source_glob)
+        # unpack debian/ into source dir
+        run('aunpack', '-X', source_path, debian_ar, log_cmd=False)
+        # copy .dsc
+        shutil.copyfile(py35path(srcpkg_path),
+                        py35path(out_path / srcpkg_path.name))
+
+        log.info("starting direct build using dpkg-buildpackage")
+        with cd(source_path):
+            # build
+            run('dpkg-buildpackage',
+                '-us',  # unsigned source package.
+                '-uc',  # unsigned .changes file.
+                direct=True)
+
+    pkgs = []
+    log.info("copying built packages to result dir: %s" % out_path)
+    for src_pkg in glob.iglob('%s/*.deb' % build_path):
+        dst_pkg = out_path / Path(src_pkg).name
+        shutil.copyfile(py35path(src_pkg), py35path(dst_pkg))
+        pkgs.append(dst_pkg)
+
+    return pkgs
