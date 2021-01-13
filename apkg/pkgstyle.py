@@ -8,15 +8,15 @@ import pkgutil
 import apkg.pkgstyles
 
 
-def iter_package_styles():
+def iter_pkgstyles():
     return pkgutil.iter_modules(
             apkg.pkgstyles.__path__,
             apkg.pkgstyles.__name__ + ".")
 
 
-def import_package_styles():
+def import_pkgstyles():
     styles = {}
-    for _, modname, _ in iter_package_styles():
+    for _, modname, _ in iter_pkgstyles():
         _, _, name = modname.rpartition('.')
         module = importlib.import_module(modname)
         # insert package style name into module for convenience
@@ -25,22 +25,22 @@ def import_package_styles():
     return styles
 
 
-def get_package_template_style(path):
-    for style in PACKAGE_STYLES.values():
-        if style.is_valid_package_template(path):
+def get_pkgstyle_for_template(path):
+    for style in PKGSTYLES.values():
+        if style.is_valid_template(path):
             return style
     return None
 
 
-def get_package_style_for_distro(distro):
-    for style in PACKAGE_STYLES.values():
+def get_pkgstyle_for_distro(distro):
+    for style in PKGSTYLES.values():
         if distro in style.SUPPORTED_DISTROS:
             return style
     return None
 
 
-def get_package_style(style):
-    return PACKAGE_STYLES.get(style)
+def get_pkgstyle(style):
+    return PKGSTYLES.get(style)
 
 
-PACKAGE_STYLES = import_package_styles()
+PKGSTYLES = import_pkgstyles()

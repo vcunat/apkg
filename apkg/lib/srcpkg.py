@@ -12,7 +12,7 @@ from apkg.project import Project
 from apkg.lib import ar
 
 
-def make_source_package(
+def make_srcpkg(
         archive=None, version=None, release=None,
         distro=None, upstream=False):
     log.verbose('creating source package')
@@ -42,13 +42,13 @@ def make_source_package(
     log.info("target distro: %s" % distro)
 
     # fetch correct package template
-    template = proj.get_package_template_for_distro(distro)
+    template = proj.get_template_for_distro(distro)
     if not template:
-        tdir = proj.package_templates_path
+        tdir = proj.templates_path
         msg = ("missing package template for distro: %s\n\n"
                "you can add it into: %s" % (distro, tdir))
         raise exception.MissingPackagingTemplate(msg=msg)
-    ps = template.package_style
+    ps = template.pkgstyle
     log.info("package style: %s", ps.name)
     log.info("package template: %s", template.path)
     log.info("package archive: %s", ar_path)
@@ -56,8 +56,8 @@ def make_source_package(
     # get needed paths
     pkg_name = ps.get_package_name(template.path)
     nvr = "%s-%s-%s" % (pkg_name, version, release)
-    build_path = proj.source_package_build_path / distro / nvr
-    out_path = proj.source_package_out_path / distro / nvr
+    build_path = proj.srcpkg_build_path / distro / nvr
+    out_path = proj.srcpkg_out_path / distro / nvr
     log.info("package name: %s", nvr)
     log.info("build dir: %s", build_path)
     log.info("result dir: %s", out_path)
@@ -81,11 +81,11 @@ def make_source_package(
         'distro': distro,
     }
     # create source package using desired package style
-    template.package_style.build_source_package(
+    template.pkgstyle.build_srcpkg(
         build_path,
         out_path,
         archive_path=ar_path,
-        package_template=template,
+        template=template,
         env=env)
 
     if out_path.exists():

@@ -17,7 +17,7 @@ SUPPORTED_DISTROS = [
 RE_PKG_NAME = r'pkgname\s*=\s*(\S+)'
 
 
-def is_valid_package_template(path):
+def is_valid_template(path):
     pkgbuild = path / "PKGBUILD"
     return pkgbuild.exists()
 
@@ -34,15 +34,15 @@ def get_package_name(path):
             msg="unable to determine pkgname from: %s" % pkgbuild)
 
 
-def build_source_package(
+def build_srcpkg(
         build_path,
         out_path,
         archive_path,
-        package_template,
+        template,
         env):
     in_pkgbuild = build_path / 'PKGBUILD'
     log.info("building arch source package: %s" % in_pkgbuild)
-    package_template.render(build_path, env or {})
+    template.render(build_path, env or {})
     os.makedirs(out_path)
     log.info("copying PKGBUILD and archive to: %s" % out_path)
     shutil.copyfile(in_pkgbuild, out_path / 'PKGBUILD')

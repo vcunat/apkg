@@ -17,7 +17,7 @@ SUPPORTED_DISTROS = [
 ]
 
 
-def is_valid_package_template(path):
+def is_valid_template(path):
     for _ in glob.iglob("%s/*.spec" % path):
         return True
     return False

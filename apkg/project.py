@@ -27,7 +27,7 @@ class Project:
 
     name = None
     path = None
-    package_templates_path = None
+    templates_path = None
     config_base_path = None
     config_path = None
     archive_path = None
@@ -35,9 +35,9 @@ class Project:
     upstream_archive_path = None
     build_path = None
     package_build_path = None
-    source_package_build_path = None
+    srcpkg_build_path = None
     package_out_path = None
-    source_package_out_path = None
+    srcpkg_out_path = None
 
     def __init__(self, path=None, autoload=True):
         if path:
@@ -64,7 +64,7 @@ class Project:
         fill in projects paths based on current self.path and self.config
         """
         # package templates: distro/pkg
-        self.package_templates_path = self.path / INPUT_BASE_DIR / 'pkg'
+        self.templates_path = self.path / INPUT_BASE_DIR / 'pkg'
         # archives: pkg/archives
         self.archive_path = self.path / OUTPUT_BASE_DIR / 'archives'
         self.dev_archive_path = self.archive_path / 'dev'
@@ -72,10 +72,10 @@ class Project:
         # build: pkg/build
         self.build_path = self.path / OUTPUT_BASE_DIR / 'build'
         self.package_build_path = self.build_path / 'pkgs'
-        self.source_package_build_path = self.build_path / 'srcpkgs'
+        self.srcpkg_build_path = self.build_path / 'srcpkgs'
         # output: pkg/{src-,}package
         self.package_out_path = self.path / OUTPUT_BASE_DIR / 'pkgs'
-        self.source_package_out_path = self.path / OUTPUT_BASE_DIR / 'srcpkgs'
+        self.srcpkg_out_path = self.path / OUTPUT_BASE_DIR / 'srcpkgs'
 
     def load(self):
         """
@@ -97,17 +97,17 @@ class Project:
             return False
 
     @cached_property
-    def package_templates(self):
-        if self.package_templates_path.exists():
-            return load_package_templates(self.package_templates_path)
+    def templates(self):
+        if self.templates_path.exists():
+            return load_templates(self.templates_path)
         else:
             return []
 
-    def get_package_template_for_distro(self, distro):
+    def get_template_for_distro(self, distro):
         # NOTE: this is very simplistic, more complex mechanism TBD
         ldistro = distro.lower()
-        for t in self.package_templates:
-            ps = t.package_style
+        for t in self.templates:
+            ps = t.pkgstyle
             for d in ps.SUPPORTED_DISTROS:
                 if d in ldistro:
                     return t
@@ -124,13 +124,13 @@ class Project:
         return glob.glob("%s/%s*" % (ar_path, name))
 
 
-def load_package_templates(path):
-    package_templates = []
+def load_templates(path):
+    templates = []
     for entry_path in glob.glob('%s/*' % path):
         if os.path.isdir(entry_path):
             template = pkgtemplate.PackageTemplate(entry_path)
-            if template.package_style:
-                package_templates.append(template)
+            if template.pkgstyle:
+                templates.append(template)
             else:
                 log.warn("ignoring unknown package style in %s", entry_path)
-    return package_templates
+    return templates
