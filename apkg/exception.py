@@ -36,6 +36,11 @@ class InvalidFormat(ApkgException):
     exit_code = 18
 
 
+class InvalidSourcePackageFormat(InvalidFormat):
+    msg_fmt = "Invalid source package format: %(fmt)s"
+    exit_code = 19
+
+
 class MissingRequiredArgument(ApkgException):
     msg_fmt = "Missing required argument: %(arg)s"
     exit_code = 20
@@ -94,3 +99,8 @@ class UnexpectedCommandOutput(ApkgException):
 class ArchiveNotFound(ApkgException):
     msg_fmt = "%(type)s archive not found: %(ar)s"
     exit_code = 80
+
+
+class SourcePackageNotFound(ApkgException):
+    msg_fmt = "%(type)s source package not found: %(srcpkg)s"
+    exit_code = 82

@@ -5,7 +5,7 @@ Maintainer: Jakub Ružička <jakub.ruzicka@nic.cz>
 Uploaders:
  Jakub Ružička <jakub.ruzicka@nic.cz>,
 Build-Depends:
- debhelper-compat (= 10),
+ debhelper,
  dh-python,
  python3-all,
  python3-pbr,

@@ -82,6 +82,13 @@ def success(*args, **kwargs):
     log.info(*args, **kwargs)
 
 
+def bold(*args, **kwargs):
+    if args:
+        msg, *rest = args
+        args = [T.bold('I %s' % msg)] + rest
+    log.info(*args, **kwargs)
+
+
 def info(*args, **kwargs):
     if args:
         msg, *rest = args
