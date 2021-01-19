@@ -58,7 +58,8 @@ def build_srcpkg(
 def build_packages(
         build_path,
         out_path,
-        srcpkg_path):
+        srcpkg_path,
+        **kwargs):
     if srcpkg_path.name != 'PKGBUILD':
         raise exception.InvalidSourcePackageFormat(
             fmt='arch source package format is PKGBUILD but got: %s'
@@ -78,3 +79,11 @@ def build_packages(
         pkgs.append(dst_pkg)
 
     return pkgs
+
+
+def install_build_deps(
+        srcpkg_path,
+        **kwargs):
+    msg = ("build-dep installation isn't currently supported on arch\n\n"
+           "this might work: makepkg -si && sudo pacman -R <package-name>")
+    raise exception.DistroNotSupported(msg=msg)

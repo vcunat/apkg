@@ -41,7 +41,6 @@ class LogTerminal(terminal.Terminal):
         return self.magenta
 
 
-
 # global terminal instance for color printing
 T = LogTerminal()
 

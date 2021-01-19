@@ -12,7 +12,7 @@ from apkg.compat import py35path
 from apkg import exception
 from apkg import log
 from apkg import parse
-from apkg.util.run import run, cd
+from apkg.util.run import cd, run, sudo
 
 
 SUPPORTED_DISTROS = [
@@ -119,7 +119,7 @@ def build_packages(
         sudo('pbuilder', 'build',
              '--buildresult', build_path,
              srcpkg_path,
-             preserve_env=True, # preserve env inc. DEB_BUILD_OPTIONS
+             preserve_env=True,  # preserve env inc. DEB_BUILD_OPTIONS
              direct=True)
     else:
         nvr, _ = os.path.splitext(py35path(srcpkg_path.name))
@@ -154,3 +154,15 @@ def build_packages(
         pkgs.append(dst_pkg)
 
     return pkgs
+
+
+def install_build_deps(
+        srcpkg_path,
+        **kwargs):
+    interactive = kwargs.get('interactive', False)
+    log.info("installing build deps using apt-get build-dep")
+    cmd = ['apt-get', 'build-dep']
+    if not interactive:
+        cmd.append('-y')
+    cmd.append(srcpkg_path.resolve())
+    sudo(*cmd, direct=True)

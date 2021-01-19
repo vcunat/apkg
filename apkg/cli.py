@@ -9,8 +9,9 @@ Commands:
   status                      show status of current project
   make-archive                create dev archive from current project state
   get-archive                 download upstream source archive
-  srcpkg                      create source package (files to build package from)
-  build                 TODO: build package
+  srcpkg                      create source package (files to build packages from)
+  build                       build package
+  build-dep                   install build dependencies
 
 Options:
   -h --help     show help screen, can be used after a command

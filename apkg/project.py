@@ -7,6 +7,7 @@ from pathlib import Path
 import os
 import toml
 
+from apkg import exception
 from apkg import log
 from apkg import pkgtemplate
 
@@ -103,15 +104,24 @@ class Project:
         else:
             return []
 
-    def get_template_for_distro(self, distro):
-        # NOTE: this is very simplistic, more complex mechanism TBD
-        ldistro = distro.lower()
+    def _get_template_for_distro(self, distro):
         for t in self.templates:
             ps = t.pkgstyle
             for d in ps.SUPPORTED_DISTROS:
-                if d in ldistro:
+                # NOTE: this is very simplistic
+                if d in distro:
                     return t
         return None
+
+    def get_template_for_distro(self, distro):
+        ldistro = distro.lower()
+        template = self._get_template_for_distro(ldistro)
+        if not template:
+            tdir = self.templates_path
+            msg = ("missing package template for distro: %s\n\n"
+                   "you can add it into: %s" % (distro, tdir))
+            raise exception.MissingPackagingTemplate(msg=msg)
+        return template
 
     def find_archives_by_name(self, name, upstream=False):
         """
