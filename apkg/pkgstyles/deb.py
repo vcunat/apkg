@@ -116,11 +116,11 @@ def build_packages(
     if isolated:
         log.info("starting isolated build using pbuilder")
         # TODO: ensure pbuilder's base image exists (pbuilder create)
-        run('sudo', '-E',  # preserve env including DEB_BUILD_OPTIONS
-            'pbuilder', 'build',
-            '--buildresult', build_path,
-            srcpkg_path,
-            direct=True)
+        sudo('pbuilder', 'build',
+             '--buildresult', build_path,
+             srcpkg_path,
+             preserve_env=True, # preserve env inc. DEB_BUILD_OPTIONS
+             direct=True)
     else:
         nvr, _ = os.path.splitext(py35path(srcpkg_path.name))
         nv, _, _ = nvr.rpartition('-')
