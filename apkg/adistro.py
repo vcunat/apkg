@@ -8,6 +8,19 @@ import re
 import distro
 
 
+def distro_arg(distro_str):
+    """
+    normalize --distro argument as used by CLI
+
+    return current distro if not set
+    """
+    if distro_str:
+        # convert custom distro string to idver format
+        return distro2idver(distro_str)
+    # use current distro by default
+    return idver()
+
+
 def distro2idver(distro_name):
     """
     convert generic distro string into idver format

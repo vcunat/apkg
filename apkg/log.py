@@ -33,8 +33,12 @@ class LogTerminal(terminal.Terminal):
         return self.green
 
     @property
-    def cmd(self):
+    def command(self):
         return self.cyan
+
+    @property
+    def sudo(self):
+        return self.magenta
 
 
 # global terminal instance for color printing
@@ -113,5 +117,12 @@ def debug(*args, **kwargs):
 def command(*args, **kwargs):
     if args:
         msg, *rest = args
-        args = [T.cmd('$ %s' % msg)] + rest
+        args = [T.command('$ %s' % msg)] + rest
+    log.info(*args, **kwargs)
+
+
+def sudo(*args, **kwargs):
+    if args:
+        msg, *rest = args
+        args = [T.sudo('# %s' % msg)] + rest
     log.info(*args, **kwargs)

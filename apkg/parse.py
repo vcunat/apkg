@@ -7,7 +7,7 @@ from apkg import exception
 # 1) name
 # 2) name-version separator ('-' or '_')
 # 3) version (including release)
-RE_NVR = r'^(.+?)([-_])(\d+(?:\.\d+)+(?:.+?)?)$'
+RE_NVR = r'^(.+?)([-_])(v?\d+(?:\.\d+)+(?:.+?)?)$'
 
 
 def split_archive_fn(archive_fn):
@@ -28,3 +28,14 @@ def split_archive_fn(archive_fn):
 
     msg = "unable to parse version from archive file name: %s" % archive_fn
     raise exception.ParsingFailed(msg=msg)
+
+
+def parse_version(version_str):
+    """
+    parse version from common version strings
+
+    currently only strips v from vX.Y.Z
+    """
+    if version_str.startswith('v'):
+        return version_str[1:]
+    return version_str

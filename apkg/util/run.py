@@ -8,6 +8,11 @@ from apkg import exception
 from apkg import log
 
 
+IS_ROOT = False
+if os.geteuid() == 0:
+    IS_ROOT = True
+
+
 def log_cmd_fail(cmd, cout, fail_log_fun=log.error, out_log_fun=log.info):
     fail_log_fun('{t.error}command failed: {t.normal}{t.cmd}{cmd}{t.normal}'
                  .format(t=log.T, cmd=cmd))
@@ -29,6 +34,7 @@ def run(*cmd, **kwargs):
     direct = kwargs.get('direct', False)
     log_cmd = kwargs.get('log_cmd', True)
     log_fail = kwargs.get('log_fail', True)
+    log_fun = kwargs.get('log_fun', log.command)
     input = kwargs.get('input')
     print_stdout = kwargs.get('print_stdout', False)
     print_stderr = kwargs.get('print_stderr', False)
@@ -40,7 +46,7 @@ def run(*cmd, **kwargs):
     cmd_str = ' '.join(cmd)
 
     if log_cmd:
-        log.command(log.T.cmd(cmd_str))
+        log_fun(cmd_str)
 
     if print_output:
         print_stdout = True
@@ -48,7 +54,6 @@ def run(*cmd, **kwargs):
 
     if input:
         stdin = subprocess.PIPE
-        input = input
     else:
         stdin = None
 
@@ -95,6 +100,17 @@ def run(*cmd, **kwargs):
         if fatal:
             raise exception.CommandFailed(cmd=cmd, out=cout)
     return cout
+
+
+def sudo(*cmd, **kwargs):
+    preserve_env = kwargs.pop('preserve_env', False)
+    if not IS_ROOT:
+        sudo_cmd = ['sudo']
+        if preserve_env:
+            sudo_cmd.append('-E')
+        cmd = sudo_cmd + list(cmd)
+        kwargs['log_fun'] = log.sudo
+    return run(*cmd, **kwargs)
 
 
 @contextmanager

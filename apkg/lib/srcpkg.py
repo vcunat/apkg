@@ -18,6 +18,9 @@ def make_srcpkg(
     log.bold('creating source package')
 
     proj = Project()
+    distro = adistro.distro_arg(distro)
+    log.info("target distro: %s" % distro)
+
     if not release:
         release = '1'
 
@@ -32,14 +35,6 @@ def make_srcpkg(
         else:
             ar_path = ar.make_archive(version=version, project=proj)
         version = ar.get_archive_version(ar_path, version=version)
-
-    if distro:
-        # convert custom distro string to idver format
-        distro = adistro.distro2idver(distro)
-    else:
-        # use current distro by default
-        distro = adistro.idver()
-    log.info("target distro: %s" % distro)
 
     # fetch correct package template
     template = proj.get_template_for_distro(distro)
