@@ -10,7 +10,7 @@ import requests
 from apkg import exception
 from apkg import log
 from apkg.compat import py35path
-from apkg.parse import split_archive_fn
+from apkg.parse import split_archive_fn, parse_version
 from apkg.project import Project
 from apkg.util.run import run
 
@@ -47,7 +47,7 @@ def make_archive(version=None, project=None):
     if version:
         # specific version requested - rename if needed
         name, sep, ver, ext = split_archive_fn(archive_fn)
-        if ver != version:
+        if parse_version(ver) != version:
             archive_fn = name + sep + version + ext
             msg = "archive renamed to match requested version: %s"
             log.info(msg, archive_fn)
@@ -151,9 +151,10 @@ def get_archive_version(archive_path, version=None):
     """
     archive_path = Path(archive_path)
     _, _, ver, _ = split_archive_fn(archive_path.name)
+    ar_ver = parse_version(ver)
     if version:
         # optional version check requested
-        if ver == version:
+        if ar_ver == version:
             log.verbose("archive name matches desired version: %s", version)
         else:
             msg = ("archive name doesn't match desired version: %s\n\n"
@@ -162,7 +163,7 @@ def get_archive_version(archive_path, version=None):
             raise exception.InvalidVersion(msg=msg)
     else:
         # no version was requested - use archive version
-        version = ver
+        version = ar_ver
     return version
 
 
