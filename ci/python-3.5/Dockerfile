@@ -18,4 +18,4 @@ RUN apt-get install -y -qqq git atool
 # packaging deps
 RUN apt-get install -y -qqq dpkg-dev debhelper dh-python python3-all
 # testing deps
-RUN apt-get install -y -qqq tox python3-pytest python3-pytest-cov
+RUN apt-get install -y -qqq tox python3-pytest python3-pytest-cov python3-pytest-catchlog

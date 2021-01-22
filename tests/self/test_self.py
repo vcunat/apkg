@@ -1,4 +1,5 @@
 from pathlib import Path
+import os
 import re
 
 from apkg.util import test
@@ -56,3 +57,45 @@ def test_apkg_build(tmpdir, capsys):
     out, _ = capsys.readouterr()
     # last line should be one of resulting packages
     assert re.search(r"pkg/pkgs/\S+/apkg\S+$", out)
+
+
+def test_apkg_cache(tmpdir, caplog):
+    repo_path = test.init_testing_repo(APKG_BASE_DIR, str(tmpdir))
+    with cd(repo_path):
+        cache_path = Path('pkg/.cache.json')
+        if cache_path.exists():
+            os.remove(str(cache_path))
+
+        # 1) run with --no-cache shouldn't create cache
+        assert apkg('make-archive', '--no-cache') == 0
+        assert not cache_path.exists()
+        # 2) normal run should create cache
+        assert apkg('make-archive') == 0
+        assert cache_path.exists()
+        # 3) should reuse archive from previous run
+        assert apkg('make-archive') == 0
+        # 4) --no-cache shouldn't reuse cached archive
+        assert apkg('make-archive', '--no-cache') == 0
+
+        # helpers to parse cumulative log output
+        def is_relevant(r):
+            if 'made archive' in r.message:
+                return True
+            if 'reuse cached archive' in r.message:
+                return True
+            return False
+
+        def msg_head(r):
+            head, _, _ = r.message.partition(' ')
+            return head
+
+        # pick relevant log lines's heads
+        msgs = [msg_head(r) for r in caplog.records if is_relevant(r)]
+
+        # make sure cached archive was reused only when it should
+        assert msgs == [
+            'made',  # 1) should create archive
+            'made',  # 2) should create archive as 2) didn't cache it
+            'reuse',  # 3) should reuse archive from 2)
+            'made',  # 4) should create archive due to --no-cache
+            ]

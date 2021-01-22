@@ -27,8 +27,14 @@ def log_cmd_fail(cmd, cout):
 
 
 def run(*cmd, **kwargs):
+    """
+    run system commands easily - a subprocess.Popen wrapper
+
+    run('echo', 'hello world')
+    """
     fatal = kwargs.get('fatal', True)
     direct = kwargs.get('direct', False)
+    silent = kwargs.get('silent', False)
     log_cmd = kwargs.get('log_cmd', True)
     log_fail = kwargs.get('log_fail', True)
     log_fun = kwargs.get('log_fun', log.command)
@@ -42,8 +48,11 @@ def run(*cmd, **kwargs):
     cmd = [str(c) for c in cmd]
     cmd_str = ' '.join(cmd)
 
-    if log_cmd:
-        log_fun(cmd_str)
+    if silent:
+        log_cmd = False
+        log_fail = False
+        print_stdout = False
+        print_stderr = False
 
     if print_output:
         print_stdout = True
@@ -60,6 +69,9 @@ def run(*cmd, **kwargs):
     else:
         stdout = subprocess.PIPE
         stderr = subprocess.PIPE
+
+    if log_cmd:
+        log_fun(cmd_str)
 
     try:
         prc = subprocess.Popen(cmd, stdin=stdin, stdout=stdout,

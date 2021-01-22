@@ -26,6 +26,9 @@ def print_status():
     msg = "project base path:       {t.bold}{path}{t.normal}"
     print(msg.format(path=proj.path.resolve(), t=T))
 
+    msg = "project VCS:             {t.bold}{vcs}{t.normal}"
+    print(msg.format(vcs=proj.vcs or 'none', t=T))
+
     msg = "project config:          {t.bold}{path}{t.normal}"
     if proj.config_path.exists():
         msg += " ({t.green}exists{t.normal})"
@@ -57,7 +60,7 @@ def print_status():
     msg = "current distro: {t.cyan}{id}{t.normal} / {t.cyan}{full}{t.normal}"
     print(msg.format(full=adistro.fullname(), id=adistro.idver(), t=T))
 
-    template = proj.get_template_for_distro(adistro.idver())
+    template = proj._get_template_for_distro(adistro.idver())
     msg = "    package style: "
     if template:
         style = template.pkgstyle.name

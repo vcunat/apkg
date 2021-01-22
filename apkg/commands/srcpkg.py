@@ -1,7 +1,9 @@
 """
 create source package (files to build package from)
 
-usage: apkg srcpkg [-u] [-a <ar>] [-v <ver>] [-r <rls>] [-d <distro>]
+usage: apkg srcpkg [-a <ar>] [-u]
+                   [-v <ver>] [-r <rls>] [-d <distro>]
+                   [--no-cache]
 
 options:
   -u, --upstream                  use upstream archive / apkg get-source
@@ -11,6 +13,7 @@ options:
   -r <rls>, --release <rls>       set package release
   -d <distro>, --distro <distro>  set target distro
                                   default: current distro
+  --no-cache                      disable cache
 """ # noqa
 
 from docopt import docopt
@@ -25,6 +28,7 @@ def run_command(cargs):
             archive=args['--archive'],
             version=args['--version'],
             release=args['--release'],
-            distro=args['--distro'])
+            distro=args['--distro'],
+            use_cache=not args['--no-cache'])
     print(out_srcpkg)
     return out_srcpkg

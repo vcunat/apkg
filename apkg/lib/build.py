@@ -22,11 +22,14 @@ def build_package(
         release=None,
         distro=None,
         install_dep=False,
-        isolated=False):
+        isolated=False,
+        use_cache=True,
+        project=None):
     log.bold('building package')
 
-    proj = Project()
+    proj = project or Project()
     distro = adistro.distro_arg(distro)
+    use_cache = proj.cache.enabled(use_cache)
     log.info("target distro: %s" % distro)
 
     if srcpkg:
@@ -43,7 +46,18 @@ def build_package(
             version=version,
             release=release,
             distro=distro,
-            upstream=upstream)
+            upstream=upstream,
+            project=proj,
+            use_cache=use_cache)
+
+    if use_cache and not upstream:
+        cache_name = 'pkg/dev/%s' % distro
+        pkgs = proj.cache.get(cache_name, proj.checksum)
+        if pkgs:
+            log.success(
+                "reuse %d cached packages from: %s",
+                len(pkgs), pkgs[0].parent)
+            return pkgs
 
     if install_dep:
         # install build deps if requested
@@ -81,6 +95,12 @@ def build_package(
                "no packages:\n\n%s" % out_path)
         raise exception.UnexpectedCommandOutput(msg=msg)
     log.success("built %s packages in: %s", len(pkgs), out_path)
+
+    if use_cache and not upstream:
+        fns = list(map(str, pkgs))
+        proj.cache.update(
+            cache_name, proj.checksum, fns)
+
     return pkgs
 
 

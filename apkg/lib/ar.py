@@ -18,12 +18,18 @@ from apkg.util.run import run
 log = getLogger(__name__)
 
 
-def make_archive(version=None, project=None):
+def make_archive(version=None, project=None, use_cache=True):
     """
     create archive from current project state
     """
     log.bold("creating dev archive")
     proj = project or Project()
+    use_cache = proj.cache.enabled(use_cache)
+    if use_cache:
+        archive_path = proj.cache.get('archive/dev', proj.checksum)
+        if archive_path:
+            log.success("reuse cached archive: %s", archive_path)
+            return archive_path
     try:
         script = proj.config['project']['make_archive_script']
     except KeyError:
@@ -38,15 +44,15 @@ def make_archive(version=None, project=None):
     out = run(script)
     # last script stdout line is expected to be path to resulting archive
     _, _, last_line = out.rpartition('\n')
-    archive_path = Path(last_line)
-    if not archive_path.exists():
+    in_archive_path = Path(last_line)
+    if not in_archive_path.exists():
         msg = ("make_archive_script finished successfully but the archive\n"
                "(indicated by last script stdout line) doesn't exist:\n\n"
-               "%s" % archive_path)
+               "%s" % in_archive_path)
         raise exception.UnexpectedCommandOutput(msg=msg)
-    log.info("archive created: %s" % archive_path)
+    log.info("archive created: %s" % in_archive_path)
 
-    archive_fn = archive_path.name
+    archive_fn = in_archive_path.name
     if version:
         # specific version requested - rename if needed
         name, sep, ver, ext = split_archive_fn(archive_fn)
@@ -54,15 +60,18 @@ def make_archive(version=None, project=None):
             archive_fn = name + sep + version + ext
             msg = "archive renamed to match requested version: %s"
             log.info(msg, archive_fn)
-    out_path = proj.dev_archive_path / archive_fn
-    log.info("copying archive to: %s" % out_path)
+    archive_path = proj.dev_archive_path / archive_fn
+    log.info("copying archive to: %s" % archive_path)
     os.makedirs(py35path(proj.dev_archive_path), exist_ok=True)
-    shutil.copy(py35path(archive_path), py35path(out_path))
-    log.success("made archive: %s", out_path)
-    return out_path
+    shutil.copy(py35path(in_archive_path), py35path(archive_path))
+    log.success("made archive: %s", archive_path)
+    if use_cache:
+        proj.cache.update(
+            'archive/dev', proj.checksum, str(archive_path))
+    return archive_path
 
 
-def get_archive(version=None, project=None):
+def get_archive(version=None, project=None, use_cache=True):
     """
     download archive for current project
     """
@@ -71,6 +80,7 @@ def get_archive(version=None, project=None):
             "TODO: automatic latest version detection\n\n"
             "For now please select using --version/-v.")
     proj = project or Project()
+    use_cache = proj.cache.enabled(use_cache)
     try:
         upstream_archive_url = proj.config['project']['upstream_archive_url']
     except KeyError:
@@ -87,6 +97,13 @@ def get_archive(version=None, project=None):
 
     archive_t = jinja2.Template(upstream_archive_url)
     archive_url = archive_t.render(**env)
+
+    if use_cache:
+        archive_path = proj.cache.get('archive/upstream', archive_url)
+        if archive_path:
+            log.success("reuse cached archive: %s", archive_path)
+            return archive_path
+
     log.info('downloading archive: %s', archive_url)
     r = requests.get(archive_url, allow_redirects=True)
     if r.status_code != 200:
@@ -103,6 +120,10 @@ def get_archive(version=None, project=None):
     os.makedirs(py35path(proj.upstream_archive_path), exist_ok=True)
     archive_path.open('wb').write(r.content)
     log.success('downloaded archive: %s', archive_path)
+
+    if use_cache:
+        proj.cache.update(
+            'archive/upstream', archive_url, str(archive_path))
 
     try:
         upstream_signature_url = \
