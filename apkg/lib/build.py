@@ -6,9 +6,12 @@ import shutil
 from apkg import adistro
 from pathlib import Path
 from apkg import exception
-from apkg import log
+from apkg.log import getLogger
 from apkg.project import Project
 from apkg.lib import srcpkg as _srcpkg
+
+
+log = getLogger(__name__)
 
 
 def build_package(

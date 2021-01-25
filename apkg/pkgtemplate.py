@@ -6,8 +6,11 @@ from pathlib import Path
 import jinja2
 
 from apkg.compat import py35path
-from apkg import log
+from apkg.log import getLogger
 from apkg import pkgstyle as _pkgstyle
+
+
+log = getLogger(__name__)
 
 
 class PackageTemplate:

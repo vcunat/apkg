@@ -2,7 +2,7 @@
 
 Usage: apkg <command> [<args>...]
        apkg <command> --help
-       apkg [--debug | --verbose | --quiet] <command> [<args>...]
+       apkg [--debug | --verbose | --brief | --quiet] <command> [<args>...]
        apkg [--help | --version]
 
 Commands:
@@ -28,7 +28,11 @@ from docopt import docopt
 from apkg import __version__
 from apkg import commands  # noqa: F401 (dynamic import)
 from apkg import exception
-from apkg import log
+from apkg.log import getLogger, T
+import apkg.log as _log
+
+
+log = getLogger(__name__)
 
 
 def apkg(*cargs):
@@ -73,7 +77,7 @@ def apkg(*cargs):
         code = ex.exit_code
     except exception.ApkgException as ex:
         print()
-        print(log.T.bold_yellow(str(ex)))
+        print(T.bold_yellow(str(ex)))
         code = ex.exit_code
 
     return code
@@ -108,9 +112,10 @@ def cmd2mod(command):
 
 
 APKG_LOG_OPTIONS = {
-    'debug': log.DEBUG,
-    'verbose': log.VERBOSE,
-    'quiet': log.ERROR,
+    'debug': _log.DEBUG,
+    'verbose': _log.VERBOSE,
+    'brief': _log.WARN,
+    'quiet': _log.ERROR,
 }
 
 
@@ -137,7 +142,7 @@ def setup_logging(**kwargs):
     log_level = 'default'
     for opt, log_level in APKG_LOG_OPTIONS.items():
         if kwargs.get(opt):
-            log.log.setLevel(log_level)
+            _log.set_log_level(log_level)
             log.verbose("log level: --%s (%s)" % (opt, log_level))
             break
 

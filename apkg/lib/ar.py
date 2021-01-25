@@ -8,11 +8,14 @@ import jinja2
 import requests
 
 from apkg import exception
-from apkg import log
+from apkg.log import getLogger
 from apkg.compat import py35path
 from apkg.parse import split_archive_fn, parse_version
 from apkg.project import Project
 from apkg.util.run import run
+
+
+log = getLogger(__name__)
 
 
 def make_archive(version=None, project=None):
