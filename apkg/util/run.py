@@ -5,7 +5,10 @@ import subprocess
 
 from apkg.compat import py35path
 from apkg import exception
-from apkg import log
+from apkg.log import getLogger, T
+
+
+log = getLogger(__name__)
 
 
 IS_ROOT = False
@@ -13,20 +16,14 @@ if os.geteuid() == 0:
     IS_ROOT = True
 
 
-def log_cmd_fail(cmd, cout, fail_log_fun=log.error, out_log_fun=log.info):
-    fail_log_fun('{t.error}command failed: {t.normal}{t.cmd}{cmd}{t.normal}'
-                 .format(t=log.T, cmd=cmd))
-    nl = False
+def log_cmd_fail(cmd, cout):
+    log.error("command failed: %s" % T.command(cmd))
     if cout:
-        out_log_fun(log.T.bold("stdout:"))
-        out_log_fun(cout)
-        nl = True
+        log.bold("stdout:")
+        log.info(cout)
     if cout.stderr:
-        out_log_fun(log.T.bold("stderr:"))
-        out_log_fun(cout.stderr)
-        nl = True
-    if nl:
-        out_log_fun('')
+        log.bold("stderr:")
+        log.info(cout.stderr)
 
 
 def run(*cmd, **kwargs):

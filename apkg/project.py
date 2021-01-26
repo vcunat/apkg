@@ -8,8 +8,11 @@ import os
 import toml
 
 from apkg import exception
-from apkg import log
+from apkg.log import getLogger
 from apkg import pkgtemplate
+
+
+log = getLogger(__name__)
 
 
 INPUT_BASE_DIR = 'distro'
@@ -142,5 +145,5 @@ def load_templates(path):
             if template.pkgstyle:
                 templates.append(template)
             else:
-                log.warn("ignoring unknown package style in %s", entry_path)
+                log.warning("ignoring unknown package style in %s", entry_path)
     return templates

@@ -7,9 +7,12 @@ import shutil
 from apkg import adistro
 from apkg.compat import py35path
 from apkg import exception
-from apkg import log
+from apkg.log import getLogger
 from apkg.project import Project
 from apkg.lib import ar
+
+
+log = getLogger(__name__)
 
 
 def make_srcpkg(
