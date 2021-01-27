@@ -89,8 +89,14 @@ def get_archive(version=None, project=None):
     archive_url = archive_t.render(**env)
     log.info('downloading archive: %s', archive_url)
     r = requests.get(archive_url, allow_redirects=True)
-    if not r.ok:
+    if r.status_code != 200:
         raise exception.FileDownloadFailed(code=r.status_code, url=archive_url)
+    content_type = r.headers['content-type']
+    if not content_type.startswith('application/'):
+        msg = 'Failed to download archive - invalid content-type "%s":\n\n%s'
+        raise exception.FileDownloadFailed(
+            msg=msg % (content_type, archive_url))
+
     _, _, archive_name = archive_url.rpartition('/')
     archive_path = proj.upstream_archive_path / archive_name
     log.info('saving archive to: %s', archive_path)
