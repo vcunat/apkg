@@ -3,7 +3,7 @@ build package
 
 usage: apkg build ([-u] | [-s <srcpkg>] | [-a <ar>] )
                   [-v <ver>] [-r <rls>] [-d <distro>]
-                  [-i] [-I]
+                  [-i] [-I] [--no-cache]
 
 options:
   -s <srcpkg>, --srcpkg <srcpkg>  use specified source package (path or name)
@@ -17,6 +17,7 @@ options:
   -i, --install-dep               install build dependencies
   -I, --isolated                  use isolated builder (pbuilder/mock) if supported
                                   default: use direct build
+  --no-cache                      disable cache
 """ # noqa
 
 from docopt import docopt
@@ -34,7 +35,8 @@ def run_command(cargs):
             release=args['--release'],
             distro=args['--distro'],
             install_dep=args['--install-dep'],
-            isolated=args['--isolated'])
+            isolated=args['--isolated'],
+            use_cache=not args['--no-cache'])
     for pkg in pkgs:
         print("%s" % pkg)
     return pkgs

@@ -7,6 +7,7 @@ disable=
     line-too-long,  # checked by flake8
     missing-docstring,
     no-else-return,
+    no-self-use,
     raise-missing-from,
     too-few-public-methods,
     unused-import,  # checked by flake8

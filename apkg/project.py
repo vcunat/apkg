@@ -3,13 +3,16 @@ try:
 except ImportError:
     from cached_property import cached_property
 import glob
+import hashlib
 from pathlib import Path
 import os
 import toml
 
+from apkg import cache as _cache
 from apkg import exception
 from apkg.log import getLogger
 from apkg import pkgtemplate
+from apkg.util.git import git
 
 
 log = getLogger(__name__)
@@ -32,6 +35,7 @@ class Project:
     name = None
     path = None
     templates_path = None
+    cache_path = None
     config_base_path = None
     config_path = None
     archive_path = None
@@ -50,6 +54,7 @@ class Project:
             self.path = Path('.')
         if autoload:
             self.load()
+        self.cache = _cache.ProjectCache(self)
 
     def update_attrs(self):
         """
@@ -80,6 +85,8 @@ class Project:
         # output: pkg/{src-,}pkg
         self.package_out_path = self.path / OUTPUT_BASE_DIR / 'pkgs'
         self.srcpkg_out_path = self.path / OUTPUT_BASE_DIR / 'srcpkgs'
+        # cache: pkg/.cache.json
+        self.cache_path = self.path / OUTPUT_BASE_DIR / '.cache.json'
 
     def load(self):
         """
@@ -99,6 +106,34 @@ class Project:
         else:
             log.verbose("project config not found: %s" % self.config_path)
             return False
+
+    @cached_property
+    def vcs(self):
+        """
+        Version Control System used in project
+
+        possible outputs: 'git', None
+        """
+        o = git('rev-parse', silent=True, fatal=False)
+        if o.return_code == 0:
+            return 'git'
+        return None
+
+    @cached_property
+    def checksum(self):
+        """
+        checksum of current project state
+
+        requires VCS (git), only computed once
+        """
+        if self.vcs == 'git':
+            checksum = git.current_commit()[:10]
+            diff = git('diff', log_cmd=False)
+            if diff:
+                diff_hash = hashlib.sha256(diff.encode('utf-8'))
+                checksum += '-%s' % diff_hash.hexdigest()[:10]
+            return checksum
+        return None
 
     @cached_property
     def templates(self):

@@ -17,11 +17,13 @@ log = getLogger(__name__)
 
 def make_srcpkg(
         archive=None, version=None, release=None,
-        distro=None, upstream=False):
+        distro=None, upstream=False, use_cache=True,
+        project=None):
     log.bold('creating source package')
 
-    proj = Project()
+    proj = project or Project()
     distro = adistro.distro_arg(distro)
+    use_cache = proj.cache.enabled(use_cache)
     log.info("target distro: %s" % distro)
 
     if not release:
@@ -34,10 +36,24 @@ def make_srcpkg(
     else:
         # archive not specified - use make_archive or get_archive
         if upstream:
-            ar_path = ar.get_archive(version=version, project=proj)
+            ar_path = ar.get_archive(
+                version=version,
+                project=proj,
+                use_cache=use_cache)
         else:
-            ar_path = ar.make_archive(version=version, project=proj)
+            ar_path = ar.make_archive(
+                version=version,
+                project=proj,
+                use_cache=use_cache)
         version = ar.get_archive_version(ar_path, version=version)
+
+    # --upstream builds aren't well supported yet - don't cache for now
+    if use_cache and not upstream:
+        cache_name = 'srcpkg/dev/%s' % distro
+        srcpkg_path = proj.cache.get(cache_name, proj.checksum)
+        if srcpkg_path:
+            log.success("reuse cached source package: %s", srcpkg_path)
+            return srcpkg_path
 
     # fetch correct package template
     template = proj.get_template_for_distro(distro)
@@ -92,4 +108,9 @@ def make_srcpkg(
         msg = ("source package build reported success but there are "
                "no results:\n\n%s" % srcpkg_path)
         raise exception.UnexpectedCommandOutput(msg=msg)
+
+    if use_cache and not upstream:
+        proj.cache.update(
+            cache_name, proj.checksum, str(srcpkg_path))
+
     return srcpkg_path
