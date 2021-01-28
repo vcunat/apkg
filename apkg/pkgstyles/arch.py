@@ -7,7 +7,7 @@ import os
 import shutil
 
 from apkg import exception
-from apkg.log import getLogger, INFO
+from apkg.log import getLogger, LOG_LEVEL, INFO
 from apkg.compat import py35path
 from apkg.util.run import cd, run
 
@@ -69,10 +69,10 @@ def build_packages(
             % srcpkg_path.name)
     log.info("copying source package to build dir: %s" % build_path)
     shutil.copytree(py35path(srcpkg_path.parent), py35path(build_path))
-    direct = bool(log.level >= INFO)
     # build package using makepkg
+    log.info("starting arch package build using makepkg")
     with cd(build_path):
-        run('makepkg', direct=direct)
+        run('makepkg', direct=bool(LOG_LEVEL <= INFO))
     log.info("copying built packages to result dir: %s" % out_path)
     os.makedirs(py35path(out_path), exist_ok=True)
     pkgs = []
