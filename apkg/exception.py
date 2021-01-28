@@ -77,7 +77,7 @@ class HTTPRequestFailed(ApkgException):
 
 
 class FileDownloadFailed(ApkgException):
-    msg_fmt = "Failed to download file with code %(code)s:\n%(url)s"
+    msg_fmt = "Failed to download file with code %(code)s:\n\n%(url)s"
     exit_code = 56
 
 
