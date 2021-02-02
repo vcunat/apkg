@@ -1,5 +1,11 @@
 """
-This is 'arch' apkg package style for Arch linux
+apkg package style for **Arch** linux.
+
+**source template:** `PKGBUILD`
+
+**source package:** `PKGBUILD`
+
+**packages:** `*.zst` built using `makepkg`
 """
 import glob
 from pathlib import Path

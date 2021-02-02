@@ -1,11 +1,11 @@
 """
-build package
+build packages
 
-usage: apkg build ([-u] | [-s <srcpkg>] | [-a <ar>] )
+Usage: apkg build ([-u] | [-s <srcpkg>] | [-a <ar>] )
                   [-v <ver>] [-r <rls>] [-d <distro>]
                   [-i] [-I] [--no-cache]
 
-options:
+Options:
   -s <srcpkg>, --srcpkg <srcpkg>  use specified source package (path or name)
   -a <ar>, --archive <ar>         use specified archive (path or name)
   -u, --upstream                  use upstream archive / apkg get-source

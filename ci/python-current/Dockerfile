@@ -23,4 +23,4 @@ RUN apt-get install -y -qqq tox python3-pytest python3-pytest-sugar python3-pyte
 RUN apt-get install -y -qqq python3-flake8 pylint3
 # doc deps
 RUN apt-get install -y -qqq python3-pip
-RUN pip3 install mkdocs
+RUN pip3 install mkdocs mkdocs-macros-plugin
