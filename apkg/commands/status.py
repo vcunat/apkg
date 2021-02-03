@@ -1,7 +1,7 @@
 """
 show status of current project
 
-usage: apkg status
+Usage: apkg status
 """
 
 import os

@@ -1,9 +1,10 @@
 """
-Create dev archive from current project state
+create dev archive from current project state
+using script specified by project.make_archive_script config option
 
-usage: apkg make-archive [-v <ver>] [--no-cache]
+Usage: apkg make-archive [-v <ver>] [--no-cache]
 
-options:
+Options:
   -v <ver>, --version <ver>  rename archive to match specified version if needed
   --no-cache                 disable cache
 """ # noqa

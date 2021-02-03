@@ -2,4 +2,18 @@ site_name: apkg
 theme: readthedocs
 nav:
   - README.md
-  - design.md
+  - intro.md
+  - install.md
+  - guide.md
+  - commands.md
+  - config.md
+  - pkgstyles.md
+  - templates.md
+markdown_extensions:
+  - admonition
+  - toc:
+      permalink: True
+plugins:
+  - search
+  - macros:
+      module_name: docs

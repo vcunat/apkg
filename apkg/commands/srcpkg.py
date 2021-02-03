@@ -1,11 +1,11 @@
 """
 create source package (files to build package from)
 
-usage: apkg srcpkg [-a <ar>] [-u]
+Usage: apkg srcpkg [-a <ar>] [-u]
                    [-v <ver>] [-r <rls>] [-d <distro>]
                    [--no-cache]
 
-options:
+Options:
   -u, --upstream                  use upstream archive / apkg get-source
                                   default: use dev archvie / apkg make-source
   -a <ar>, --archive <ar>         use specified archive (path or name)

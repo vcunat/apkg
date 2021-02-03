@@ -1,6 +1,18 @@
 """
-This is 'rpm' apkg package style for RPM-based distros such as
-Fedora, CentOS, SUSE, RHEL.
+apkg package style for RPM-based distros
+such as Fedora, CentOS, SUSE, RHEL.
+
+!!! warning
+    `rpm` pkgstyle **isn't finished yet**! it will be done for v0.1
+
+**source template**: `*.spec`
+
+!!! TODO
+    **source package:** `*.src.rpm`
+
+!!! TODO
+    **packages:** `*.rpm` built directly using `rpmbuild`
+    or `--isolated` using `mock`
 """
 import glob
 

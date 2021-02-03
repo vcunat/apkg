@@ -1,9 +1,10 @@
 """
-Download upstream archive for current project
+download upstream archive for current project
+using project.upstream_archive_url config option
 
-usage: apkg get-archive [-v <ver>] [--no-cache]
+Usage: apkg get-archive [-v <ver>] [--no-cache]
 
-options:
+Options:
   -v <ver>, --version <ver>  version of archive to download
   --no-cache                 disable cache
 """ # noqa

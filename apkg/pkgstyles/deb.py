@@ -1,6 +1,13 @@
 """
-This is 'deb' apkg package style for Debian-based distros such as
-Debian, Ubuntu, and their many clones.
+apkg package style for **Debian**
+and its many clones such as Ubuntu or Mint.
+
+**source template**: content of `debian/` dir (`control`, `changelog`, ...)
+
+**source package:** `*.dsc` + archives
+
+**packages:** `*.deb` built directly using `dpkg-buildpackage`
+or `--isolated` using `pbuilder`
 """
 import glob
 import os
