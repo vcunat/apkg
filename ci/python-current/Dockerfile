@@ -12,7 +12,7 @@ RUN apt-get update -qqq
 RUN apt-get upgrade -y -qqq
 
 # basic deps
-RUN apt-get install -y -qqq python3-pbr python3-jinja2 python3-distro python3-docopt python3-blessings python3-toml
+RUN apt-get install -y -qqq python3-pbr python3-jinja2 python3-distro python3-docopt python3-blessings python3-requests python3-toml python3-cached-property
 # non-python deps
 RUN apt-get install -y -qqq git atool
 # packaging deps
