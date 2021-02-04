@@ -1,18 +1,22 @@
-try:
-    from functools import cached_property
-except ImportError:
-    from cached_property import cached_property
 import glob
 import hashlib
 from pathlib import Path
 import os
+import re
+
+import jinja2
 import toml
+try:
+    from functools import cached_property
+except ImportError:
+    from cached_property import cached_property
 
 from apkg import cache as _cache
 from apkg import exception
 from apkg.log import getLogger
 from apkg import pkgtemplate
 from apkg.util.git import git
+from apkg.util import upstreamversion
 
 
 log = getLogger(__name__)
@@ -60,7 +64,7 @@ class Project:
         """
         update project attributes based on current config
         """
-        self.name = self.config.get('project', {}).get('name')
+        self.name = self.config_get('project.name')
         if self.name:
             log.verbose("project name from config: %s" % self.name)
         else:
@@ -107,6 +111,20 @@ class Project:
             log.verbose("project config not found: %s" % self.config_path)
             return False
 
+    def config_get(self, option):
+        """
+        get config option if set or None
+
+        example options: 'project.name', 'upstream.archive_url'
+        """
+        c = self.config
+        for key in option.split('.'):
+            try:
+                c = c[key]
+            except KeyError:
+                return None
+        return c
+
     @cached_property
     def vcs(self):
         """
@@ -133,6 +151,46 @@ class Project:
                 diff_hash = hashlib.sha256(diff.encode('utf-8'))
                 checksum += '-%s' % diff_hash.hexdigest()[:10]
             return checksum
+        return None
+
+    def upstream_archive_url(self, version):
+        url = self.config_get('upstream.archive_url')
+        if not url:
+            return None
+        env = {'project': self, 'version': version}
+        url = jinja2.Template(url).render(**env)
+        return url
+
+    def upstream_signature_url(self, version):
+        url = self.config_get('upstream.signature_url')
+        if not url:
+            return None
+        env = {'project': self, 'version': version}
+        url = jinja2.Template(url).render(**env)
+        return url
+
+    @cached_property
+    def upstream_version(self):
+        """
+        check latest upstream version
+
+        upstream is only queried once
+
+        possible outputs: version, None
+        """
+        uv_script = self.config_get('upstream.version_script')
+        if uv_script:
+            v = upstreamversion.version_from_script(
+                uv_script, script_name='upstream.version_script')
+            log.info("detected upstream version (from script): %s", v)
+            return v
+        ar_url = self.upstream_archive_url('VERSION')
+        if ar_url:
+            m = re.match(r'(.*/)[^/]+', ar_url)
+            ar_base_url = m.group(1)
+            v = upstreamversion.version_from_listing(ar_base_url)
+            log.info("detected upstream version: %s", v)
+            return v
         return None
 
     @cached_property

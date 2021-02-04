@@ -33,14 +33,14 @@ edit distro/config/apkg.toml
 
 You can use `apkg`'s {{ 'distro/config/apkg.toml' | file_link }} as a starting point.
 
-See [project config docs](config.md#project-config) for a
+See [apkg config docs](config.md) for a
 complete list of individual `apkg.toml` options including descriptions.
 
 This guide assumes you have following options specified in your `apkg.toml`:
 
 * [project.name](config.md#projectname)
 * [project.make_archive_script](config.md#projectmake_archive_script)
-* [project.upstream_archive_url](config.md#projectupstream_archive_url) if project has upstream archives
+* [upstream.archive_url](config.md#upstreamarchive_url) if project has upstream archives
 
 Confirm that `apkg status` in project directory mentions existing config file:
 

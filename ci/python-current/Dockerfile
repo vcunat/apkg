@@ -11,16 +11,17 @@ CMD ["/bin/bash"]
 RUN apt-get update -qqq
 RUN apt-get upgrade -y -qqq
 
+# packaging deps
+RUN apt-get install -y -qqq dpkg-dev debhelper-compat dh-python python3-all python3-pip
 # basic deps
 RUN apt-get install -y -qqq python3-pbr python3-jinja2 python3-distro python3-docopt python3-blessings python3-requests python3-toml python3-cached-property
 # non-python deps
 RUN apt-get install -y -qqq git atool
-# packaging deps
-RUN apt-get install -y -qqq dpkg-dev debhelper-compat dh-python python3-all
+# deps not available in distro
+RUN pip3 install htmllistparse
 # testing deps
 RUN apt-get install -y -qqq tox python3-pytest python3-pytest-sugar python3-pytest-cov
 # linting deps
 RUN apt-get install -y -qqq python3-flake8 pylint3
 # doc deps
-RUN apt-get install -y -qqq python3-pip
 RUN pip3 install mkdocs mkdocs-macros-plugin

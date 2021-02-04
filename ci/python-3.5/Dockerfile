@@ -11,11 +11,13 @@ CMD ["/bin/bash"]
 RUN apt-get update -qqq
 RUN apt-get upgrade -y -qqq
 
+# packaging deps
+RUN apt-get install -y -qqq dpkg-dev debhelper dh-python python3-all python3-pip
 # basic deps
-RUN apt-get install -y -qqq python3-pbr python3-jinja2 python3-docopt python3-blessings python3-toml
+RUN apt-get install -y -qqq python3-pbr python3-jinja2 python3-docopt python3-blessings python3-toml python3-packaging
 # non-python deps
 RUN apt-get install -y -qqq git atool
-# packaging deps
-RUN apt-get install -y -qqq dpkg-dev debhelper dh-python python3-all
+# deps not available in distro
+RUN pip3 install htmllistparse
 # testing deps
 RUN apt-get install -y -qqq tox python3-pytest python3-pytest-cov python3-pytest-catchlog

@@ -4,7 +4,6 @@ apkg lib for handling source archives
 import os
 from pathlib import Path
 import shutil
-import jinja2
 import requests
 
 from apkg import exception
@@ -30,9 +29,8 @@ def make_archive(version=None, project=None, use_cache=True):
         if archive_path:
             log.success("reuse cached archive: %s", archive_path)
             return archive_path
-    try:
-        script = proj.config['project']['make_archive_script']
-    except KeyError:
+    script = proj.config_get('project.make_archive_script')
+    if not script:
         msg = ("make-archive requires project.make_archive_script option to\n"
                "be set in project config to a script that creates project\n"
                "archive and prints path to it on last stdout line.\n\n"
@@ -75,28 +73,13 @@ def get_archive(version=None, project=None, use_cache=True):
     """
     download archive for current project
     """
-    if not version:
-        raise exception.ApkgException(
-            "TODO: automatic latest version detection\n\n"
-            "For now please select using --version/-v.")
     proj = project or Project()
+    if not version:
+        version = proj.upstream_version
+        if not version:
+            raise exception.UnableToDetectUpstreamVersion()
     use_cache = proj.cache.enabled(use_cache)
-    try:
-        upstream_archive_url = proj.config['project']['upstream_archive_url']
-    except KeyError:
-        msg = ("get-archive requires project.upstream_archive_url option to\n"
-               "be set in project config:\n\n"
-               "%s" % proj.config_path)
-        raise exception.MissingRequiredConfigOption(msg=msg)
-
-    # variables available during templating
-    env = {
-        'project': proj,
-        'version': version,
-    }
-
-    archive_t = jinja2.Template(upstream_archive_url)
-    archive_url = archive_t.render(**env)
+    archive_url = proj.upstream_archive_url(version)
 
     if use_cache:
         archive_path = proj.cache.get('archive/upstream', archive_url)
@@ -125,15 +108,12 @@ def get_archive(version=None, project=None, use_cache=True):
         proj.cache.update(
             'archive/upstream', archive_url, str(archive_path))
 
-    try:
-        upstream_signature_url = \
-                proj.config['project']['upstream_signature_url']
-    except KeyError:
+    signature_url = proj.upstream_signature_url(version)
+    if not signature_url:
         log.verbose("project.upstream_signature_url not set"
                     " - skipping signature download")
         return archive_path
-    signature_t = jinja2.Template(upstream_signature_url)
-    signature_url = signature_t.render(**env)
+    # singature check
     log.info('downloading signature: %s', signature_url)
     r = requests.get(signature_url, allow_redirects=True)
     if not r.ok:

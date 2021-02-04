@@ -56,8 +56,9 @@ Resulting archive is copied to `pkg/archives/dev/`.
 {{ 'get-archive' | cmd_help }}
 
 `get-archive` requires
-[project.upstream_archive_url](config.md#projectmake_archive_script)
-config option to be set.
+[upstream.archive_url](config.md#upstreamarchive_url)
+config option to be set with additional options available in
+[upstream config section](config.md#upstream)
 
 This command will only succeed when it managed to download specified archive.
 
