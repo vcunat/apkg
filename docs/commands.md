@@ -64,10 +64,9 @@ This command will only succeed when it managed to download specified archive.
 
 Archive is downloaded into `pkg/archives/upstream/`.
 
-!!! notice
-    automatic latest version detection isn't implemented yet so version needs
-    to be manually specified with `-v`/`--version` option for now, i.e.
-    `apkg get-archive -v 1.2.3`
+If automatic latest upstream version detection doesn't work,
+you can always supply version manually with `-v`/`--version` option,
+i.e. `apkg get-archive -v 1.2.3`
 
 
 ## srcpkg

@@ -33,6 +33,11 @@ class InvalidChoice(ApkgException):
 
 class InvalidFormat(ApkgException):
     msg_fmt = "Invalid format: %(fmt)s"
+    exit_code = 17
+
+
+class InvalidArchiveFormat(InvalidFormat):
+    msg_fmt = "Invalid archive format: %(fmt)s"
     exit_code = 18
 
 

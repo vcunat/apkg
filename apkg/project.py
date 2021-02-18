@@ -45,6 +45,7 @@ class Project:
     archive_path = None
     dev_archive_path = None
     upstream_archive_path = None
+    unpacked_archive_path = None
     build_path = None
     package_build_path = None
     srcpkg_build_path = None
@@ -77,26 +78,37 @@ class Project:
         fill in projects paths based on current self.path and self.config
         """
         # package templates: distro/pkg
-        self.templates_path = self.path / INPUT_BASE_DIR / 'pkg'
-        # archives: pkg/archives/{dev,upstream}
-        self.archive_path = self.path / OUTPUT_BASE_DIR / 'archives'
+        self.templates_path = self.input_path / 'pkg'
+        # archives: pkg/archives/{dev,upstream,unpacked}
+        self.archive_path = self.output_path / 'archives'
         self.dev_archive_path = self.archive_path / 'dev'
         self.upstream_archive_path = self.archive_path / 'upstream'
+        self.unpacked_archive_path = self.archive_path / 'unpacked'
         # build: pkg/build/{src-,}pkg
-        self.build_path = self.path / OUTPUT_BASE_DIR / 'build'
+        self.build_path = self.output_path / 'build'
         self.package_build_path = self.build_path / 'pkgs'
         self.srcpkg_build_path = self.build_path / 'srcpkgs'
         # output: pkg/{src-,}pkg
-        self.package_out_path = self.path / OUTPUT_BASE_DIR / 'pkgs'
-        self.srcpkg_out_path = self.path / OUTPUT_BASE_DIR / 'srcpkgs'
+        self.package_out_path = self.output_path / 'pkgs'
+        self.srcpkg_out_path = self.output_path / 'srcpkgs'
         # cache: pkg/.cache.json
-        self.cache_path = self.path / OUTPUT_BASE_DIR / '.cache.json'
+        self.cache_path = self.output_path / '.cache.json'
 
-    def load(self):
+    def load(self,
+             input_path=None,
+             output_path=None):
         """
         load project config and update its attributes
         """
-        self.config_base_path = self.path / INPUT_BASE_DIR / 'config'
+        if not input_path:
+            input_path = self.path / INPUT_BASE_DIR
+        self.input_path = input_path
+
+        if not output_path:
+            output_path = self.path / OUTPUT_BASE_DIR
+        self.output_path = output_path
+
+        self.config_base_path = self.input_path / 'config'
         self.config_path = self.config_base_path / CONFIG_FN
         self.load_config()
         self.update_attrs()
