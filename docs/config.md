@@ -27,8 +27,11 @@ This is available to templates through {% raw %}`{{ project.name }}`{% endraw %}
 In order to create packages from your project source, `apkg` requires a script
 which creates archive from current project state.
 
-The script MUST return the path to created archive on last line of its
+The script MUST return the path to created archive on first line of its
 `stdout`.
+
+The script can output additional files (such as signatures) and print their
+paths on individual `stdout` lines after the main archive.
 
 Include such script in your project and then point to it using `make_archive_script`:
 
@@ -65,8 +68,8 @@ Optional signature file to download alongside upstream archive.
 If default upstream version auto-detection from HTML listing of files at
 `upstream.archive_url` parent doesn't work for your project or you want full
 control over the process, you can create a custom executable script which
-prints current upstream version as a last line of its stdout and tell `apkg`
-to use it with `upstream.version_script` option:
+prints current upstream version to `stdout` and tell `apkg` to use it
+with `upstream.version_script` option:
 
 ```
 [upstream]

@@ -7,6 +7,7 @@ import shutil
 import requests
 
 from apkg import exception
+from apkg.lib import common
 from apkg.log import getLogger
 from apkg.compat import py35path
 from apkg.parse import split_archive_fn, parse_version
@@ -17,23 +18,32 @@ from apkg.util.run import run
 log = getLogger(__name__)
 
 
-def make_archive(version=None, project=None, use_cache=True):
+def make_archive(
+        version=None,
+        result_dir=None,
+        use_cache=True,
+        project=None):
     """
     create archive from current project state
     """
     log.bold("creating dev archive")
     proj = project or Project()
+
     use_cache = proj.cache.enabled(use_cache)
     if use_cache:
-        archive_path = proj.cache.get('archive/dev', proj.checksum)
-        if archive_path:
-            log.success("reuse cached archive: %s", archive_path)
-            return archive_path
+        cache_name = 'archive/dev'
+        cache_key = proj.checksum
+        cached = common.get_cached_paths(
+            proj, cache_name, cache_key, result_dir)
+        if cached:
+            log.success("reuse cached archive: %s", cached[0])
+            return cached
+
     script = proj.config_get('project.make_archive_script')
     if not script:
         msg = ("make-archive requires project.make_archive_script option to\n"
                "be set in project config to a script that creates project\n"
-               "archive and prints path to it on last stdout line.\n\n"
+               "archive and prints its path to stdout.\n\n"
                "Please update project config with required information:\n\n"
                "%s" % proj.config_path)
         raise exception.MissingRequiredConfigOption(msg=msg)
@@ -50,6 +60,10 @@ def make_archive(version=None, project=None, use_cache=True):
         raise exception.UnexpectedCommandOutput(msg=msg)
     log.info("archive created: %s" % in_archive_path)
 
+    if result_dir:
+        ar_base_path = Path(result_dir)
+    else:
+        ar_base_path = proj.dev_archive_path
     archive_fn = in_archive_path.name
     if version:
         # specific version requested - rename if needed
@@ -58,18 +72,23 @@ def make_archive(version=None, project=None, use_cache=True):
             archive_fn = name + sep + version + ext
             msg = "archive renamed to match requested version: %s"
             log.info(msg, archive_fn)
-    archive_path = proj.dev_archive_path / archive_fn
+    archive_path = ar_base_path / archive_fn
     log.info("copying archive to: %s" % archive_path)
-    os.makedirs(py35path(proj.dev_archive_path), exist_ok=True)
+    os.makedirs(py35path(ar_base_path), exist_ok=True)
     shutil.copy(py35path(in_archive_path), py35path(archive_path))
     log.success("made archive: %s", archive_path)
+    results = [archive_path]
     if use_cache:
         proj.cache.update(
-            'archive/dev', proj.checksum, str(archive_path))
-    return archive_path
+            cache_name, cache_key, results)
+    return results
 
 
-def get_archive(version=None, project=None, use_cache=True):
+def get_archive(
+        version=None,
+        result_dir=None,
+        use_cache=True,
+        project=None):
     """
     download archive for current project
     """
@@ -78,14 +97,17 @@ def get_archive(version=None, project=None, use_cache=True):
         version = proj.upstream_version
         if not version:
             raise exception.UnableToDetectUpstreamVersion()
-    use_cache = proj.cache.enabled(use_cache)
     archive_url = proj.upstream_archive_url(version)
 
+    use_cache = proj.cache.enabled(use_cache)
     if use_cache:
-        archive_path = proj.cache.get('archive/upstream', archive_url)
-        if archive_path:
-            log.success("reuse cached archive: %s", archive_path)
-            return archive_path
+        cache_name = 'archive/upstream'
+        cache_key = archive_url
+        cached = common.get_cached_paths(
+            proj, cache_name, cache_key, result_dir)
+        if cached:
+            log.success("reuse cached archive: %s", cached[0])
+            return cached
 
     log.info('downloading archive: %s', archive_url)
     r = requests.get(archive_url, allow_redirects=True)
@@ -97,35 +119,41 @@ def get_archive(version=None, project=None, use_cache=True):
         raise exception.FileDownloadFailed(
             msg=msg % (content_type, archive_url))
 
-    _, _, archive_name = archive_url.rpartition('/')
-    archive_path = proj.upstream_archive_path / archive_name
+    if result_dir:
+        ar_base_path = Path(result_dir)
+    else:
+        ar_base_path = proj.upstream_archive_path
+    _, _, archive_fn = archive_url.rpartition('/')
+    archive_path = ar_base_path / archive_fn
     log.info('saving archive to: %s', archive_path)
-    os.makedirs(py35path(proj.upstream_archive_path), exist_ok=True)
+    os.makedirs(py35path(ar_base_path), exist_ok=True)
     archive_path.open('wb').write(r.content)
     log.success('downloaded archive: %s', archive_path)
+    results = [archive_path]
+
+    signature_url = proj.upstream_signature_url(version)
+    if signature_url:
+        # singature check
+        log.info('downloading signature: %s', signature_url)
+        r = requests.get(signature_url, allow_redirects=True)
+        if not r.ok:
+            raise exception.FileDownloadFailed(
+                    code=r.status_code, url=signature_url)
+        _, _, signature_name = signature_url.rpartition('/')
+        signature_path = ar_base_path / signature_name
+        log.info('saving signature to: %s', signature_path)
+        signature_path.open('wb').write(r.content)
+        log.success('downloaded signature: %s', signature_path)
+        results.append(signature_path)
+    else:
+        log.verbose("project.upstream_signature_url not set"
+                    " - skipping signature download")
 
     if use_cache:
         proj.cache.update(
-            'archive/upstream', archive_url, str(archive_path))
+            cache_name, cache_key, results)
 
-    signature_url = proj.upstream_signature_url(version)
-    if not signature_url:
-        log.verbose("project.upstream_signature_url not set"
-                    " - skipping signature download")
-        return archive_path
-    # singature check
-    log.info('downloading signature: %s', signature_url)
-    r = requests.get(signature_url, allow_redirects=True)
-    if not r.ok:
-        raise exception.FileDownloadFailed(
-                code=r.status_code, url=signature_url)
-    _, _, signature_name = signature_url.rpartition('/')
-    signature_path = proj.upstream_archive_path / signature_name
-    log.info('saving signature to: %s', signature_path)
-    signature_path.open('wb').write(r.content)
-    log.success('downloaded signature: %s', signature_path)
-
-    return archive_path
+    return results
 
 
 def find_archive(archive, upstream=False, project=None):

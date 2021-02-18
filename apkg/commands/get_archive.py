@@ -11,22 +11,26 @@ When no --version is specified, apkg tries to detect latest version:
 1) using upstream.version_script if set
 2) from HTML listing if upstream.archive_url is set
 
-Usage: apkg get-archive [-v <ver>] [--no-cache]
+Usage: apkg get-archive [-v <ver>] [-O <dir>] [--no-cache]
 
 Options:
-  -v <ver>, --version <ver>  version of archive to download
-  --no-cache                 disable cache
+  -v <ver>, --version <ver>     version of archive to download
+  -O <dir>, --result-dir <dir>  put results into specified dir
+                                default: pkg/archive/upstream/
+  --no-cache                    disable cache
 """ # noqa
 
 from docopt import docopt
 
 from apkg.lib import ar
+from apkg.lib import common
 
 
 def run_command(cargs):
     args = docopt(__doc__, argv=cargs)
-    out_path = ar.get_archive(
+    results = ar.get_archive(
         version=args['--version'],
+        result_dir=args['--result-dir'],
         use_cache=not args['--no-cache'])
-    print(out_path)
-    return out_path
+    common.print_results(results)
+    return results

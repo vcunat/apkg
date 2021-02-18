@@ -46,9 +46,11 @@ current distro: arch / Arch Linux
 [project.make_archive_script](config.md#projectmake_archive_script)
 config option to be set.
 
-This command will only succeed when the script finishes successfully (with exit code 0) and the resulting archive it created and printed to last line of its stdout exists, otherwise it will complain accordingly.
+This command will only succeed when the script finishes successfully (with
+exit code 0) and the resulting archive it created and printed to stdout
+followed by one line for each additional file (like signature).
 
-Resulting archive is copied to `pkg/archives/dev/`.
+Resulting archive is copied to `pkg/archives/dev/` or to `--result-dir`.
 
 
 ## get-archive
@@ -62,7 +64,7 @@ config option to be set with additional options available in
 
 This command will only succeed when it managed to download specified archive.
 
-Archive is downloaded into `pkg/archives/upstream/`.
+Archive is downloaded into `pkg/archives/upstream/` or to `--result-dir`.
 
 If automatic latest upstream version detection doesn't work,
 you can always supply version manually with `-v`/`--version` option,

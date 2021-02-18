@@ -50,18 +50,24 @@ class ProjectCache:
         self.load()
         self.loaded = True
 
-    def update(self, cache_name, key, path):
-        assert key
+    def update(self, cache_name, key, paths):
+        """
+        update cache entry
+        """
         log.verbose("cache update for %s: %s -> %s",
-                    cache_name, key, path)
+                    cache_name, key, paths[0])
+        assert key
         self._ensure_load()
         if cache_name not in self.cache:
             self.cache[cache_name] = {}
-        entry = self.path2entry(path)
-        self.cache[cache_name][key] = entry
+        entries = list(map(path2entry, paths))
+        self.cache[cache_name][key] = entries
         self.save()
 
     def get(self, cache_name, key):
+        """
+        get cache entry or None
+        """
         log.verbose("cache query for %s: %s",
                     cache_name, key)
 
@@ -77,58 +83,23 @@ class ProjectCache:
                 return False
             return True
 
+        def entry2path_valid(e):
+            return entry2path(e, validate_fun=validate)
+
+        assert key
         self._ensure_load()
-        entry = self.cache.get(cache_name, {}).get(key)
-        if not entry:
+        entries = self.cache.get(cache_name, {}).get(key)
+        if not entries:
             return None
-        path = self.entry2path(entry, validate_fun=validate)
-        return path
+        paths = list(map(entry2path_valid, entries))
+        return paths
 
     def delete(self, cache_name, key):
+        """
+        delete cache entry
+        """
         self.cache[cache_name].pop(key, None)
         self.save()
-
-    def path2entry(self, path):
-        """
-        convert path or a list of paths to corresponding cache entry
-
-        return (fn, checksum) or a list of that on multiple paths
-        """
-        is_list = True
-        if not isinstance(path, list):
-            path = [path]
-            is_list = False
-
-        e = list(map(
-            lambda x: (str(x), file_checksum(x)),
-            path))
-        if is_list:
-            return e
-        return e[0]
-
-    def entry2path(self, entry, validate_fun=None):
-        """
-        convert cache entry to file path or list of paths
-
-        if validate is True, make sure file has correct checksum
-        and flush invalid cache entry if it doesn't
-        """
-        is_list = True
-        if not isinstance(entry[0], list):
-            entry = [entry]
-            is_list = False
-
-        paths = []
-        for fn, checksum in entry:
-            p = Path(fn)
-            if validate_fun:
-                if not validate_fun(p, checksum):
-                    return None
-            paths.append(p)
-
-        if is_list:
-            return paths
-        return paths[0]
 
     def enabled(self, use_cache=True):
         """
@@ -147,3 +118,27 @@ class ProjectCache:
         else:
             log.verbose("cache DISABLED")
         return False
+
+
+def path2entry(path):
+    """
+    convert a path to corresponding cache entry
+
+    return (fn, checksum) or a list of that on multiple paths
+    """
+    return str(path), file_checksum(path)
+
+
+def entry2path(entry, validate_fun=None):
+    """
+    convert cache entry to a corresponding path
+
+    if validate_fun is specified, it's used confirm file has
+    valid checksum and flush invalid cache entry if it doesn't
+    """
+    fn, checksum = entry
+    p = Path(fn)
+    if validate_fun:
+        if not validate_fun(p, checksum):
+            return None
+    return p

@@ -2,14 +2,16 @@
 apkg lib for handling source archives
 """
 import os
+from pathlib import Path
 import shutil
 
 from apkg import adistro
 from apkg.cache import file_checksum
 from apkg.compat import py35path
 from apkg import exception
-from apkg.log import getLogger
 from apkg.lib import ar
+from apkg.lib import common
+from apkg.log import getLogger
 from apkg.project import Project
 from apkg.util.archive import unpack_archive
 
@@ -18,8 +20,13 @@ log = getLogger(__name__)
 
 
 def make_srcpkg(
-        archive=None, version=None, release=None,
-        distro=None, upstream=False, use_cache=True,
+        upstream=False,
+        archive=None,
+        version=None,
+        release=None,
+        distro=None,
+        result_dir=None,
+        use_cache=True,
         render_template=False,
         project=None):
     srcpkg_type = 'upstream' if upstream else 'dev'
@@ -30,7 +37,6 @@ def make_srcpkg(
 
     proj = project or Project()
     distro = adistro.distro_arg(distro)
-    use_cache = proj.cache.enabled(use_cache) and not render_template
     log.info("target distro: %s", distro)
 
     if not release:
@@ -46,24 +52,26 @@ def make_srcpkg(
             ar_path = ar.get_archive(
                 version=version,
                 project=proj,
-                use_cache=use_cache)
+                use_cache=use_cache)[0]
         else:
             ar_path = ar.make_archive(
                 version=version,
                 project=proj,
-                use_cache=use_cache)
+                use_cache=use_cache)[0]
         version = ar.get_archive_version(ar_path, version=version)
 
+    use_cache = proj.cache.enabled(use_cache) and not render_template
     if use_cache:
         cache_name = 'srcpkg/%s/%s' % (srcpkg_type, distro)
         if upstream:
             cache_key = file_checksum(ar_path)
         else:
             cache_key = proj.checksum
-        srcpkg_path = proj.cache.get(cache_name, cache_key)
-        if srcpkg_path:
-            log.success("reuse cached source package: %s", srcpkg_path)
-            return srcpkg_path
+        cached = common.get_cached_paths(
+            proj, cache_name, cache_key, result_dir)
+        if cached:
+            log.success("reuse cached source package: %s", cached[0])
+            return cached
 
     if upstream:
         # --upstream mode - use distro/ from archive
@@ -90,7 +98,10 @@ def make_srcpkg(
     pkg_name = ps.get_template_name(template.path)
     nvr = "%s-%s-%s" % (pkg_name, version, release)
     build_path = proj.srcpkg_build_path / distro / nvr
-    out_path = proj.srcpkg_out_path / distro / nvr
+    if result_dir:
+        out_path = Path(result_dir)
+    else:
+        out_path = proj.srcpkg_out_path / distro / nvr
     log.info("package NVR: %s", nvr)
     log.info("build dir: %s", build_path)
     log.info("result dir: %s", out_path)
@@ -100,8 +111,8 @@ def make_srcpkg(
         log.info("removing existing build dir: %s" % build_path)
         shutil.rmtree(py35path(build_path))
     os.makedirs(py35path(build_path), exist_ok=True)
-    # ensure output dir doesn't exist
-    if out_path.exists():
+    # ensure output dir doesn't exist unless it was specified
+    if not result_dir and out_path.exists():
         log.info("removing existing result dir: %s" % out_path)
         shutil.rmtree(out_path)
 
@@ -115,27 +126,31 @@ def make_srcpkg(
     }
     if render_template:
         # render template only, don't build srcpkg
+        if result_dir:
+            # respect --result-dir when rendering template
+            build_path = out_path
         template.render(build_path, env)
         log.success("rendered source package template: %s", build_path)
-        return build_path
+        return [build_path]
 
     # create source package using desired package style
-    srcpkg_path = template.pkgstyle.build_srcpkg(
+    results = template.pkgstyle.build_srcpkg(
         build_path,
         out_path,
         archive_path=ar_path,
         template=template,
         env=env)
 
-    if srcpkg_path.exists():
-        log.success("made source package: %s", srcpkg_path)
-    else:
-        msg = ("source package build reported success but there are "
-               "no results:\n\n%s" % srcpkg_path)
-        raise exception.UnexpectedCommandOutput(msg=msg)
+    # check reported results exist
+    for p in results:
+        if not Path(p).exists():
+            msg = ("source package build reported success but result is "
+                   "missing:\n\n%s" % p)
+            raise exception.UnexpectedCommandOutput(msg=msg)
+    log.success("made source package: %s", results[0])
 
     if use_cache:
         proj.cache.update(
-            cache_name, cache_key, str(srcpkg_path))
+            cache_name, cache_key, results)
 
-    return srcpkg_path
+    return results
