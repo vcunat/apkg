@@ -20,14 +20,18 @@ log = getLogger(__name__)
 def make_srcpkg(
         archive=None, version=None, release=None,
         distro=None, upstream=False, use_cache=True,
+        render_template=False,
         project=None):
     srcpkg_type = 'upstream' if upstream else 'dev'
-    log.bold('creating %s source package', srcpkg_type)
+    if render_template:
+        log.bold('rendering %s source package template', srcpkg_type)
+    else:
+        log.bold('creating %s source package', srcpkg_type)
 
     proj = project or Project()
     distro = adistro.distro_arg(distro)
-    use_cache = proj.cache.enabled(use_cache)
-    log.info("target distro: %s" % distro)
+    use_cache = proj.cache.enabled(use_cache) and not render_template
+    log.info("target distro: %s", distro)
 
     if not release:
         release = '1'
@@ -109,6 +113,12 @@ def make_srcpkg(
         'nvr': nvr,
         'distro': distro,
     }
+    if render_template:
+        # render template only, don't build srcpkg
+        template.render(build_path, env)
+        log.success("rendered source package template: %s", build_path)
+        return build_path
+
     # create source package using desired package style
     srcpkg_path = template.pkgstyle.build_srcpkg(
         build_path,

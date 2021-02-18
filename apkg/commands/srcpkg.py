@@ -3,7 +3,7 @@ create source package (files to build package from)
 
 Usage: apkg srcpkg [-u] [-a <ar>]
                    [-v <ver>] [-r <rls>] [-d <distro>]
-                   [--no-cache]
+                   [--no-cache] [--render-template]
 
 Options:
   -u, --upstream                  upstream source package from archive
@@ -14,6 +14,7 @@ Options:
   -d <distro>, --distro <distro>  set target distro
                                   default: current distro
   --no-cache                      disable cache
+  --render-template               only render source package template
 """ # noqa
 
 from docopt import docopt
@@ -29,6 +30,7 @@ def run_command(cargs):
             version=args['--version'],
             release=args['--release'],
             distro=args['--distro'],
-            use_cache=not args['--no-cache'])
+            use_cache=not args['--no-cache'],
+            render_template=args['--render-template'])
     print(out_srcpkg)
     return out_srcpkg
