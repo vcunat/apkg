@@ -5,11 +5,13 @@ import os
 import shutil
 
 from apkg import adistro
+from apkg.cache import file_checksum
 from apkg.compat import py35path
 from apkg import exception
 from apkg.log import getLogger
-from apkg.project import Project
 from apkg.lib import ar
+from apkg.project import Project
+from apkg.util.archive import unpack_archive
 
 
 log = getLogger(__name__)
@@ -19,7 +21,8 @@ def make_srcpkg(
         archive=None, version=None, release=None,
         distro=None, upstream=False, use_cache=True,
         project=None):
-    log.bold('creating source package')
+    srcpkg_type = 'upstream' if upstream else 'dev'
+    log.bold('creating %s source package', srcpkg_type)
 
     proj = project or Project()
     distro = adistro.distro_arg(distro)
@@ -47,13 +50,25 @@ def make_srcpkg(
                 use_cache=use_cache)
         version = ar.get_archive_version(ar_path, version=version)
 
-    # --upstream builds aren't well supported yet - don't cache for now
-    if use_cache and not upstream:
-        cache_name = 'srcpkg/dev/%s' % distro
-        srcpkg_path = proj.cache.get(cache_name, proj.checksum)
+    if use_cache:
+        cache_name = 'srcpkg/%s/%s' % (srcpkg_type, distro)
+        if upstream:
+            cache_key = file_checksum(ar_path)
+        else:
+            cache_key = proj.checksum
+        srcpkg_path = proj.cache.get(cache_name, cache_key)
         if srcpkg_path:
             log.success("reuse cached source package: %s", srcpkg_path)
             return srcpkg_path
+
+    if upstream:
+        # --upstream mode - use distro/ from archive
+        log.info("unpacking upstream archive: %s", ar_path)
+        unpack_path = unpack_archive(ar_path, proj.unpacked_archive_path)
+        input_path = unpack_path / 'distro'
+        log.info("loading upstream project input: %s", input_path)
+        # reload project with input_path from archive
+        proj.load(input_path=input_path, output_path=proj.output_path)
 
     # fetch correct package template
     template = proj.get_template_for_distro(distro)
@@ -109,8 +124,8 @@ def make_srcpkg(
                "no results:\n\n%s" % srcpkg_path)
         raise exception.UnexpectedCommandOutput(msg=msg)
 
-    if use_cache and not upstream:
+    if use_cache:
         proj.cache.update(
-            cache_name, proj.checksum, str(srcpkg_path))
+            cache_name, cache_key, str(srcpkg_path))
 
     return srcpkg_path

@@ -1,15 +1,15 @@
 """
 build packages
 
-Usage: apkg build ([-u] | [-s <srcpkg>] | [-a <ar>] )
+Usage: apkg build [-u] [-s <srcpkg> | -a <ar>]
                   [-v <ver>] [-r <rls>] [-d <distro>]
                   [-i] [-I] [--no-cache]
 
 Options:
+  -u, --upstream                  upstream build from archive
+                                  default: dev build from project
   -s <srcpkg>, --srcpkg <srcpkg>  use specified source package (path or name)
   -a <ar>, --archive <ar>         use specified archive (path or name)
-  -u, --upstream                  use upstream archive / apkg get-source
-                                  default: use dev archvie / apkg make-source
   -v <ver>, --version <ver>       set package version
   -r <rls>, --release <rls>       set package release
   -d <distro>, --distro <distro>  set target distro

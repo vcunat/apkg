@@ -3,5 +3,9 @@
 name = "apkg"
 # needed for make-archive
 make_archive_script = "scripts/make-dev-archive.sh"
+
+[upstream]
 # needed for get-archive
-upstream_archive_url = "https://gitlab.nic.cz/packaging/{{ project.name }}/-/archive/v{{ version }}/{{ project.name }}-v{{ version }}.tar.gz"
+archive_url = "https://gitlab.nic.cz/packaging/{{ project.name }}/-/archive/v{{ version }}/{{ project.name }}-v{{ version }}.tar.gz"
+# script to check latest upstream version
+version_script = "scripts/upstream-version.py"

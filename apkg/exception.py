@@ -33,6 +33,11 @@ class InvalidChoice(ApkgException):
 
 class InvalidFormat(ApkgException):
     msg_fmt = "Invalid format: %(fmt)s"
+    exit_code = 17
+
+
+class InvalidArchiveFormat(InvalidFormat):
+    msg_fmt = "Invalid archive format: %(fmt)s"
     exit_code = 18
 
 
@@ -104,3 +109,14 @@ class ArchiveNotFound(ApkgException):
 class SourcePackageNotFound(ApkgException):
     msg_fmt = "%(type)s source package not found: %(srcpkg)s"
     exit_code = 82
+
+
+class UnableToDetectUpstreamVersion(ApkgException):
+    msg_fmt = (
+        "Unable to detect upstream version.\n\n"
+        "Please consider one of following:\n\n"
+        "1) set upstream.archive_url "
+        "(requires htmllistparse module)\n"
+        "2) set upstream.version_script to custom script\n"
+        "3) manually supply version using -v/--version option")
+    exit_code = 90

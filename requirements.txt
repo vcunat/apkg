@@ -1,8 +1,11 @@
-blessings
-docopt
-distro
-cached_property # for python <= 3.7
-jinja2
-pbr
-requests
-toml
+# CORE REQUIREMENTS
+cached_property  # @cached_property for python <= 3.7
+distro           # current distro detection
+docopt           # nice CLI from docstrings
+jinja2           # templating
+pbr              # packaging/versioning
+requests         # HTTP for humans™
+toml             # config files
+# OPTIONAL REQUIREMENTS
+blessings        # terminal colors - recommended!
+htmllistparse    # upstream version detection
