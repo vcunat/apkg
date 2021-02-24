@@ -107,11 +107,16 @@ def build_srcpkg(
     log.info("copying source package to result dir: %s", out_path)
     os.makedirs(py35path(out_path))
     _copy_srcpkg_files(build_path, out_path)
-    try:
-        return Path(glob.glob('%s/*.dsc' % out_path)[0])
-    except KeyError:
+    fns = glob.glob('%s/*' % out_path)
+    # make sure .dsc is first
+    for i, fn in enumerate(fns):
+        if fn.endswith('.dsc'):
+            fns = [fns.pop(i)] + fns
+            break
+    else:
         raise exception.UnexpectedCommandOutput(
             msg="no *.dsc found after moving built source package")
+    return list(map(Path, fns))
 
 
 def build_packages(

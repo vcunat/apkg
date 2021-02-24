@@ -55,13 +55,14 @@ def build_srcpkg(
         env):
     in_pkgbuild = build_path / 'PKGBUILD'
     out_pkgbuild = out_path / 'PKGBUILD'
+    out_archive = out_path / archive_path.name
     log.info("building arch source package: %s" % in_pkgbuild)
     template.render(build_path, env or {})
     os.makedirs(out_path)
     log.info("copying PKGBUILD and archive to: %s" % out_path)
     shutil.copyfile(in_pkgbuild, out_pkgbuild)
-    shutil.copyfile(archive_path, out_path / archive_path.name)
-    return out_pkgbuild
+    shutil.copyfile(archive_path, out_archive)
+    return [out_pkgbuild, out_archive]
 
 
 def build_packages(

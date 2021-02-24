@@ -3,7 +3,8 @@ create source package (files to build package from)
 
 Usage: apkg srcpkg [-u] [-a <ar>]
                    [-v <ver>] [-r <rls>] [-d <distro>]
-                   [--no-cache]
+                   [-O <dir>]
+                   [--no-cache] [--render-template]
 
 Options:
   -u, --upstream                  upstream source package from archive
@@ -13,22 +14,28 @@ Options:
   -r <rls>, --release <rls>       set package release
   -d <distro>, --distro <distro>  set target distro
                                   default: current distro
+  -O <dir>, --result-dir <dir>    put results into specified dir
+                                  default: pkg/srcpkg/DISTRO/NVR
   --no-cache                      disable cache
+  --render-template               only render source package template
 """ # noqa
 
 from docopt import docopt
 
 from apkg.lib import srcpkg
+from apkg.lib import common
 
 
 def run_command(cargs):
     args = docopt(__doc__, argv=cargs)
-    out_srcpkg = srcpkg.make_srcpkg(
-            upstream=args['--upstream'],
-            archive=args['--archive'],
-            version=args['--version'],
-            release=args['--release'],
-            distro=args['--distro'],
-            use_cache=not args['--no-cache'])
-    print(out_srcpkg)
-    return out_srcpkg
+    results = srcpkg.make_srcpkg(
+        upstream=args['--upstream'],
+        archive=args['--archive'],
+        version=args['--version'],
+        release=args['--release'],
+        distro=args['--distro'],
+        result_dir=args['--result-dir'],
+        use_cache=not args['--no-cache'],
+        render_template=args['--render-template'])
+    common.print_results(results)
+    return results

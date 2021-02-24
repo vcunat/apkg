@@ -21,8 +21,8 @@ def test_apkg_make_archive(tmpdir, capsys):
     with cd(repo_dir):
         assert apkg('make-archive') == 0
     out, _ = capsys.readouterr()
-    # last stdout line should be resulting archive
-    assert re.search(r"pkg/archives/dev/apkg-.*\.tar\.gz$", out)
+    # first stdout line should be resulting archive
+    assert re.match(r"pkg/archives/dev/apkg-.*\.tar\.gz", out)
 
 
 def test_apkg_get_archive(tmpdir, capsys):
@@ -33,8 +33,8 @@ def test_apkg_get_archive(tmpdir, capsys):
     with cd(repo_dir):
         assert apkg('get-archive', '--version', VERSION) == 0
     out, _ = capsys.readouterr()
-    # last stdout line should be downloaded archive
-    assert ("pkg/archives/upstream/apkg-v%s.tar.gz" % VERSION) in out
+    # first stdout line should be downloaded archive
+    assert out.startswith("pkg/archives/upstream/apkg-v%s.tar.gz" % VERSION)
 
 
 def test_apkg_srcpkg(tmpdir, capsys):
@@ -44,8 +44,8 @@ def test_apkg_srcpkg(tmpdir, capsys):
     with cd(repo_dir):
         assert apkg('srcpkg') == 0
     out, _ = capsys.readouterr()
-    # last stdout line should be resulting source package
-    assert re.search(r"pkg/srcpkgs/\S+/apkg\S+$", out)
+    # first stdout line should be resulting source package
+    assert re.match(r"pkg/srcpkgs/\S+/apkg\S+", out)
 
 
 def test_apkg_build(tmpdir, capsys):
@@ -55,8 +55,8 @@ def test_apkg_build(tmpdir, capsys):
     with cd(repo_dir):
         assert apkg('build') == 0
     out, _ = capsys.readouterr()
-    # last line should be one of resulting packages
-    assert re.search(r"pkg/pkgs/\S+/apkg\S+$", out)
+    # at least one package should be printed
+    assert re.match(r"pkg/pkgs/\S+/apkg\S+", out)
 
 
 def test_apkg_cache(tmpdir, caplog):
