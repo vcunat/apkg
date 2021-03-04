@@ -181,3 +181,38 @@ def install_build_deps(
         cmd.append('-y')
     cmd.append(srcpkg_path.resolve())
     sudo(*cmd, direct=True)
+
+
+def install_custom_packages(
+        packages,
+        **kwargs):
+
+    def local_path(pkg):
+        """
+        apt install is able to install local packages
+        as long as they use full path or relative including ./
+        """
+        p = str(pkg)
+        if p[0] not in '/\\.':
+            return "./%s" % p
+        return p
+
+    interactive = kwargs.get('interactive', False)
+
+    cmd = ['apt', 'install']
+    if not interactive:
+        cmd += ['-y']
+    cmd += list(map(local_path, packages))
+    sudo(*cmd, direct=True)
+
+
+def install_distro_packages(
+        packages,
+        **kwargs):
+    interactive = kwargs.get('interactive', False)
+
+    cmd = ['apt-get', 'install']
+    if not interactive:
+        cmd += ['-y']
+    cmd += packages
+    sudo(*cmd, direct=True)
