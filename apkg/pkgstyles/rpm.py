@@ -176,3 +176,24 @@ def install_build_deps(
         cmd.append('-y')
     cmd.append(srcpkg_path.resolve())
     sudo(*cmd, direct=True)
+
+
+def install_custom_packages(
+        packages,
+        **kwargs):
+    interactive = kwargs.get('interactive', False)
+    distro = kwargs.get('distro')
+    dnf = _get_dnf_or_yum(distro)
+
+    cmd = [dnf, 'install']
+    if not interactive:
+        cmd += ['-y']
+    cmd += packages
+    sudo(*cmd, direct=True)
+
+
+def install_distro_packages(
+        packages,
+        **kwargs):
+    # dnf handles both local and distro packages
+    install_custom_packages(packages, **kwargs)
