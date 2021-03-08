@@ -175,12 +175,16 @@ def install_build_deps(
         srcpkg_path,
         **kwargs):
     interactive = kwargs.get('interactive', False)
+
     log.info("installing build deps using apt-get build-dep")
     cmd = ['apt-get', 'build-dep']
+    env = {}
     if not interactive:
         cmd.append('-y')
+        env['DEBIAN_FRONTEND'] = 'noninteractive'
+
     cmd.append(srcpkg_path.resolve())
-    sudo(*cmd, direct=True)
+    sudo(*cmd, env=env, direct=True)
 
 
 def install_custom_packages(
@@ -200,10 +204,13 @@ def install_custom_packages(
     interactive = kwargs.get('interactive', False)
 
     cmd = ['apt', 'install']
+    env = {}
     if not interactive:
+        env['DEBIAN_FRONTEND'] = 'noninteractive'
         cmd += ['-y']
+
     cmd += list(map(local_path, packages))
-    sudo(*cmd, direct=True)
+    sudo(*cmd, env=env, direct=True)
 
 
 def install_distro_packages(
@@ -212,7 +219,10 @@ def install_distro_packages(
     interactive = kwargs.get('interactive', False)
 
     cmd = ['apt-get', 'install']
+    env = {}
     if not interactive:
+        env['DEBIAN_FRONTEND'] = 'noninteractive'
         cmd += ['-y']
+
     cmd += packages
-    sudo(*cmd, direct=True)
+    sudo(*cmd, env=env, direct=True)
