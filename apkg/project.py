@@ -67,7 +67,7 @@ class Project:
         """
         self.name = self.config_get('project.name')
         if self.name:
-            log.verbose("project name from config: %s" % self.name)
+            log.verbose("project name from config: %s", self.name)
         else:
             self.name = self.path.resolve().name
             log.verbose("project name not in config - "
@@ -116,11 +116,11 @@ class Project:
 
     def load_config(self):
         if self.config_path.exists():
-            log.verbose("loading project config: %s" % self.config_path)
+            log.verbose("loading project config: %s", self.config_path)
             self.config = toml.load(self.config_path.open())
             return True
         else:
-            log.verbose("project config not found: %s" % self.config_path)
+            log.verbose("project config not found: %s", self.config_path)
             return False
 
     def config_get(self, option):

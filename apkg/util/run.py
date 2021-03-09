@@ -17,7 +17,7 @@ if os.geteuid() == 0:
 
 
 def log_cmd_fail(cmd, cout):
-    log.error("command failed: %s" % T.command(cmd))
+    log.error("command failed: %s", T.command(cmd))
     if cout:
         log.bold("stdout:")
         log.info(cout)

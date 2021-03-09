@@ -32,7 +32,7 @@ def build_package(
 
     proj = project or Project()
     distro = adistro.distro_arg(distro)
-    log.info("target distro: %s" % distro)
+    log.info("target distro: %s", distro)
 
     if srcpkg:
         # use existing source package
@@ -40,7 +40,7 @@ def build_package(
         if not srcpkg_path.exists():
             raise exception.SourcePackageNotFound(
                 srcpkg=srcpkg, type=distro)
-        log.info("using existing source package: %s" % srcpkg_path)
+        log.info("using existing source package: %s", srcpkg_path)
     else:
         # make source package
         srcpkg_path = Path(_srcpkg.make_srcpkg(
@@ -84,11 +84,11 @@ def build_package(
     log.info("result dir: %s", result_path)
     # ensure build build doesn't exist
     if build_path.exists():
-        log.info("removing existing build dir: %s" % build_path)
+        log.info("removing existing build dir: %s", build_path)
         shutil.rmtree(build_path)
     # ensure result dir doesn't exist unless specified
     if not result_dir and result_path.exists():
-        log.info("removing existing result dir: %s" % result_path)
+        log.info("removing existing result dir: %s", result_path)
         shutil.rmtree(result_path)
 
     # build package using chosen distro packaging style
@@ -122,7 +122,7 @@ def install_build_deps(
 
     proj = Project()
     distro = adistro.distro_arg(distro)
-    log.info("target distro: %s" % distro)
+    log.info("target distro: %s", distro)
 
     if srcpkg:
         # use existing source package
@@ -130,7 +130,7 @@ def install_build_deps(
         if not srcpkg_path.exists():
             raise exception.SourcePackageNotFound(
                 srcpkg=srcpkg, type=distro)
-        log.info("using existing source package: %s" % srcpkg_path)
+        log.info("using existing source package: %s", srcpkg_path)
     else:
         # make source package
         srcpkg_path = _srcpkg.make_srcpkg(

@@ -74,8 +74,8 @@ def build_srcpkg(
         env):
     nv = "%s-%s" % (env['name'], env['version'])
     source_path = build_path / nv
-    log.info("building deb source package: %s" % nv)
-    log.info("unpacking archive: %s" % archive_path)
+    log.info("building deb source package: %s", nv)
+    log.info("unpacking archive: %s", archive_path)
     os.makedirs(py35path(source_path))
     run('aunpack', '-X', build_path, archive_path)
     if not source_path.exists():
@@ -162,7 +162,7 @@ def build_packages(
                 direct=direct_run)
 
     pkgs = []
-    log.info("copying built packages to result dir: %s" % out_path)
+    log.info("copying built packages to result dir: %s", out_path)
     for src_pkg in glob.iglob('%s/*.deb' % build_path):
         dst_pkg = out_path / Path(src_pkg).name
         shutil.copyfile(py35path(src_pkg), py35path(dst_pkg))
