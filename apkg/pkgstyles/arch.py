@@ -15,7 +15,7 @@ import shutil
 from apkg import exception
 from apkg.log import getLogger, LOG_LEVEL, INFO
 from apkg.compat import py35path
-from apkg.util.run import cd, run
+from apkg.util.run import cd, run, sudo
 
 
 log = getLogger(__name__)
@@ -98,3 +98,25 @@ def install_build_deps(
     msg = ("build-dep installation isn't currently supported on arch\n\n"
            "this might work: makepkg -si && sudo pacman -R <package-name>")
     raise exception.DistroNotSupported(msg=msg)
+
+
+def install_custom_packages(
+        packages,
+        **kwargs):
+    interactive = kwargs.get('interactive', False)
+    cmd = ['pacman', '-U']
+    if not interactive:
+        cmd += ['--noconfirm']
+    cmd += packages
+    sudo(*cmd, direct=True)
+
+
+def install_distro_packages(
+        packages,
+        **kwargs):
+    interactive = kwargs.get('interactive', False)
+    cmd = ['pacman', '-S']
+    if not interactive:
+        cmd += ['--noconfirm']
+    cmd += packages
+    sudo(*cmd, direct=True)

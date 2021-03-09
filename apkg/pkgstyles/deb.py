@@ -175,9 +175,54 @@ def install_build_deps(
         srcpkg_path,
         **kwargs):
     interactive = kwargs.get('interactive', False)
+
     log.info("installing build deps using apt-get build-dep")
     cmd = ['apt-get', 'build-dep']
+    env = {}
     if not interactive:
         cmd.append('-y')
+        env['DEBIAN_FRONTEND'] = 'noninteractive'
+
     cmd.append(srcpkg_path.resolve())
-    sudo(*cmd, direct=True)
+    sudo(*cmd, env=env, direct=True)
+
+
+def install_custom_packages(
+        packages,
+        **kwargs):
+
+    def local_path(pkg):
+        """
+        apt install is able to install local packages
+        as long as they use full path or relative including ./
+        """
+        p = str(pkg)
+        if p[0] not in '/\\.':
+            return "./%s" % p
+        return p
+
+    interactive = kwargs.get('interactive', False)
+
+    cmd = ['apt', 'install']
+    env = {}
+    if not interactive:
+        env['DEBIAN_FRONTEND'] = 'noninteractive'
+        cmd += ['-y']
+
+    cmd += list(map(local_path, packages))
+    sudo(*cmd, env=env, direct=True)
+
+
+def install_distro_packages(
+        packages,
+        **kwargs):
+    interactive = kwargs.get('interactive', False)
+
+    cmd = ['apt-get', 'install']
+    env = {}
+    if not interactive:
+        env['DEBIAN_FRONTEND'] = 'noninteractive'
+        cmd += ['-y']
+
+    cmd += packages
+    sudo(*cmd, env=env, direct=True)

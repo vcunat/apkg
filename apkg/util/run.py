@@ -113,6 +113,8 @@ def run(*cmd, **kwargs):
 
 def sudo(*cmd, **kwargs):
     preserve_env = kwargs.pop('preserve_env', False)
+    if 'env' in kwargs:
+        preserve_env = True
     if not IS_ROOT:
         sudo_cmd = ['sudo']
         if preserve_env:

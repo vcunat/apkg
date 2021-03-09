@@ -12,6 +12,7 @@ Commands:
   srcpkg                      create source package (files to build packages from)
   build                       build package
   build-dep                   install build dependencies
+  install                     install packages
 
 Options:
   -h --help     show help screen, can be used after a command
