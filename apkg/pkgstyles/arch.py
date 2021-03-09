@@ -72,12 +72,16 @@ def build_packages(
         **kwargs):
     if srcpkg_path.name != 'PKGBUILD':
         raise exception.InvalidSourcePackageFormat(
-            fmt='arch source package format is PKGBUILD but got: %s'
+            fmt="arch source package format is PKGBUILD but got: %s"
             % srcpkg_path.name)
+    isolated = kwargs.get('isolated')
     log.info("copying source package to build dir: %s", build_path)
     shutil.copytree(py35path(srcpkg_path.parent), py35path(build_path))
     # build package using makepkg
-    log.info("starting arch package build using makepkg")
+    if not isolated:
+        msg = "arch doesn't support direct host build - using isolated"
+        log.warning(msg)
+    log.info("starting isolated arch package build using makepkg")
     with cd(build_path):
         run('makepkg', direct=bool(LOG_LEVEL <= INFO))
     log.info("copying built packages to result dir: %s", out_path)
@@ -90,14 +94,6 @@ def build_packages(
         pkgs.append(dst_pkg)
 
     return pkgs
-
-
-def install_build_deps(
-        srcpkg_path,
-        **kwargs):
-    msg = ("build-dep installation isn't currently supported on arch\n\n"
-           "this might work: makepkg -si && sudo pacman -R <package-name>")
-    raise exception.DistroNotSupported(msg=msg)
 
 
 def install_custom_packages(

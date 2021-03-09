@@ -141,7 +141,7 @@ def build_packages(
             shutil.copyfile(py35path(src_pkg), py35path(dst_pkg))
             pkgs.append(dst_pkg)
     else:
-        log.info("starting direct .rpm build using rpmbuild")
+        log.info("starting direct host .rpm build using rpmbuild")
         srcpkg_path_abs = srcpkg_path.resolve()
         with cd(build_path):
             out = run('rpmbuild', '--rebuild',

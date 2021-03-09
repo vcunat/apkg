@@ -63,10 +63,17 @@ def build_package(
             return cached
 
     if install_dep:
-        # install build deps if requested
-        install_build_deps(
-            srcpkg=srcpkg_path,
-            distro=distro)
+        if isolated:
+            # doesn't make sense outside of host build
+            log.warning("ignoring request to install deps in isolated build")
+        else:
+            # install build deps if requested
+            try:
+                install_build_deps(
+                    srcpkg=srcpkg_path,
+                    distro=distro)
+            except exception.DistroNotSupported as ex:
+                log.warning("%s - SKIPPING", ex)
 
     # fetch pkgstyle (deb, rpm, arch, ...)
     template = proj.get_template_for_distro(distro)
@@ -124,6 +131,14 @@ def install_build_deps(
     distro = adistro.distro_arg(distro)
     log.info("target distro: %s", distro)
 
+    # fetch pkgstyle (deb, rpm, arch, ...)
+    template = proj.get_template_for_distro(distro)
+    pkgstyle = template.pkgstyle
+
+    if not hasattr(pkgstyle, 'install_build_deps'):
+        msg = "build deps installation isn't supported on distro: %s"
+        raise exception.DistroNotSupported(msg % distro)
+
     if srcpkg:
         # use existing source package
         srcpkg_path = Path(srcpkg)
@@ -139,10 +154,6 @@ def install_build_deps(
             release=release,
             distro=distro,
             upstream=upstream)[0]
-
-    # fetch pkgstyle (deb, rpm, arch, ...)
-    template = proj.get_template_for_distro(distro)
-    pkgstyle = template.pkgstyle
 
     pkgstyle.install_build_deps(
         srcpkg_path,
