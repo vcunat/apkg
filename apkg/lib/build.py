@@ -138,7 +138,7 @@ def install_build_deps(
             version=version,
             release=release,
             distro=distro,
-            upstream=upstream)
+            upstream=upstream)[0]
 
     # fetch pkgstyle (deb, rpm, arch, ...)
     template = proj.get_template_for_distro(distro)
@@ -146,4 +146,5 @@ def install_build_deps(
 
     pkgstyle.install_build_deps(
         srcpkg_path,
+        distro=distro,
         interactive=interactive)
