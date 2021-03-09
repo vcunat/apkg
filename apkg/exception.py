@@ -16,6 +16,14 @@ class ApkgException(Exception):
         super().__init__(msg)
 
 
+class InvalidApkgCommand(ApkgException):
+    msg_fmt = (
+        "Invalid apkg command: %(command)s\n\n"
+        "Run `apkg -h` to list supported commands."
+    )
+    exit_code = 10
+
+
 class InvalidInput(ApkgException):
     msg_fmt = "Invalid input: %(fail)s"
     exit_code = 12
