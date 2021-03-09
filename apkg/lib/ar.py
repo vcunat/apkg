@@ -138,7 +138,7 @@ def get_archive(
         r = requests.get(signature_url, allow_redirects=True)
         if not r.ok:
             raise exception.FileDownloadFailed(
-                    code=r.status_code, url=signature_url)
+                code=r.status_code, url=signature_url)
         _, _, signature_name = signature_url.rpartition('/')
         signature_path = ar_base_path / signature_name
         log.info('saving signature to: %s', signature_path)

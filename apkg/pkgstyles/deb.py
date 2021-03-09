@@ -50,7 +50,7 @@ def get_template_name(path):
             return m.group(1)
 
     raise exception.ParsingFailed(
-            msg="unable to determine Source from: %s" % control)
+        msg="unable to determine Source from: %s" % control)
 
 
 def get_srcpkg_nvr(path):
@@ -137,8 +137,6 @@ def build_packages(
              preserve_env=True,  # preserve env inc. DEB_BUILD_OPTIONS
              direct=direct_run)
     else:
-        nvr, _ = os.path.splitext(py35path(srcpkg_path.name))
-        nv, _, _ = nvr.rpartition('-')
         # unpack source package
         log.info("unpacking source package for direct build")
         srcpkg_abspath = srcpkg_path.resolve()

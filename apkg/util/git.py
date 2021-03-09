@@ -53,7 +53,7 @@ class Git(ShellCommand):
         if remote_branch is None:
             for rbr in self.remote_branches():
                 br = rbr[rbr.find('/') + 1:]
-                if rbr == branch or br == branch:
+                if branch in [rbr, br]:
                     remote_branch = rbr
         elif remote_branch not in self.remote_branches():
             raise Exception("Branch %s doesn't exist in remotes" %
@@ -118,7 +118,7 @@ class Git(ShellCommand):
         res = self("remote", "show", log_cmd=False)
         return self._parse_branch_output(res)
 
-    def remote_branch_split(self, branch, fatal=True):
+    def remote_branch_split(self, branch):
         parts = branch.split('/')
         n_parts = len(parts)
         if n_parts >= 2:
@@ -128,8 +128,6 @@ class Git(ShellCommand):
                 if remote in remotes:
                     _branch = '/'.join(parts[n:])
                     return remote, _branch
-        if fatal:
-            raise exception.InvalidRemoteBranch(branch=branch)
         return None, branch
 
     def remote_of_local_branch(self, branch):
@@ -261,8 +259,8 @@ class Git(ShellCommand):
     def checkout(self, branch):
         self("checkout", branch, log_cmd=False)
 
-    def remove(self, hash):
-        self('rebase', '--onto', hash + '^', hash, '--preserve-merges',
+    def remove(self, ref):
+        self('rebase', '--onto', ref + '^', ref, '--preserve-merges',
              '--committer-date-is-author-date')
 
     def get_timestamp_by_ref(self, ref):

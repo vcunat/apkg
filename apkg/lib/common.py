@@ -29,7 +29,7 @@ def copy_paths(paths, dst):
 
 
 def get_cached_paths(proj, cache_name, cache_key,
-                     result_dir=None, entry_name='files'):
+                     result_dir=None):
     """
     get cached files and move them to result_dir if specified
     """

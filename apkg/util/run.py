@@ -38,7 +38,7 @@ def run(*cmd, **kwargs):
     log_cmd = kwargs.get('log_cmd', True)
     log_fail = kwargs.get('log_fail', True)
     log_fun = kwargs.get('log_fun', log.command)
-    input = kwargs.get('input')
+    _input = kwargs.get('input')
     print_stdout = kwargs.get('print_stdout', False)
     print_stderr = kwargs.get('print_stderr', False)
     print_output = kwargs.get('print_output', False)
@@ -58,7 +58,7 @@ def run(*cmd, **kwargs):
         print_stdout = True
         print_stderr = True
 
-    if input:
+    if _input:
         stdin = subprocess.PIPE
     else:
         stdin = None
@@ -78,11 +78,11 @@ def run(*cmd, **kwargs):
                                stderr=stderr, env=env)
     except OSError:
         raise exception.CommandNotFound(cmd=cmd[0])
-    out, err = prc.communicate(input=input)
+    out, err = prc.communicate(input=_input)
 
-    if type(out) == bytes:
+    if isinstance(out, bytes):
         out = out.decode('utf-8')
-    if type(err) == bytes:
+    if isinstance(err, bytes):
         err = err.decode('utf-8')
 
     if out:
@@ -137,7 +137,7 @@ def cd(newdir):
         os.chdir(olddir)
 
 
-class ShellCommand(object):
+class ShellCommand:
     command = None
 
     def __init__(self):
@@ -152,6 +152,10 @@ class CommandOutput(str):
     """
     Just a string subclass with attribute access.
     """
+    cmd = None
+    stderr = None
+    return_code = None
+
     @property
     def success(self):
         return self.return_code == 0
