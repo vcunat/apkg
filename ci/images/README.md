@@ -1,11 +1,23 @@
-Docker Build
-------------
+# apkg CI images
 
-* python-current (for python-$VER replace "current" with "$VER")
+## build image
+
+use `build.sh` to build docker image, for example:
 
 ```
-$ docker build --no-cache -t registry.nic.cz/packaging/apkg/ci/python-current:apkg python-current
+./build.sh python-current
+```
 
+## upload image into apkg CI
+
+you need to login first:
+
+```
 $ docker login registry.nic.cz
-$ docker push registry.nic.cz/packaging/apkg/ci/python-current:apkg
+```
+
+then you can use `upload.sh` script:
+
+```
+./upload.sh python-current
 ```
