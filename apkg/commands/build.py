@@ -4,7 +4,7 @@ build packages
 Usage: apkg build [-u] [-s <srcpkg> | -a <ar>]
                   [-v <ver>] [-r <rls>] [-d <distro>]
                   [-O <dir>]
-                  [-i] [-I] [--no-cache]
+                  [-H] [-i] [--no-cache]
 
 Options:
   -u, --upstream                  upstream build from archive
@@ -17,9 +17,10 @@ Options:
                                   default: current distro
   -O <dir>, --result-dir <dir>    put results into specified dir
                                   default: pkg/pkgs/DISTRO/NVR
-  -i, --install-dep               install build dependencies
-  -I, --isolated                  use isolated builder (pbuilder/mock) if supported
-                                  default: use direct build
+  -H, --host-build                build directly on host (!) without isolated env
+                                  default: use isolated builder (pbuilder, mock, ...)
+  -i, --install-dep               install build dependencies on host
+                                  only works with -H/--host-build
   --no-cache                      disable cache
 """ # noqa
 
@@ -40,7 +41,7 @@ def run_command(cargs):
         distro=args['--distro'],
         result_dir=args['--result-dir'],
         install_dep=args['--install-dep'],
-        isolated=args['--isolated'],
+        isolated=not args['--host-build'],
         use_cache=not args['--no-cache'])
     common.print_results(results)
     return results

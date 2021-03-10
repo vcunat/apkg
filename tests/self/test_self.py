@@ -53,7 +53,7 @@ def test_apkg_build(tmpdir, capsys):
     repo_dir = str(repo_path)
     assert repo_dir.endswith('apkg')
     with cd(repo_dir):
-        assert apkg('build') == 0
+        assert apkg('build', '--host-build') == 0
     out, _ = capsys.readouterr()
     # at least one package should be printed
     assert re.match(r"pkg/pkgs/\S+/apkg\S+", out)

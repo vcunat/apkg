@@ -138,7 +138,7 @@ def build_packages(
              direct=direct_run)
     else:
         # unpack source package
-        log.info("unpacking source package for direct build")
+        log.info("unpacking source package for direct host build")
         srcpkg_abspath = srcpkg_path.resolve()
         with cd(build_path):
             run('dpkg-source', '-x', srcpkg_abspath,
@@ -151,7 +151,7 @@ def build_packages(
             msg = "failed to find unpacked source dir: %s"
             raise exception.UnexpectedCommandOutput(msg % source_glob)
 
-        log.info("starting direct build using dpkg-buildpackage")
+        log.info("starting direct host build using dpkg-buildpackage")
         with cd(source_path):
             # build
             run('dpkg-buildpackage',

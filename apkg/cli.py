@@ -91,7 +91,10 @@ def run_command(cargs):
     """
     command = cargs[0]
     modname = 'apkg.commands.%s' % cmd2mod(command)
-    mod = __import__(modname, fromlist=[''])
+    try:
+        mod = __import__(modname, fromlist=[''])
+    except ModuleNotFoundError:
+        raise exception.InvalidApkgCommand(command=command)
     return mod.run_command(cargs)
 
 
