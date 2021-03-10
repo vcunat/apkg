@@ -108,12 +108,12 @@ def make_srcpkg(
 
     # prepare new build dir
     if build_path.exists():
-        log.info("removing existing build dir: %s" % build_path)
+        log.info("removing existing build dir: %s", build_path)
         shutil.rmtree(py35path(build_path))
     os.makedirs(py35path(build_path), exist_ok=True)
     # ensure output dir doesn't exist unless it was specified
     if not result_dir and out_path.exists():
-        log.info("removing existing result dir: %s" % out_path)
+        log.info("removing existing result dir: %s", out_path)
         shutil.rmtree(out_path)
 
     # prepare vars accessible from templates

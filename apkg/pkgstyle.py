@@ -10,8 +10,8 @@ import apkg.pkgstyles
 
 def iter_pkgstyles():
     return pkgutil.iter_modules(
-            apkg.pkgstyles.__path__,
-            apkg.pkgstyles.__name__ + ".")
+        apkg.pkgstyles.__path__,
+        apkg.pkgstyles.__name__ + ".")
 
 
 def import_pkgstyles():

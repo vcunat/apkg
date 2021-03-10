@@ -56,10 +56,10 @@ def build_srcpkg(
     in_pkgbuild = build_path / 'PKGBUILD'
     out_pkgbuild = out_path / 'PKGBUILD'
     out_archive = out_path / archive_path.name
-    log.info("building arch source package: %s" % in_pkgbuild)
+    log.info("building arch source package: %s", in_pkgbuild)
     template.render(build_path, env or {})
     os.makedirs(out_path)
-    log.info("copying PKGBUILD and archive to: %s" % out_path)
+    log.info("copying PKGBUILD and archive to: %s", out_path)
     shutil.copyfile(in_pkgbuild, out_pkgbuild)
     shutil.copyfile(archive_path, out_archive)
     return [out_pkgbuild, out_archive]
@@ -74,13 +74,13 @@ def build_packages(
         raise exception.InvalidSourcePackageFormat(
             fmt='arch source package format is PKGBUILD but got: %s'
             % srcpkg_path.name)
-    log.info("copying source package to build dir: %s" % build_path)
+    log.info("copying source package to build dir: %s", build_path)
     shutil.copytree(py35path(srcpkg_path.parent), py35path(build_path))
     # build package using makepkg
     log.info("starting arch package build using makepkg")
     with cd(build_path):
         run('makepkg', direct=bool(LOG_LEVEL <= INFO))
-    log.info("copying built packages to result dir: %s" % out_path)
+    log.info("copying built packages to result dir: %s", out_path)
     os.makedirs(py35path(out_path), exist_ok=True)
     pkgs = []
     # find and copy resulting packages

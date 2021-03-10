@@ -26,11 +26,11 @@ from apkg.lib import build
 def run_command(cargs):
     args = docopt(__doc__, argv=cargs)
     return build.install_build_deps(
-            srcpkg=args['--srcpkg'],
-            archive=args['--archive'],
-            upstream=args['--upstream'],
-            version=args['--version'],
-            release=args['--release'],
-            distro=args['--distro'],
-            interactive=not args['--yes'],
-            )
+        srcpkg=args['--srcpkg'],
+        archive=args['--archive'],
+        upstream=args['--upstream'],
+        version=args['--version'],
+        release=args['--release'],
+        distro=args['--distro'],
+        interactive=not args['--yes'],
+        )

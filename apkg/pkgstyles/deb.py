@@ -50,7 +50,7 @@ def get_template_name(path):
             return m.group(1)
 
     raise exception.ParsingFailed(
-            msg="unable to determine Source from: %s" % control)
+        msg="unable to determine Source from: %s" % control)
 
 
 def get_srcpkg_nvr(path):
@@ -74,8 +74,8 @@ def build_srcpkg(
         env):
     nv = "%s-%s" % (env['name'], env['version'])
     source_path = build_path / nv
-    log.info("building deb source package: %s" % nv)
-    log.info("unpacking archive: %s" % archive_path)
+    log.info("building deb source package: %s", nv)
+    log.info("unpacking archive: %s", archive_path)
     os.makedirs(py35path(source_path))
     run('aunpack', '-X', build_path, archive_path)
     if not source_path.exists():
@@ -137,8 +137,6 @@ def build_packages(
              preserve_env=True,  # preserve env inc. DEB_BUILD_OPTIONS
              direct=direct_run)
     else:
-        nvr, _ = os.path.splitext(py35path(srcpkg_path.name))
-        nv, _, _ = nvr.rpartition('-')
         # unpack source package
         log.info("unpacking source package for direct build")
         srcpkg_abspath = srcpkg_path.resolve()
@@ -162,7 +160,7 @@ def build_packages(
                 direct=direct_run)
 
     pkgs = []
-    log.info("copying built packages to result dir: %s" % out_path)
+    log.info("copying built packages to result dir: %s", out_path)
     for src_pkg in glob.iglob('%s/*.deb' % build_path):
         dst_pkg = out_path / Path(src_pkg).name
         shutil.copyfile(py35path(src_pkg), py35path(dst_pkg))

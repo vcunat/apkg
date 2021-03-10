@@ -30,7 +30,7 @@ class PackageTemplate:
         """
         log.info("renderding package template: %s -> %s", self.path, out_path)
         if out_path.exists():
-            log.verbose("template render dir exists: %s" % out_path)
+            log.verbose("template render dir exists: %s", out_path)
         else:
             os.makedirs(py35path(out_path), exist_ok=True)
 

@@ -48,7 +48,7 @@ def make_archive(
                "%s" % proj.config_path)
         raise exception.MissingRequiredConfigOption(msg=msg)
 
-    log.info("running make_archive_script: %s" % script)
+    log.info("running make_archive_script: %s", script)
     out = run(script)
     # last script stdout line is expected to be path to resulting archive
     _, _, last_line = out.rpartition('\n')
@@ -58,7 +58,7 @@ def make_archive(
                "(indicated by last script stdout line) doesn't exist:\n\n"
                "%s" % in_archive_path)
         raise exception.UnexpectedCommandOutput(msg=msg)
-    log.info("archive created: %s" % in_archive_path)
+    log.info("archive created: %s", in_archive_path)
 
     if result_dir:
         ar_base_path = Path(result_dir)
@@ -73,7 +73,7 @@ def make_archive(
             msg = "archive renamed to match requested version: %s"
             log.info(msg, archive_fn)
     archive_path = ar_base_path / archive_fn
-    log.info("copying archive to: %s" % archive_path)
+    log.info("copying archive to: %s", archive_path)
     os.makedirs(py35path(ar_base_path), exist_ok=True)
     shutil.copy(py35path(in_archive_path), py35path(archive_path))
     log.success("made archive: %s", archive_path)
@@ -138,7 +138,7 @@ def get_archive(
         r = requests.get(signature_url, allow_redirects=True)
         if not r.ok:
             raise exception.FileDownloadFailed(
-                    code=r.status_code, url=signature_url)
+                code=r.status_code, url=signature_url)
         _, _, signature_name = signature_url.rpartition('/')
         signature_path = ar_base_path / signature_name
         log.info('saving signature to: %s', signature_path)
