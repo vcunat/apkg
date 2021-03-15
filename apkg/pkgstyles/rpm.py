@@ -14,6 +14,7 @@ import os
 from pathlib import Path
 import re
 import shutil
+import subprocess
 
 from apkg.compat import py35path
 from apkg import exception
@@ -30,11 +31,13 @@ SUPPORTED_DISTROS = [
     "rhel",
     "oracle",
     "pidora",
+    "opensuse",
     "scientific",
 ]
 
 
 RE_PKG_NAME = r'Name:\s*(\S+)'
+RE_BUILD_REQUIRES = r'BuildRequires:\s*(.*)'
 RE_RPMBUILD_OUT_RPM = r'Wrote:\s+(.*\.rpm)\s*'
 RE_RPMBUILD_OUT_SRPM = r'Wrote:\s+(.*\.src.rpm)\s*'
 
@@ -69,15 +72,17 @@ def get_srcpkg_nvr(path):
     return name
 
 
-def _get_dnf_or_yum(distro):
-    tool = 'dnf'
+def _get_package_manager(distro):
+    default = 'dnf'
     if not distro:
-        return tool
+        return default
+    if distro.startswith('opensuse'):
+        return 'zypper'
     m = re.match(r'(?:centos|rhel|oracle|scientific)-(\d+)', distro)
     if m and int(m.group(1)) <= 7:
-        # use yum on centos <= 7
-        tool = 'yum'
-    return tool
+        # use yum on EL <= 7
+        return 'yum'
+    return default
 
 
 def build_srcpkg(
@@ -161,20 +166,34 @@ def build_packages(
     return pkgs
 
 
+def get_build_deps(srcpkg_path):
+    """
+    parse BuildRequires out of .src.rpm
+    """
+    cmd = "rpm2cpio '%s' | cpio -i --to-stdout '*.spec'" % srcpkg_path
+    out = subprocess.getoutput(cmd)
+    return re.findall(RE_BUILD_REQUIRES, out)
+
+
 def install_build_deps(
         srcpkg_path,
         **kwargs):
     interactive = kwargs.get('interactive', False)
     distro = kwargs.get('distro')
-    tool = _get_dnf_or_yum(distro)
-    if tool == 'yum':
-        cmd = ['yum-builddep']
-    else:
+    pm = _get_package_manager(distro)
+    if pm == 'dnf':
         cmd = ['dnf', 'builddep', '--srpm']
+        if not interactive:
+            cmd.append('-y')
+        cmd.append(srcpkg_path.resolve())
+    else:
+        deps = get_build_deps(srcpkg_path)
+        cmd = [pm, 'install']
+        if not interactive:
+            cmd.append('-y')
+        cmd += deps
+
     log.info("installing build deps using %s", cmd[0])
-    if not interactive:
-        cmd.append('-y')
-    cmd.append(srcpkg_path.resolve())
     sudo(*cmd, direct=True)
 
 
@@ -183,9 +202,9 @@ def install_custom_packages(
         **kwargs):
     interactive = kwargs.get('interactive', False)
     distro = kwargs.get('distro')
-    dnf = _get_dnf_or_yum(distro)
+    pm = _get_package_manager(distro)
 
-    cmd = [dnf, 'install']
+    cmd = [pm, 'install']
     if not interactive:
         cmd += ['-y']
     cmd += packages
