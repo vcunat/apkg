@@ -13,7 +13,7 @@ import os
 import shutil
 
 from apkg import exception
-from apkg.log import getLogger, LOG_LEVEL, INFO
+from apkg.log import getLogger
 from apkg.compat import py35path
 from apkg.util.run import cd, run, sudo
 
@@ -50,9 +50,10 @@ def _parse_pkgbuild(pkgbuild, bash):
 def build_srcpkg(
         build_path,
         out_path,
-        archive_path,
+        archive_paths,
         template,
         env):
+    archive_path = archive_paths[0]
     in_pkgbuild = build_path / 'PKGBUILD'
     out_pkgbuild = out_path / 'PKGBUILD'
     out_archive = out_path / archive_path.name
@@ -68,8 +69,9 @@ def build_srcpkg(
 def build_packages(
         build_path,
         out_path,
-        srcpkg_path,
+        srcpkg_paths,
         **kwargs):
+    srcpkg_path = srcpkg_paths[0]
     if srcpkg_path.name != 'PKGBUILD':
         raise exception.InvalidSourcePackageFormat(
             fmt="arch source package format is PKGBUILD but got: %s"
@@ -83,7 +85,7 @@ def build_packages(
         log.warning(msg)
     log.info("starting isolated arch package build using makepkg")
     with cd(build_path):
-        run('makepkg', direct=bool(LOG_LEVEL <= INFO))
+        run('makepkg', direct='auto')
     log.info("copying built packages to result dir: %s", out_path)
     os.makedirs(py35path(out_path), exist_ok=True)
     pkgs = []

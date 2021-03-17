@@ -17,7 +17,7 @@ import shutil
 
 from apkg.compat import py35path
 from apkg import exception
-from apkg.log import getLogger, LOG_LEVEL, INFO
+from apkg.log import getLogger
 from apkg import parse
 from apkg.util.run import cd, run, sudo
 
@@ -69,9 +69,10 @@ def _copy_srcpkg_files(src_path, dst_path):
 def build_srcpkg(
         build_path,
         out_path,
-        archive_path,
+        archive_paths,
         template,
         env):
+    archive_path = archive_paths[0]
     nv = "%s-%s" % (env['name'], env['version'])
     source_path = build_path / nv
     log.info("building deb source package: %s", nv)
@@ -102,7 +103,7 @@ def build_srcpkg(
             '-nc',  # do not pre clean source tree
             '-us',  # unsigned source package.
             '-uc',  # unsigned .changes file.
-            direct=bool(LOG_LEVEL <= INFO))
+            direct='auto')
 
     log.info("copying source package to result dir: %s", out_path)
     os.makedirs(py35path(out_path))
@@ -122,12 +123,12 @@ def build_srcpkg(
 def build_packages(
         build_path,
         out_path,
-        srcpkg_path,
+        srcpkg_paths,
         **kwargs):
+    srcpkg_path = srcpkg_paths[0]
     os.makedirs(py35path(build_path))
     os.makedirs(py35path(out_path))
     isolated = kwargs.get('isolated')
-    direct_run = bool(LOG_LEVEL <= INFO)
     if isolated:
         log.info("starting isolated build using pbuilder")
         # TODO: ensure pbuilder's base image exists (pbuilder create)
@@ -135,14 +136,14 @@ def build_packages(
              '--buildresult', build_path,
              srcpkg_path,
              preserve_env=True,  # preserve env inc. DEB_BUILD_OPTIONS
-             direct=direct_run)
+             direct='auto')
     else:
         # unpack source package
         log.info("unpacking source package for direct host build")
         srcpkg_abspath = srcpkg_path.resolve()
         with cd(build_path):
             run('dpkg-source', '-x', srcpkg_abspath,
-                direct=direct_run)
+                direct='auto')
         # find unpacked source dir
         try:
             source_glob = '%s/*/' % build_path
@@ -157,7 +158,7 @@ def build_packages(
             run('dpkg-buildpackage',
                 '-us',  # unsigned source package.
                 '-uc',  # unsigned .changes file.
-                direct=direct_run)
+                direct='auto')
 
     pkgs = []
     log.info("copying built packages to result dir: %s", out_path)

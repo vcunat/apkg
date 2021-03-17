@@ -2,10 +2,11 @@
 from contextlib import contextmanager
 import os
 import subprocess
+import sys
 
 from apkg.compat import py35path
 from apkg import exception
-from apkg.log import getLogger, T
+from apkg.log import getLogger, T, LOG_LEVEL, INFO
 
 
 log = getLogger(__name__)
@@ -63,6 +64,8 @@ def run(*cmd, **kwargs):
     else:
         stdin = None
 
+    if direct == 'auto':
+        direct = bool(sys.stdout.isatty() and LOG_LEVEL <= INFO)
     if direct:
         stdout = None
         stderr = None
