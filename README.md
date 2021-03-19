@@ -1,4 +1,6 @@
-# [apkg docs online][docs]
+# [apkg docs online][upstream-docs]
+
+## [apkg docs on Read the Docs][docs]
 
 ## [apkg docs on GitLab](https://gitlab.nic.cz/packaging/apkg/-/blob/master/docs/README.md)
 
@@ -14,4 +16,5 @@ You can also render docs into HTML using mkdocs:
 
 #### read the [docs] and have a nice packaging ᕕ( ᐛ )ᕗ
 
-[docs]: https://pkg.labs.nic.cz/pages/apkg
+[docs]: https://apkg.rtfd.io
+[upstream-docs]: https://pkg.labs.nic.cz/pages/apkg
