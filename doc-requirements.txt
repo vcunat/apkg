@@ -1,2 +1,7 @@
+cached_property
+docopt
+jinja2
 mkdocs
 mkdocs-macros-plugin
+pbr
+toml
