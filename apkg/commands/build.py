@@ -1,27 +1,32 @@
 """
 build packages
 
-Usage: apkg build [-u] [-s <srcpkg> | -a <ar>]
+Usage: apkg build [-u] [-s | -a] [<file> | -F <file-list>]...
                   [-v <ver>] [-r <rls>] [-d <distro>]
-                  [-O <dir>]
-                  [-H] [-i] [--no-cache]
+                  [-O <dir>] [--no-cache]
+                  [-H] [-i]
+
+Arguments:
+  <file>                  specify input <file>s (when using -s or -a)
+  -F, --file-list <fl>    specify text file listing one input file per line
+                          use '-' to read from stdin
 
 Options:
-  -u, --upstream                  upstream build from archive
-                                  default: dev build from project
-  -s <srcpkg>, --srcpkg <srcpkg>  use specified source package (path or name)
-  -a <ar>, --archive <ar>         use specified archive (path or name)
-  -v <ver>, --version <ver>       set package version
-  -r <rls>, --release <rls>       set package release
-  -d <distro>, --distro <distro>  set target distro
-                                  default: current distro
-  -O <dir>, --result-dir <dir>    put results into specified dir
-                                  default: pkg/pkgs/DISTRO/NVR
-  -H, --host-build                build directly on host (!) without isolated env
-                                  default: use isolated builder (pbuilder, mock, ...)
-  -i, --install-dep               install build dependencies on host
-                                  only works with -H/--host-build
-  --no-cache                      disable cache
+  -u, --upstream          upstream build from archive
+                          default: dev build from project
+  -s, --srcpkg            build from source package <file>s
+  -a, --archive           build from archive <files>s
+  -v, --version           set package version
+  -r, --release <rls>     set package release
+  -d, --distro <distro>   set target distro
+                          default: current distro
+  -O, --result-dir <dir>  put results into specified dir
+                          default: pkg/pkgs/DISTRO/NVR
+  --no-cache              disable cache
+  -H, --host-build        build directly on host (!) without isolated env
+                          default: use isolated builder (pbuilder, mock, ...)
+  -i, --install-dep       install build dependencies on host
+                          only works with -H/--host-build
 """ # noqa
 
 from docopt import docopt
@@ -33,9 +38,11 @@ from apkg.lib import common
 def run_command(cargs):
     args = docopt(__doc__, argv=cargs)
     results = build.build_package(
+        upstream=args['--upstream'],
         srcpkg=args['--srcpkg'],
         archive=args['--archive'],
-        upstream=args['--upstream'],
+        input_files=args['<file>'],
+        input_file_lists=args['--file-list'],
         version=args['--version'],
         release=args['--release'],
         distro=args['--distro'],

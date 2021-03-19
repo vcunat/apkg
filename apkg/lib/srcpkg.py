@@ -21,7 +21,9 @@ log = getLogger(__name__)
 
 def make_srcpkg(
         upstream=False,
-        archive=None,
+        archive=False,
+        input_files=None,
+        input_file_lists=None,
         version=None,
         release=None,
         distro=None,
@@ -43,22 +45,24 @@ def make_srcpkg(
         release = '1'
 
     if archive:
-        # archive specified - find it
-        ar_path = ar.find_archive(archive, upstream=upstream, project=proj)
-        version = ar.get_archive_version(ar_path, version=version)
+        # use existing archive
+        infiles = common.parse_input_files(input_files, input_file_lists)
     else:
         # archive not specified - use make_archive or get_archive
         if upstream:
-            ar_path = ar.get_archive(
+            infiles = ar.get_archive(
                 version=version,
                 project=proj,
-                use_cache=use_cache)[0]
+                use_cache=use_cache)
         else:
-            ar_path = ar.make_archive(
+            infiles = ar.make_archive(
                 version=version,
                 project=proj,
-                use_cache=use_cache)[0]
-        version = ar.get_archive_version(ar_path, version=version)
+                use_cache=use_cache)
+
+    common.ensure_input_files(infiles)
+    ar_path = infiles[0]
+    version = ar.get_archive_version(ar_path, version=version)
 
     use_cache = proj.cache.enabled(use_cache) and not render_template
     if use_cache:
@@ -137,7 +141,7 @@ def make_srcpkg(
     results = template.pkgstyle.build_srcpkg(
         build_path,
         out_path,
-        archive_path=ar_path,
+        archive_paths=infiles,
         template=template,
         env=env)
 

@@ -18,8 +18,8 @@ import subprocess
 
 from apkg.compat import py35path
 from apkg import exception
-from apkg.log import getLogger, LOG_LEVEL, INFO
-from apkg.util.run import cd, run, sudo
+from apkg.log import getLogger
+from apkg.util.run import run, sudo
 
 
 log = getLogger(__name__)
@@ -88,21 +88,31 @@ def _get_package_manager(distro):
 def build_srcpkg(
         build_path,
         out_path,
-        archive_path,
+        archive_paths,
         template,
         env):
-    rpmbuild_path = Path.home() / 'rpmbuild'
-    rpmbuild_ar_path = rpmbuild_path / 'SOURCES' / archive_path.name
+    rpmbuild_topdir = build_path / 'rpmbuild'
+    rpmbuild_src = rpmbuild_topdir / 'SOURCES'
+    rpmbuild_spec = rpmbuild_topdir / 'SPEC'
 
-    template.render(build_path, env)
-    spec_path = _get_spec(build_path)
-    log.verbose(".spec file: %s", spec_path)
-    log.info("copying archive into build dir: %s", archive_path)
-    os.makedirs(py35path(rpmbuild_ar_path.parent), exist_ok=True)
-    shutil.copyfile(py35path(archive_path), py35path(rpmbuild_ar_path))
+    rpmbuild_src.mkdir(parents=True, exist_ok=True)
+
+    template.render(rpmbuild_src, env)
+
+    spec_src_path = _get_spec(rpmbuild_src)
+    spec_path = rpmbuild_spec / spec_src_path.name
+    log.verbose("moving .spec file into SPEC: %s", spec_path)
+    rpmbuild_spec.mkdir(exist_ok=True)
+    spec_src_path.rename(spec_path)
+
+    log.info("copying archive files into SOURCES: %s", rpmbuild_src)
+    for src_path in archive_paths:
+        dst_path = rpmbuild_src / src_path.name
+        shutil.copyfile(py35path(src_path), py35path(dst_path))
     log.info("building .src.rpm using rpmbuild")
-    with cd(build_path):
-        out = run('rpmbuild', '-bs', spec_path.name)
+    out = run('rpmbuild', '-bs',
+              '--define', '_topdir %s' % rpmbuild_topdir.resolve(),
+              spec_path)
 
     log.info("copying .src.rpm to result dir: %s", out_path)
     os.makedirs(py35path(out_path))
@@ -122,12 +132,11 @@ def build_srcpkg(
 def build_packages(
         build_path,
         out_path,
-        srcpkg_path,
+        srcpkg_paths,
         **kwargs):
     isolated = kwargs.get('isolated')
-    direct_run = bool(LOG_LEVEL <= INFO)
     pkgs = []
-    os.makedirs(py35path(build_path))
+    srcpkg_path = srcpkg_paths[0]
 
     if isolated:
         log.info("starting isolated .rpm build using mock")
@@ -137,7 +146,7 @@ def build_packages(
              '--resultdir', build_path,
              srcpkg_path,
              preserve_env=True,
-             direct=direct_run)
+             direct='auto')
         log.info("copying built packages to result dir: %s", out_path)
         os.makedirs(py35path(out_path))
         for rpm in glob.iglob('%s/*.rpm' % build_path):
@@ -147,10 +156,11 @@ def build_packages(
             pkgs.append(dst_pkg)
     else:
         log.info("starting direct host .rpm build using rpmbuild")
-        srcpkg_path_abs = srcpkg_path.resolve()
-        with cd(build_path):
-            out = run('rpmbuild', '--rebuild',
-                      srcpkg_path_abs)
+        rpmbuild_topdir = build_path / 'rpmbuild'
+        rpmbuild_topdir.mkdir(parents=True, exist_ok=True)
+        out = run('rpmbuild', '--rebuild',
+                  '--define', '_topdir %s' % rpmbuild_topdir.resolve(),
+                  srcpkg_path)
         log.info("copying built packages to result dir: %s", out_path)
         os.makedirs(py35path(out_path))
         for m in re.finditer(RE_RPMBUILD_OUT_RPM, out):

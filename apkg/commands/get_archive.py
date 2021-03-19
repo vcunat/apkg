@@ -11,13 +11,14 @@ When no --version is specified, apkg tries to detect latest version:
 1) using upstream.version_script if set
 2) from HTML listing if upstream.archive_url is set
 
+
 Usage: apkg get-archive [-v <ver>] [-O <dir>] [--no-cache]
 
 Options:
-  -v <ver>, --version <ver>     version of archive to download
-  -O <dir>, --result-dir <dir>  put results into specified dir
-                                default: pkg/archive/upstream/
-  --no-cache                    disable cache
+  -v, --version <ver>     version of archive to download
+  -O, --result-dir <dir>  put results into specified dir
+                          default: pkg/archive/upstream/
+  --no-cache              disable cache
 """ # noqa
 
 from docopt import docopt

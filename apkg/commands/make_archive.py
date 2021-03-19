@@ -1,14 +1,16 @@
 """
 create dev archive from current project state
-using script specified by project.make_archive_script config option
+
+Use script specified by project.make_archive_script config option.
+
 
 Usage: apkg make-archive [-v <ver>] [-O <dir>] [--no-cache]
 
 Options:
-  -v <ver>, --version <ver>     rename archive to match specified version if needed
-  -O <dir>, --result-dir <dir>  put results into specified dir
-                                default: pkg/archive/dev/
-  --no-cache                    disable cache
+  -v, --version <ver>     rename archive to match specified version if needed
+  -O, --result-dir <dir>  put results into specified dir
+                          default: pkg/archive/dev/
+  --no-cache              disable cache
 """ # noqa
 
 from docopt import docopt

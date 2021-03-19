@@ -18,8 +18,10 @@ log = getLogger(__name__)
 
 def build_package(
         upstream=False,
-        srcpkg=None,
-        archive=None,
+        srcpkg=False,
+        archive=False,
+        input_files=None,
+        input_file_lists=None,
         version=None,
         release=None,
         distro=None,
@@ -36,21 +38,22 @@ def build_package(
 
     if srcpkg:
         # use existing source package
-        srcpkg_path = Path(srcpkg)
-        if not srcpkg_path.exists():
-            raise exception.SourcePackageNotFound(
-                srcpkg=srcpkg, type=distro)
-        log.info("using existing source package: %s", srcpkg_path)
+        infiles = common.parse_input_files(input_files, input_file_lists)
     else:
         # make source package
-        srcpkg_path = Path(_srcpkg.make_srcpkg(
+        infiles = _srcpkg.make_srcpkg(
             archive=archive,
             version=version,
             release=release,
             distro=distro,
             upstream=upstream,
             project=proj,
-            use_cache=use_cache)[0])
+            use_cache=use_cache)
+
+    common.ensure_input_files(infiles)
+    srcpkg_path = infiles[0]
+    if srcpkg:
+        log.info("using existing source package: %s", srcpkg_path)
 
     use_cache = proj.cache.enabled(use_cache)
     if use_cache:
@@ -100,9 +103,11 @@ def build_package(
 
     # build package using chosen distro packaging style
     pkgs = pkgstyle.build_packages(
-        build_path, result_path, srcpkg_path,
-        isolated=isolated,
-    )
+        build_path,
+        result_path,
+        srcpkg_paths=infiles,
+        isolated=isolated)
+
     if not pkgs:
         msg = ("package build reported success but there are "
                "no packages:\n\n%s" % result_path)
