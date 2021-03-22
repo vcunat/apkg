@@ -12,13 +12,12 @@ or `--isolated` using `mock`
 import glob
 from pathlib import Path
 import re
-import shutil
 import subprocess
 
-from apkg.compat import py35path
 from apkg import exception
 from apkg.log import getLogger
 from apkg.util.run import run, sudo
+import apkg.util.shutil35 as shutil
 
 
 log = getLogger(__name__)
@@ -107,7 +106,7 @@ def build_srcpkg(
     log.info("copying archive files into SOURCES: %s", rpmbuild_src)
     for src_path in archive_paths:
         dst_path = rpmbuild_src / src_path.name
-        shutil.copyfile(py35path(src_path), py35path(dst_path))
+        shutil.copyfile(src_path, dst_path)
     log.info("building .src.rpm using rpmbuild")
     out = run('rpmbuild', '-bs',
               '--define', '_topdir %s' % rpmbuild_topdir.resolve(),
@@ -120,7 +119,7 @@ def build_srcpkg(
         srpm = m.group(1)
         src_srpm = Path(srpm)
         dst_srpm = out_path / src_srpm.name
-        shutil.copyfile(py35path(src_srpm), py35path(dst_srpm))
+        shutil.copyfile(src_srpm, dst_srpm)
         srcpkgs.append(dst_srpm)
     if not srcpkgs:
         raise exception.ParsingFailed(
@@ -151,7 +150,7 @@ def build_packages(
         for rpm in glob.iglob('%s/*.rpm' % build_path):
             src_pkg = Path(rpm)
             dst_pkg = out_path / src_pkg.name
-            shutil.copyfile(py35path(src_pkg), py35path(dst_pkg))
+            shutil.copyfile(src_pkg, dst_pkg)
             pkgs.append(dst_pkg)
     else:
         log.info("starting direct host .rpm build using rpmbuild")
@@ -166,7 +165,7 @@ def build_packages(
             rpm = m.group(1)
             src_pkg = Path(rpm)
             dst_pkg = out_path / src_pkg.name
-            shutil.copyfile(py35path(src_pkg), py35path(dst_pkg))
+            shutil.copyfile(src_pkg, dst_pkg)
             pkgs.append(dst_pkg)
         if not pkgs:
             raise exception.ParsingFailed(

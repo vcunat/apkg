@@ -12,13 +12,12 @@ or `--isolated` using `pbuilder`
 import glob
 from pathlib import Path
 import re
-import shutil
 
-from apkg.compat import py35path
 from apkg import exception
 from apkg.log import getLogger
 from apkg import parse
 from apkg.util.run import cd, run, sudo
+import apkg.util.shutil35 as shutil
 
 
 log = getLogger(__name__)
@@ -61,7 +60,7 @@ def _copy_srcpkg_files(src_path, dst_path):
     for pattern in ['*.dsc', '*.debian.tar.*', '*.orig.tar.*', '*.diff.*']:
         for f in glob.iglob('%s/%s' % (src_path, pattern)):
             srcp = Path(f)
-            shutil.copyfile(py35path(f), py35path(dst_path / srcp.name))
+            shutil.copyfile(f, dst_path / srcp.name)
 
 
 # pylint: disable=too-many-locals
@@ -91,7 +90,7 @@ def build_srcpkg(
     debian_ar = "%s_%s.orig%s" % (env['name'], env['version'], ext)
     debian_ar_path = build_path / debian_ar
     log.info("copying archive into source package: %s", debian_ar_path)
-    shutil.copyfile(py35path(archive_path), py35path(debian_ar_path))
+    shutil.copyfile(archive_path, debian_ar_path)
 
     log.info("building deb source-only package...")
     with cd(source_path):
@@ -163,7 +162,7 @@ def build_packages(
     log.info("copying built packages to result dir: %s", out_path)
     for src_pkg in glob.iglob('%s/*.deb' % build_path):
         dst_pkg = out_path / Path(src_pkg).name
-        shutil.copyfile(py35path(src_pkg), py35path(dst_pkg))
+        shutil.copyfile(src_pkg, dst_pkg)
         pkgs.append(dst_pkg)
 
     return pkgs

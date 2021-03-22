@@ -6,7 +6,6 @@ import hashlib
 import json
 from pathlib import Path
 
-from apkg.compat import py35path
 from apkg.log import getLogger
 
 
@@ -15,7 +14,7 @@ log = getLogger(__name__)
 
 def file_checksum(path):
     chsum = hashlib.sha256()
-    with open(py35path(path), "rb") as f:
+    with Path(path).open("rb") as f:
         for chunk in iter(lambda: f.read(4096), b""):
             chsum.update(chunk)
     return chsum.hexdigest()[:20]

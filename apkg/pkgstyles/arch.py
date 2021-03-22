@@ -9,12 +9,11 @@ apkg package style for **Arch** linux.
 """
 import glob
 from pathlib import Path
-import shutil
 
 from apkg import exception
 from apkg.log import getLogger
-from apkg.compat import py35path
 from apkg.util.run import cd, run, sudo
+import apkg.util.shutil35 as shutil
 
 
 log = getLogger(__name__)
@@ -77,7 +76,7 @@ def build_packages(
             % srcpkg_path.name)
     isolated = kwargs.get('isolated')
     log.info("copying source package to build dir: %s", build_path)
-    shutil.copytree(py35path(srcpkg_path.parent), py35path(build_path))
+    shutil.copytree(srcpkg_path.parent, build_path)
     # build package using makepkg
     if not isolated:
         msg = "arch doesn't support direct host build - using isolated"
@@ -91,7 +90,7 @@ def build_packages(
     # find and copy resulting packages
     for src_pkg in glob.iglob('%s/*.zst' % build_path):
         dst_pkg = out_path / Path(src_pkg).name
-        shutil.copyfile(py35path(src_pkg), py35path(dst_pkg))
+        shutil.copyfile(src_pkg, dst_pkg)
         pkgs.append(dst_pkg)
 
     return pkgs
