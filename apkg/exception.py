@@ -84,11 +84,6 @@ class DistroNotSupported(ApkgException):
     exit_code = 44
 
 
-class HTTPRequestFailed(ApkgException):
-    msg_fmt = "HTTP request failed with code %(code)s: %(request)s"
-    exit_code = 54
-
-
 class FileDownloadFailed(ApkgException):
     msg_fmt = "Failed to download file with code %(code)s:\n\n%(url)s"
     exit_code = 56
