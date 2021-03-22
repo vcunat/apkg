@@ -9,6 +9,7 @@ nav:
   - config.md
   - pkgstyles.md
   - templates.md
+  - errors.md
 markdown_extensions:
   - admonition
   - toc:
