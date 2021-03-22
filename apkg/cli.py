@@ -28,7 +28,7 @@ from docopt import docopt
 
 from apkg import __version__
 from apkg import commands  # noqa: F401 (dynamic import)
-from apkg import exception
+from apkg import ex
 from apkg.log import getLogger, T
 import apkg.log as _log
 
@@ -73,13 +73,13 @@ def apkg(*cargs):
         if args['<command>']:
             run_command(cargs)
             code = 0
-    except exception.CommandFailed as ex:
+    except ex.CommandFailed as e:
         # this was logged already
-        code = ex.exit_code
-    except exception.ApkgException as ex:
+        code = e.exit_code
+    except ex.ApkgException as e:
         print()
-        print(T.bold_yellow(str(ex)))
-        code = ex.exit_code
+        print(T.bold_yellow(str(e)))
+        code = e.exit_code
 
     return code
 
@@ -94,7 +94,7 @@ def run_command(cargs):
     try:
         mod = __import__(modname, fromlist=[''])
     except ModuleNotFoundError:
-        raise exception.InvalidApkgCommand(command=command)
+        raise ex.InvalidApkgCommand(command=command)
     return mod.run_command(cargs)
 
 

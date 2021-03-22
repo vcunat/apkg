@@ -4,7 +4,7 @@ apkg lib for handling package installation using native package manager
 import sys
 
 from apkg import adistro
-from apkg import exception
+from apkg import ex
 from apkg.log import getLogger
 from apkg import pkgstyle
 
@@ -34,7 +34,7 @@ def install_packages(
 
     ps = pkgstyle.get_pkgstyle_for_distro(distro)
     if not ps:
-        raise exception.DistroNotSupported(distro=distro)
+        raise ex.DistroNotSupported(distro=distro)
     log.info("target pkgstyle: %s", ps.name)
 
     if distro_pkgs:

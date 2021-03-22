@@ -5,6 +5,7 @@ when apkg CLI run results in exception being raised
 its exit_code is returned as process exit code
 """
 
+
 class ApkgException(Exception):
     msg_fmt = "An unknown error occurred"
     exit_code = 1

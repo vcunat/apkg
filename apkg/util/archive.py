@@ -3,7 +3,7 @@ apkg archive (tarball) utils
 """
 from pathlib import Path
 
-from apkg import exception
+from apkg import ex
 from apkg.util.run import run
 
 
@@ -25,5 +25,5 @@ def unpack_archive(archive_path, out_path):
     n_root_files = len(root_dirs)
     if n_root_files != 1:
         fmt = "Expected a single root dir but insteat got %d files in root"
-        raise exception.InvalidArchiveFormat(fmt=fmt % n_root_files)
+        raise ex.InvalidArchiveFormat(fmt=fmt % n_root_files)
     return out_path / root_dirs.pop()

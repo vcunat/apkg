@@ -1,6 +1,6 @@
 import re
 
-from apkg import exception
+from apkg import ex
 
 
 # subgroups:
@@ -27,7 +27,7 @@ def split_archive_fn(archive_fn):
         return r.groups() + (ext,)
 
     msg = "unable to parse version from archive file name: %s" % archive_fn
-    raise exception.ParsingFailed(msg=msg)
+    raise ex.ParsingFailed(msg=msg)
 
 
 def parse_version(version_str):

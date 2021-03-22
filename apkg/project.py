@@ -12,7 +12,7 @@ except ImportError:
     from cached_property import cached_property
 
 from apkg import cache as _cache
-from apkg import exception
+from apkg import ex
 from apkg.log import getLogger
 from apkg import pkgtemplate
 from apkg.util.git import git
@@ -228,7 +228,7 @@ class Project:
             tdir = self.templates_path
             msg = ("missing package template for distro: %s\n\n"
                    "you can add it into: %s" % (distro, tdir))
-            raise exception.MissingPackagingTemplate(msg=msg)
+            raise ex.MissingPackagingTemplate(msg=msg)
         return template
 
     def find_archives_by_name(self, name, upstream=False):

@@ -1,8 +1,8 @@
 from pathlib import Path
 import sys
 
+from apkg import ex
 from apkg.log import getLogger
-from apkg import exception
 import apkg.util.shutil35 as shutil
 
 
@@ -61,7 +61,7 @@ def parse_input_files(files, file_lists):
 
     if len([fl for fl in file_lists if fl == '-']) > 1:
         fail = "requested to read stdin multiple times"
-        raise exception.InvalidInput(fail=fail)
+        raise ex.InvalidInput(fail=fail)
 
     for fl in file_lists:
         if fl == '-':
@@ -76,9 +76,9 @@ def parse_input_files(files, file_lists):
 
 def ensure_input_files(infiles):
     if not infiles:
-        raise exception.InvalidInput(
+        raise ex.InvalidInput(
             fail="no input file(s) specified")
     for f in infiles:
         if not f.exists():
-            raise exception.InvalidInput(
+            raise ex.InvalidInput(
                 fail="input file not found: %s" % f)
