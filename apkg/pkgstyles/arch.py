@@ -9,7 +9,6 @@ apkg package style for **Arch** linux.
 """
 import glob
 from pathlib import Path
-import os
 import shutil
 
 from apkg import exception
@@ -59,7 +58,7 @@ def build_srcpkg(
     out_archive = out_path / archive_path.name
     log.info("building arch source package: %s", in_pkgbuild)
     template.render(build_path, env or {})
-    os.makedirs(out_path)
+    out_path.mkdir(parents=True)
     log.info("copying PKGBUILD and archive to: %s", out_path)
     shutil.copyfile(in_pkgbuild, out_pkgbuild)
     shutil.copyfile(archive_path, out_archive)
@@ -87,7 +86,7 @@ def build_packages(
     with cd(build_path):
         run('makepkg', direct='auto')
     log.info("copying built packages to result dir: %s", out_path)
-    os.makedirs(py35path(out_path), exist_ok=True)
+    out_path.mkdir(parents=True, exist_ok=True)
     pkgs = []
     # find and copy resulting packages
     for src_pkg in glob.iglob('%s/*.zst' % build_path):

@@ -10,7 +10,6 @@ such as Fedora, CentOS, SUSE, RHEL.
 or `--isolated` using `mock`
 """
 import glob
-import os
 from pathlib import Path
 import re
 import shutil
@@ -115,7 +114,7 @@ def build_srcpkg(
               spec_path)
 
     log.info("copying .src.rpm to result dir: %s", out_path)
-    os.makedirs(py35path(out_path))
+    out_path.mkdir(parents=True)
     srcpkgs = []
     for m in re.finditer(RE_RPMBUILD_OUT_SRPM, out):
         srpm = m.group(1)
@@ -148,7 +147,7 @@ def build_packages(
              preserve_env=True,
              direct='auto')
         log.info("copying built packages to result dir: %s", out_path)
-        os.makedirs(py35path(out_path))
+        out_path.mkdir(parents=True)
         for rpm in glob.iglob('%s/*.rpm' % build_path):
             src_pkg = Path(rpm)
             dst_pkg = out_path / src_pkg.name
@@ -162,7 +161,7 @@ def build_packages(
                   '--define', '_topdir %s' % rpmbuild_topdir.resolve(),
                   srcpkg_path)
         log.info("copying built packages to result dir: %s", out_path)
-        os.makedirs(py35path(out_path))
+        out_path.mkdir(parents=True)
         for m in re.finditer(RE_RPMBUILD_OUT_RPM, out):
             rpm = m.group(1)
             src_pkg = Path(rpm)

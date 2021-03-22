@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 import shutil
 import sys
@@ -16,7 +15,7 @@ def copy_paths(paths, dst):
     utility to copy a list of paths to dst
     """
     if not dst.exists():
-        os.makedirs(py35path(dst), exist_ok=True)
+        dst.mkdir(parents=True, exist_ok=True)
     dst_full = dst.resolve()
     new_paths = []
     for p in paths:

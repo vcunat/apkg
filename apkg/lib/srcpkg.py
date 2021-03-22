@@ -1,7 +1,6 @@
 """
 apkg lib for handling source archives
 """
-import os
 from pathlib import Path
 import shutil
 
@@ -114,7 +113,7 @@ def make_srcpkg(
     if build_path.exists():
         log.info("removing existing build dir: %s", build_path)
         shutil.rmtree(py35path(build_path))
-    os.makedirs(py35path(build_path), exist_ok=True)
+    build_path.mkdir(parents=True, exist_ok=True)
     # ensure output dir doesn't exist unless it was specified
     if not result_dir and out_path.exists():
         log.info("removing existing result dir: %s", out_path)

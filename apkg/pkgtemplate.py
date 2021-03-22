@@ -32,13 +32,13 @@ class PackageTemplate:
         if out_path.exists():
             log.verbose("template render dir exists: %s", out_path)
         else:
-            os.makedirs(py35path(out_path), exist_ok=True)
+            out_path.mkdir(parents=True, exist_ok=True)
 
         # recursively render all files
         for d, _, files in os.walk(py35path(self.path)):
             rel_dir = Path(d).relative_to(self.path)
             dst_dir = out_path / rel_dir
-            os.makedirs(py35path(dst_dir), exist_ok=True)
+            dst_dir.mkdir(parents=True, exist_ok=True)
 
             for fn in files:
                 dst = out_path / rel_dir / fn

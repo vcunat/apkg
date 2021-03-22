@@ -10,7 +10,6 @@ and its many clones such as Ubuntu or Mint.
 or `--isolated` using `pbuilder`
 """
 import glob
-import os
 from pathlib import Path
 import re
 import shutil
@@ -77,7 +76,7 @@ def build_srcpkg(
     source_path = build_path / nv
     log.info("building deb source package: %s", nv)
     log.info("unpacking archive: %s", archive_path)
-    os.makedirs(py35path(source_path))
+    source_path.mkdir(parents=True)
     run('aunpack', '-X', build_path, archive_path)
     if not source_path.exists():
         # NOTE: if this happens oftern (it shouldn't), consider using
@@ -106,7 +105,7 @@ def build_srcpkg(
             direct='auto')
 
     log.info("copying source package to result dir: %s", out_path)
-    os.makedirs(py35path(out_path))
+    out_path.mkdir(parents=True)
     _copy_srcpkg_files(build_path, out_path)
     fns = glob.glob('%s/*' % out_path)
     # make sure .dsc is first
@@ -126,8 +125,8 @@ def build_packages(
         srcpkg_paths,
         **kwargs):
     srcpkg_path = srcpkg_paths[0]
-    os.makedirs(py35path(build_path))
-    os.makedirs(py35path(out_path))
+    build_path.mkdir(parents=True)
+    out_path.mkdir(parents=True)
     isolated = kwargs.get('isolated')
     if isolated:
         log.info("starting isolated build using pbuilder")

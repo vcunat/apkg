@@ -21,7 +21,7 @@ def inject_tree(src_path, dst_path, ignore_dirs=[]):
     overwrite existing files
     """
     if not dst_path.exists():
-        os.makedirs(py35path(dst_path), exist_ok=True)
+        dst_path.mkdir(parents=True, exist_ok=True)
 
     # recursively copy all files
     for d, subdirs, files in os.walk(py35path(src_path)):
@@ -36,7 +36,7 @@ def inject_tree(src_path, dst_path, ignore_dirs=[]):
 
         rel_dir = Path(d).relative_to(src_path)
         dst_dir = dst_path / rel_dir
-        os.makedirs(py35path(dst_dir), exist_ok=True)
+        dst_dir.mkdir(parents=True, exist_ok=True)
 
         for fn in files:
             dst = dst_dir / fn
