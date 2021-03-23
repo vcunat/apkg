@@ -13,7 +13,7 @@ import glob
 from pathlib import Path
 import re
 
-from apkg import exception
+from apkg import ex
 from apkg.log import getLogger
 from apkg import parse
 from apkg.util.run import cd, run, sudo
@@ -47,7 +47,7 @@ def get_template_name(path):
         if m:
             return m.group(1)
 
-    raise exception.ParsingFailed(
+    raise ex.ParsingFailed(
         msg="unable to determine Source from: %s" % control)
 
 
@@ -81,7 +81,7 @@ def build_srcpkg(
         # NOTE: if this happens oftern (it shouldn't), consider using
         #       atool's --save-outdir option above
         msg = "archive unpack didn't result in expected dir: %s" % source_path
-        raise exception.UnexpectedCommandOutput(msg=msg)
+        raise ex.UnexpectedCommandOutput(msg=msg)
     # render template
     debian_path = source_path / 'debian'
     template.render(debian_path, env)
@@ -113,7 +113,7 @@ def build_srcpkg(
             fns = [fns.pop(i)] + fns
             break
     else:
-        raise exception.UnexpectedCommandOutput(
+        raise ex.UnexpectedCommandOutput(
             msg="no *.dsc found after moving built source package")
     return list(map(Path, fns))
 
@@ -148,7 +148,7 @@ def build_packages(
             source_path = Path(glob.glob(source_glob)[0])
         except IndexError:
             msg = "failed to find unpacked source dir: %s"
-            raise exception.UnexpectedCommandOutput(msg % source_glob)
+            raise ex.UnexpectedCommandOutput(msg % source_glob)
 
         log.info("starting direct host build using dpkg-buildpackage")
         with cd(source_path):

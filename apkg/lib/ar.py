@@ -4,7 +4,7 @@ apkg lib for handling source archives
 from pathlib import Path
 import requests
 
-from apkg import exception
+from apkg import ex
 from apkg.lib import common
 from apkg.log import getLogger
 from apkg.parse import split_archive_fn, parse_version
@@ -44,7 +44,7 @@ def make_archive(
                "archive and prints its path to stdout.\n\n"
                "Please update project config with required information:\n\n"
                "%s" % proj.config_path)
-        raise exception.MissingRequiredConfigOption(msg=msg)
+        raise ex.MissingRequiredConfigOption(msg=msg)
 
     log.info("running make_archive_script: %s", script)
     out = run(script)
@@ -55,7 +55,7 @@ def make_archive(
         msg = ("make_archive_script finished successfully but the archive\n"
                "(indicated by last script stdout line) doesn't exist:\n\n"
                "%s" % in_archive_path)
-        raise exception.UnexpectedCommandOutput(msg=msg)
+        raise ex.UnexpectedCommandOutput(msg=msg)
     log.info("archive created: %s", in_archive_path)
 
     if result_dir:
@@ -94,7 +94,7 @@ def get_archive(
     if not version:
         version = proj.upstream_version
         if not version:
-            raise exception.UnableToDetectUpstreamVersion()
+            raise ex.UnableToDetectUpstreamVersion()
     archive_url = proj.upstream_archive_url(version)
 
     use_cache = proj.cache.enabled(use_cache)
@@ -110,11 +110,11 @@ def get_archive(
     log.info('downloading archive: %s', archive_url)
     r = requests.get(archive_url, allow_redirects=True)
     if r.status_code != 200:
-        raise exception.FileDownloadFailed(code=r.status_code, url=archive_url)
+        raise ex.FileDownloadFailed(code=r.status_code, url=archive_url)
     content_type = r.headers['content-type']
     if not content_type.startswith('application/'):
         msg = 'Failed to download archive - invalid content-type "%s":\n\n%s'
-        raise exception.FileDownloadFailed(
+        raise ex.FileDownloadFailed(
             msg=msg % (content_type, archive_url))
 
     if result_dir:
@@ -135,7 +135,7 @@ def get_archive(
         log.info('downloading signature: %s', signature_url)
         r = requests.get(signature_url, allow_redirects=True)
         if not r.ok:
-            raise exception.FileDownloadFailed(
+            raise ex.FileDownloadFailed(
                 code=r.status_code, url=signature_url)
         _, _, signature_name = signature_url.rpartition('/')
         signature_path = ar_base_path / signature_name
@@ -165,13 +165,13 @@ def find_archive(archive, upstream=False, project=None):
             project = Project()
         ars = project.find_archives_by_name(archive, upstream=upstream)
         if not ars:
-            raise exception.ArchiveNotFound(ar=archive, type=ar_type)
+            raise ex.ArchiveNotFound(ar=archive, type=ar_type)
         if len(ars) > 1:
             msg = ("multiple matching %s archives found - "
                    "not sure which one to use:\n" % ar_type)
             for ar in ars:
                 msg += "\n%s" % ar
-            raise exception.ArchiveNotFound(msg=msg)
+            raise ex.ArchiveNotFound(msg=msg)
         ar_path = Path(ars[0])
 
         log.verbose("found %s archive: %s", ar_type, ar_path)
@@ -196,7 +196,7 @@ def get_archive_version(archive_path, version=None):
             msg = ("archive name doesn't match desired version: %s\n\n"
                    "desired version: %s\n"
                    "archive version: %s" % (archive_path.name, version, ver))
-            raise exception.InvalidVersion(msg=msg)
+            raise ex.InvalidVersion(msg=msg)
     else:
         # no version was requested - use archive version
         version = ar_ver

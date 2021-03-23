@@ -14,7 +14,7 @@ from pathlib import Path
 import re
 import subprocess
 
-from apkg import exception
+from apkg import ex
 from apkg.log import getLogger
 from apkg.util.run import run, sudo
 import apkg.util.shutil35 as shutil
@@ -58,7 +58,7 @@ def get_template_name(path):
         if m:
             return m.group(1)
 
-    raise exception.ParsingFailed(
+    raise ex.ParsingFailed(
         msg="unable to determine Name from: %s" % spec)
 
 
@@ -122,7 +122,7 @@ def build_srcpkg(
         shutil.copyfile(src_srpm, dst_srpm)
         srcpkgs.append(dst_srpm)
     if not srcpkgs:
-        raise exception.ParsingFailed(
+        raise ex.ParsingFailed(
             msg="unable to parse rpmbuild results")
     return srcpkgs
 
@@ -168,7 +168,7 @@ def build_packages(
             shutil.copyfile(src_pkg, dst_pkg)
             pkgs.append(dst_pkg)
         if not pkgs:
-            raise exception.ParsingFailed(
+            raise ex.ParsingFailed(
                 msg="unable to parse rpmbuild results")
 
     return pkgs

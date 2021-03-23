@@ -5,7 +5,7 @@ from pathlib import Path
 
 from apkg import adistro
 from apkg.cache import file_checksum
-from apkg import exception
+from apkg import ex
 from apkg.lib import srcpkg as _srcpkg
 from apkg.lib import common
 from apkg.log import getLogger
@@ -75,8 +75,8 @@ def build_package(
                 install_build_deps(
                     srcpkg=srcpkg_path,
                     distro=distro)
-            except exception.DistroNotSupported as ex:
-                log.warning("%s - SKIPPING", ex)
+            except ex.DistroNotSupported as e:
+                log.warning("%s - SKIPPING", e)
 
     # fetch pkgstyle (deb, rpm, arch, ...)
     template = proj.get_template_for_distro(distro)
@@ -111,7 +111,7 @@ def build_package(
     if not pkgs:
         msg = ("package build reported success but there are "
                "no packages:\n\n%s" % result_path)
-        raise exception.UnexpectedCommandOutput(msg=msg)
+        raise ex.UnexpectedCommandOutput(msg=msg)
     log.success("built %s packages in: %s", len(pkgs), result_path)
 
     if use_cache and not upstream:
@@ -142,13 +142,13 @@ def install_build_deps(
 
     if not hasattr(pkgstyle, 'install_build_deps'):
         msg = "build deps installation isn't supported on distro: %s"
-        raise exception.DistroNotSupported(msg % distro)
+        raise ex.DistroNotSupported(msg % distro)
 
     if srcpkg:
         # use existing source package
         srcpkg_path = Path(srcpkg)
         if not srcpkg_path.exists():
-            raise exception.SourcePackageNotFound(
+            raise ex.SourcePackageNotFound(
                 srcpkg=srcpkg, type=distro)
         log.info("using existing source package: %s", srcpkg_path)
     else:

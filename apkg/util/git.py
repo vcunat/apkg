@@ -2,7 +2,7 @@
 import contextlib
 import os
 
-from apkg import exception
+from apkg import ex
 from apkg.util.run import run
 from apkg.util.run import ShellCommand
 
@@ -134,7 +134,7 @@ class Git(ShellCommand):
         try:
             o = self('for-each-ref', '--format=%(upstream:short)',
                      'refs/heads/%s' % branch, log_cmd=False, log_fail=False)
-        except exception.CommandFailed:
+        except ex.CommandFailed:
             return None
         if not o:
             return None
@@ -147,7 +147,7 @@ class Git(ShellCommand):
     def create_branch(self, new_branch, branch):
         try:
             self('branch', '-f', new_branch, branch)
-        except exception.CommandFailed:
+        except ex.CommandFailed:
             # this could only fail if we're on the branch
             self('reset', '--hard', branch)
 
@@ -247,7 +247,7 @@ class Git(ShellCommand):
         try:
             return self("config", "--get", param,
                         log_fail=False, log_cmd=False)
-        except exception.CommandFailed:
+        except ex.CommandFailed:
             return default
 
     def config_set(self, param, value, is_global=False):

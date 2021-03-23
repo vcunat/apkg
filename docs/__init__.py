@@ -1,6 +1,9 @@
 """
 generate docs from apkg code/docstrings using mkdocs-macros-plugin
 """
+import inspect
+
+from apkg import ex
 from apkg import pkgstyle
 from apkg.cli import cmd2mod
 from pathlib import Path
@@ -17,6 +20,7 @@ def define_env(env):
     """
     env.variables.pkgstyles = pkgstyle.PKGSTYLES
     env.variables.new_issue_url = APKG_NEW_ISSUE_URL
+    env.variables.exceptions = get_exceptions()
 
     @env.filter
     def relpath(path):
@@ -43,3 +47,12 @@ def define_env(env):
         modname = 'apkg.commands.%s' % cmd2mod(cmd)
         return "``` text\n$> apkg %s --help\n\n%s\n```" % (
             cmd, mod_doc(modname))
+
+
+def get_exceptions():
+    """
+    return all apkg exceptions sorted by exit_code
+    """
+    exs = [e for _, e in inspect.getmembers(ex, inspect.isclass)]
+    exs.sort(key=lambda x: x.exit_code)
+    return exs

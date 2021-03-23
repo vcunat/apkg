@@ -4,7 +4,7 @@ import os
 import subprocess
 import sys
 
-from apkg import exception
+from apkg import ex
 from apkg.log import getLogger, T, LOG_LEVEL, INFO
 
 
@@ -79,7 +79,7 @@ def run(*cmd, **kwargs):
         prc = subprocess.Popen(cmd, stdin=stdin, stdout=stdout,
                                stderr=stderr, env=env)
     except OSError:
-        raise exception.CommandNotFound(cmd=cmd[0])
+        raise ex.CommandNotFound(cmd=cmd[0])
     out, err = prc.communicate(input=_input)
 
     if isinstance(out, bytes):
@@ -109,7 +109,7 @@ def run(*cmd, **kwargs):
         if log_fail:
             log_cmd_fail(cmd_str, cout)
         if fatal:
-            raise exception.CommandFailed(cmd=cmd, out=cout)
+            raise ex.CommandFailed(cmd=cmd, out=cout)
     return cout
 
 

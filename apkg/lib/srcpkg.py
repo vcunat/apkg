@@ -5,7 +5,7 @@ from pathlib import Path
 
 from apkg import adistro
 from apkg.cache import file_checksum
-from apkg import exception
+from apkg import ex
 from apkg.lib import ar
 from apkg.lib import common
 from apkg.log import getLogger
@@ -90,7 +90,7 @@ def make_srcpkg(
         tdir = proj.templates_path
         msg = ("missing package template for distro: %s\n\n"
                "you can add it into: %s" % (distro, tdir))
-        raise exception.MissingPackagingTemplate(msg=msg)
+        raise ex.MissingPackagingTemplate(msg=msg)
     ps = template.pkgstyle
     log.info("package style: %s", ps.name)
     log.info("package template: %s", template.path)
@@ -148,7 +148,7 @@ def make_srcpkg(
         if not Path(p).exists():
             msg = ("source package build reported success but result is "
                    "missing:\n\n%s" % p)
-            raise exception.UnexpectedCommandOutput(msg=msg)
+            raise ex.UnexpectedCommandOutput(msg=msg)
     log.success("made source package: %s", results[0])
 
     if use_cache:

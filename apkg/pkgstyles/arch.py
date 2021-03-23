@@ -10,7 +10,7 @@ apkg package style for **Arch** linux.
 import glob
 from pathlib import Path
 
-from apkg import exception
+from apkg import ex
 from apkg.log import getLogger
 from apkg.util.run import cd, run, sudo
 import apkg.util.shutil35 as shutil
@@ -71,7 +71,7 @@ def build_packages(
         **kwargs):
     srcpkg_path = srcpkg_paths[0]
     if srcpkg_path.name != 'PKGBUILD':
-        raise exception.InvalidSourcePackageFormat(
+        raise ex.InvalidSourcePackageFormat(
             fmt="arch source package format is PKGBUILD but got: %s"
             % srcpkg_path.name)
     isolated = kwargs.get('isolated')
