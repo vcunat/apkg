@@ -4,9 +4,8 @@ integration tests for Knot Resolver
 import glob
 from pathlib import Path
 import pytest
-import shutil
+import apkg.util.shutil35 as shutil
 
-from apkg.compat import py35path
 from apkg.util import test
 from apkg.util.run import cd
 from apkg.util.git import git
@@ -40,7 +39,7 @@ def kresd_path(kresd_git, tmpdir):
     """
     # NOTE(py35): use tmp_path once py3.5 is dropped
     p = '%s/knot-resolver' % tmpdir
-    shutil.copytree(py35path(kresd_git), p, symlinks=True)
+    shutil.copytree(kresd_git, p, symlinks=True)
     return Path(p)
 
 

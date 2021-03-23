@@ -1,19 +1,17 @@
 """
 apkg lib for handling source archives
 """
-import os
 from pathlib import Path
-import shutil
 
 from apkg import adistro
 from apkg.cache import file_checksum
-from apkg.compat import py35path
 from apkg import exception
 from apkg.lib import ar
 from apkg.lib import common
 from apkg.log import getLogger
 from apkg.project import Project
 from apkg.util.archive import unpack_archive
+import apkg.util.shutil35 as shutil
 
 
 log = getLogger(__name__)
@@ -113,8 +111,8 @@ def make_srcpkg(
     # prepare new build dir
     if build_path.exists():
         log.info("removing existing build dir: %s", build_path)
-        shutil.rmtree(py35path(build_path))
-    os.makedirs(py35path(build_path), exist_ok=True)
+        shutil.rmtree(build_path)
+    build_path.mkdir(parents=True, exist_ok=True)
     # ensure output dir doesn't exist unless it was specified
     if not result_dir and out_path.exists():
         log.info("removing existing result dir: %s", out_path)

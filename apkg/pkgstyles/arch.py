@@ -9,13 +9,11 @@ apkg package style for **Arch** linux.
 """
 import glob
 from pathlib import Path
-import os
-import shutil
 
 from apkg import exception
 from apkg.log import getLogger
-from apkg.compat import py35path
 from apkg.util.run import cd, run, sudo
+import apkg.util.shutil35 as shutil
 
 
 log = getLogger(__name__)
@@ -59,7 +57,7 @@ def build_srcpkg(
     out_archive = out_path / archive_path.name
     log.info("building arch source package: %s", in_pkgbuild)
     template.render(build_path, env or {})
-    os.makedirs(out_path)
+    out_path.mkdir(parents=True)
     log.info("copying PKGBUILD and archive to: %s", out_path)
     shutil.copyfile(in_pkgbuild, out_pkgbuild)
     shutil.copyfile(archive_path, out_archive)
@@ -78,7 +76,7 @@ def build_packages(
             % srcpkg_path.name)
     isolated = kwargs.get('isolated')
     log.info("copying source package to build dir: %s", build_path)
-    shutil.copytree(py35path(srcpkg_path.parent), py35path(build_path))
+    shutil.copytree(srcpkg_path.parent, build_path)
     # build package using makepkg
     if not isolated:
         msg = "arch doesn't support direct host build - using isolated"
@@ -87,12 +85,12 @@ def build_packages(
     with cd(build_path):
         run('makepkg', direct='auto')
     log.info("copying built packages to result dir: %s", out_path)
-    os.makedirs(py35path(out_path), exist_ok=True)
+    out_path.mkdir(parents=True, exist_ok=True)
     pkgs = []
     # find and copy resulting packages
     for src_pkg in glob.iglob('%s/*.zst' % build_path):
         dst_pkg = out_path / Path(src_pkg).name
-        shutil.copyfile(py35path(src_pkg), py35path(dst_pkg))
+        shutil.copyfile(src_pkg, dst_pkg)
         pkgs.append(dst_pkg)
 
     return pkgs

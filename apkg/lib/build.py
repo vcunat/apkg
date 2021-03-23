@@ -2,7 +2,6 @@
 apkg lib for handling package builds
 """
 from pathlib import Path
-import shutil
 
 from apkg import adistro
 from apkg.cache import file_checksum
@@ -11,6 +10,7 @@ from apkg.lib import srcpkg as _srcpkg
 from apkg.lib import common
 from apkg.log import getLogger
 from apkg.project import Project
+import apkg.util.shutil35 as shutil
 
 
 log = getLogger(__name__)

@@ -1,11 +1,9 @@
 """
 shared apkg testing functions
 """
-import os
 from pathlib import Path
-import shutil
 
-from apkg.compat import py35path
+import apkg.util.shutil35 as shutil
 
 
 def init_testing_repo(repo_path, test_path, ignore_dirs=[]):
@@ -21,10 +19,10 @@ def inject_tree(src_path, dst_path, ignore_dirs=[]):
     overwrite existing files
     """
     if not dst_path.exists():
-        os.makedirs(py35path(dst_path), exist_ok=True)
+        dst_path.mkdir(parents=True, exist_ok=True)
 
     # recursively copy all files
-    for d, subdirs, files in os.walk(py35path(src_path)):
+    for d, subdirs, files in shutil.walk(src_path):
         if ignore_dirs:
             # ignore selected dirs
             ignored = []
@@ -36,12 +34,12 @@ def inject_tree(src_path, dst_path, ignore_dirs=[]):
 
         rel_dir = Path(d).relative_to(src_path)
         dst_dir = dst_path / rel_dir
-        os.makedirs(py35path(dst_dir), exist_ok=True)
+        dst_dir.mkdir(parents=True, exist_ok=True)
 
         for fn in files:
             dst = dst_dir / fn
             src = Path(d) / fn
-            shutil.copy(py35path(src), py35path(dst))
+            shutil.copy(src, dst)
 
 
 def log_contains(string, caplog):

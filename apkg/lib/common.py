@@ -1,11 +1,9 @@
-import os
 from pathlib import Path
-import shutil
 import sys
 
 from apkg.log import getLogger
-from apkg.compat import py35path
 from apkg import exception
+import apkg.util.shutil35 as shutil
 
 
 log = getLogger(__name__)
@@ -16,7 +14,7 @@ def copy_paths(paths, dst):
     utility to copy a list of paths to dst
     """
     if not dst.exists():
-        os.makedirs(py35path(dst), exist_ok=True)
+        dst.mkdir(parents=True, exist_ok=True)
     dst_full = dst.resolve()
     new_paths = []
     for p in paths:
@@ -25,7 +23,7 @@ def copy_paths(paths, dst):
         else:
             p_dst = dst / p.name
             log.verbose("copying file: %s -> %s", p, p_dst)
-            shutil.copy(py35path(p), py35path(p_dst))
+            shutil.copy(p, p_dst)
             new_paths.append(p_dst)
     return new_paths
 

@@ -1,18 +1,16 @@
 """
 apkg lib for handling source archives
 """
-import os
 from pathlib import Path
-import shutil
 import requests
 
 from apkg import exception
 from apkg.lib import common
 from apkg.log import getLogger
-from apkg.compat import py35path
 from apkg.parse import split_archive_fn, parse_version
 from apkg.project import Project
 from apkg.util.run import run
+import apkg.util.shutil35 as shutil
 
 
 log = getLogger(__name__)
@@ -74,8 +72,8 @@ def make_archive(
             log.info(msg, archive_fn)
     archive_path = ar_base_path / archive_fn
     log.info("copying archive to: %s", archive_path)
-    os.makedirs(py35path(ar_base_path), exist_ok=True)
-    shutil.copy(py35path(in_archive_path), py35path(archive_path))
+    ar_base_path.mkdir(parents=True, exist_ok=True)
+    shutil.copy(in_archive_path, archive_path)
     log.success("made archive: %s", archive_path)
     results = [archive_path]
     if use_cache:
@@ -126,7 +124,7 @@ def get_archive(
     _, _, archive_fn = archive_url.rpartition('/')
     archive_path = ar_base_path / archive_fn
     log.info('saving archive to: %s', archive_path)
-    os.makedirs(py35path(ar_base_path), exist_ok=True)
+    ar_base_path.mkdir(parents=True, exist_ok=True)
     archive_path.open('wb').write(r.content)
     log.success('downloaded archive: %s', archive_path)
     results = [archive_path]

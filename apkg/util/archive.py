@@ -1,7 +1,6 @@
 """
 apkg archive (tarball) utils
 """
-import os
 from pathlib import Path
 
 from apkg import exception
@@ -19,7 +18,7 @@ def unpack_archive(archive_path, out_path):
     def root_dir(ps):
         return Path(ps).parts[0]
 
-    os.makedirs(out_path, exist_ok=True)
+    out_path.mkdir(parents=True, exist_ok=True)
     o = run('aunpack', '-X', out_path, archive_path)
     # parse output and make sure there's only a single root dir
     root_dirs = set(map(root_dir, o.split("\n")))
