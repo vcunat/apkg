@@ -12,6 +12,12 @@ import apkg.util.shutil35 as shutil
 log = getLogger(__name__)
 
 
+def default_render_filter(path):
+    if str(path).endswith('.patch'):
+        return False
+    return True
+
+
 class PackageTemplate:
     def __init__(self, path, style=None):
         self.path = Path(path)
@@ -23,7 +29,8 @@ class PackageTemplate:
             self.style = _pkgstyle.get_pkgstyle_for_template(self.path)
         return self.style
 
-    def render(self, out_path, env):
+    def render(self, out_path, env,
+               render_filter=default_render_filter):
         """
         render package template into specified output directory
         """
@@ -42,9 +49,15 @@ class PackageTemplate:
             for fn in files:
                 dst = out_path / rel_dir / fn
                 src = Path(d) / fn
-                log.verbose("rendering file: %s -> %s", src, dst)
-                t = None
-                with src.open('r') as srcf:
-                    t = jinja2.Template(srcf.read())
-                with dst.open('w') as dstf:
-                    dstf.write(t.render(**env) + '\n')
+                # TODO: filtering should be exposed through config files
+                if render_filter(src):
+                    log.verbose("rendering file: %s -> %s", src, dst)
+                    t = None
+                    with src.open('r') as srcf:
+                        t = jinja2.Template(srcf.read())
+                    with dst.open('w') as dstf:
+                        dstf.write(t.render(**env) + '\n')
+                else:
+                    log.verbose(
+                        "copying file without render: %s -> %s", src, dst)
+                    shutil.copyfile(src, dst)
