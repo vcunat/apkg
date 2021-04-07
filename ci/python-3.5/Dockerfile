@@ -18,6 +18,6 @@ RUN apt-get install -y -qqq python3-pbr python3-jinja2 python3-docopt python3-bl
 # non-python deps
 RUN apt-get install -y -qqq git atool
 # deps not available in distro
-RUN pip3 install htmllistparse
+RUN pip3 install distro htmllistparse
 # testing deps
 RUN apt-get install -y -qqq tox python3-pytest python3-pytest-cov python3-pytest-catchlog

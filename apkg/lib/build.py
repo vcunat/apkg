@@ -43,6 +43,8 @@ def build_package(
         # make source package
         infiles = _srcpkg.make_srcpkg(
             archive=archive,
+            input_files=input_files,
+            input_file_lists=input_file_lists,
             version=version,
             release=release,
             distro=distro,

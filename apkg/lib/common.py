@@ -57,6 +57,11 @@ def parse_input_files(files, file_lists):
     utility to parse apkg input files and input file lists
     into a single list of input files
     """
+    if not files:
+        files = []
+    if not file_lists:
+        file_lists = []
+
     all_files = [Path(f) for f in files]
 
     if len([fl for fl in file_lists if fl == '-']) > 1:
