@@ -57,7 +57,12 @@ def get_srcpkg_nvr(path):
 
 
 def _copy_srcpkg_files(src_path, dst_path):
-    for pattern in ['*.dsc', '*.debian.tar.*', '*.orig.tar.*', '*.diff.*']:
+    for pattern in [
+            '*.dsc',
+            '*_source.*',
+            '*.debian.tar.*',
+            '*.orig.tar.*',
+            '*.diff.*']:
         for f in glob.iglob('%s/%s' % (src_path, pattern)):
             srcp = Path(f)
             shutil.copyfile(f, dst_path / srcp.name)
