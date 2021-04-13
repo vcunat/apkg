@@ -57,7 +57,12 @@ def get_srcpkg_nvr(path):
 
 
 def _copy_srcpkg_files(src_path, dst_path):
-    for pattern in ['*.dsc', '*.debian.tar.*', '*.orig.tar.*', '*.diff.*']:
+    for pattern in [
+            '*.dsc',
+            '*_source.*',
+            '*.debian.tar.*',
+            '*.orig.tar.*',
+            '*.diff.*']:
         for f in glob.iglob('%s/%s' % (src_path, pattern)):
             srcp = Path(f)
             shutil.copyfile(f, dst_path / srcp.name)
@@ -71,7 +76,7 @@ def build_srcpkg(
         template,
         env):
     archive_path = archive_paths[0]
-    nv = "%s-%s" % (env['name'], env['version'])
+    nv, _ = parse.split_archive_ext(archive_path.name)
     source_path = build_path / nv
     log.info("building deb source package: %s", nv)
     log.info("unpacking archive: %s", archive_path)

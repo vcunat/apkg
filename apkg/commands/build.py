@@ -16,7 +16,7 @@ Options:
                           default: dev build from project
   -s, --srcpkg            build from source package <file>s
   -a, --archive           build from archive <files>s
-  -v, --version           set package version
+  -v, --version <ver>     set package version
   -r, --release <rls>     set package release
   -d, --distro <distro>   set target distro
                           default: current distro
