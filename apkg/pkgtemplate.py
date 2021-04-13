@@ -61,3 +61,5 @@ class PackageTemplate:
                     log.verbose(
                         "copying file without render: %s -> %s", src, dst)
                     shutil.copyfile(src, dst)
+                # preserve original permission
+                dst.chmod(src.stat().st_mode)
