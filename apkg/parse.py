@@ -10,19 +10,31 @@ from apkg import ex
 RE_NVR = r'^(.+?)([-_])(v?\d+(?:\.\d+)+(?:.+?)?)$'
 
 
+def split_archive_ext(archive_fn):
+    """
+    split archive file into base name and extension such as '.tar.gz'
+
+    return (name, extension)
+    """
+    name, _, ext = archive_fn.rpartition('.')
+    if not name:
+        return archive_fn, ''
+    ext = '.%s' % ext
+    if name.endswith('.tar'):
+        name, _, _ = name.rpartition('.')
+        ext = '.tar%s' % ext
+
+    return name, ext
+
+
 def split_archive_fn(archive_fn):
     """
     split archive file name into individual parts
 
     return (name, separator, version, extension)
     """
-    nvr, _, ext = archive_fn.rpartition('.')
-    ext = '.%s' % ext
-    if nvr.endswith('.tar'):
-        nvr, _, _ = nvr.rpartition('.')
-        ext = '.tar%s' % ext
-
-    r = re.match(RE_NVR, nvr)
+    name, ext = split_archive_ext(archive_fn)
+    r = re.match(RE_NVR, name)
     if r:
         return r.groups() + (ext,)
 

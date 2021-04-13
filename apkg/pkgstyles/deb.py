@@ -71,7 +71,7 @@ def build_srcpkg(
         template,
         env):
     archive_path = archive_paths[0]
-    nv = "%s-%s" % (env['name'], env['version'])
+    nv, _ = parse.split_archive_ext(archive_path.name)
     source_path = build_path / nv
     log.info("building deb source package: %s", nv)
     log.info("unpacking archive: %s", archive_path)
