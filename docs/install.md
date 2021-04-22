@@ -16,7 +16,6 @@ Furthermore, `apkg` currently relies on following external tools available
 from most distro repos:
 
 * `git` to handle `git` repos
-* `atool` to handle archives
 
 Python modules needed to build `apkg` docs are listed in {{ 'doc-requirements.txt' | file_link }}:
 

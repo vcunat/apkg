@@ -17,6 +17,7 @@ from apkg import ex
 from apkg.log import getLogger
 from apkg import parse
 from apkg.util.run import cd, run, sudo
+from apkg.util.archive import unpack_archive
 import apkg.util.shutil35 as shutil
 
 
@@ -81,10 +82,8 @@ def build_srcpkg(
     log.info("building deb source package: %s", nv)
     log.info("unpacking archive: %s", archive_path)
     source_path.mkdir(parents=True)
-    run('aunpack', '-X', build_path, archive_path)
-    if not source_path.exists():
-        # NOTE: if this happens oftern (it shouldn't), consider using
-        #       atool's --save-outdir option above
+    unpack_path = unpack_archive(archive_path, build_path)
+    if unpack_path != source_path or not source_path.exists():
         msg = "archive unpack didn't result in expected dir: %s" % source_path
         raise ex.UnexpectedCommandOutput(msg=msg)
     # render template

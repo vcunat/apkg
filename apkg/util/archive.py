@@ -1,10 +1,9 @@
 """
 apkg archive (tarball) utils
 """
-from pathlib import Path
+import apkg.util.shutil35 as shutil
 
 from apkg import ex
-from apkg.util.run import run
 
 
 def unpack_archive(archive_path, out_path):
@@ -15,15 +14,12 @@ def unpack_archive(archive_path, out_path):
 
     return path to extracted root dir
     """
-    def root_dir(ps):
-        return Path(ps).parts[0]
-
     out_path.mkdir(parents=True, exist_ok=True)
-    o = run('aunpack', '-X', out_path, archive_path)
+    shutil.unpack_archive(archive_path, out_path)
     # parse output and make sure there's only a single root dir
-    root_dirs = set(map(root_dir, o.split("\n")))
-    n_root_files = len(root_dirs)
+    root_files = list(out_path.glob("*"))
+    n_root_files = len(root_files)
     if n_root_files != 1:
         fmt = "Expected a single root dir but insteat got %d files in root"
         raise ex.InvalidArchiveFormat(fmt=fmt % n_root_files)
-    return out_path / root_dirs.pop()
+    return root_files[0]

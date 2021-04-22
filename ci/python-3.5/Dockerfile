@@ -16,7 +16,7 @@ RUN apt-get install -y -qqq dpkg-dev debhelper dh-python python3-all python3-pip
 # basic deps
 RUN apt-get install -y -qqq python3-pbr python3-jinja2 python3-docopt python3-blessings python3-toml python3-packaging
 # non-python deps
-RUN apt-get install -y -qqq git atool
+RUN apt-get install -y -qqq git
 # deps not available in distro
 RUN pip3 install distro htmllistparse
 # testing deps
