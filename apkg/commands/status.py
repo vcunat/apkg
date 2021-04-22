@@ -60,6 +60,8 @@ def print_status():
     msg = "current distro: {t.cyan}{id}{t.normal} / {t.cyan}{full}{t.normal}"
     print(msg.format(full=adistro.fullname(), id=adistro.idver(), t=T))
 
+    # we know what we're doing here
+    # pylint: disable=protected-access
     template = proj._get_template_for_distro(adistro.idver())
     msg = "    package style: "
     if template:

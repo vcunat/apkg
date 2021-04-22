@@ -1,6 +1,7 @@
 [MESSAGES CONTROL]
 disable=
     broad-except,
+    duplicate-code, # unevitable with pkgstyle plugin arch
     fixme,
     global-statement,
     invalid-name,
@@ -10,6 +11,11 @@ disable=
     no-self-use,
     raise-missing-from,
     too-few-public-methods,
+    too-many-arguments,
+    too-many-branches,
+    too-many-locals,
+    too-many-public-methods,
+    too-many-statements,
     unused-import,  # checked by flake8
 
 

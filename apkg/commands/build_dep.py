@@ -28,8 +28,9 @@ from apkg.lib import build
 
 def run_command(cargs):
     args = docopt(__doc__, argv=cargs)
-    # XXX: this will be refactored in following patch
-    # disabling for now
+    # XXX: this will be refactored in following patch, disabling for now
+    # https://gitlab.nic.cz/packaging/apkg/-/issues/34
+    # pylint: disable=unreachable
     raise NotImplementedError
     return build.install_build_deps(
         srcpkg=args['--srcpkg'],
