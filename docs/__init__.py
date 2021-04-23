@@ -29,7 +29,7 @@ def define_env(env):
     @env.filter
     def file_link(path):
         return "[{fn}]({url}{fn})".format(
-            fn=path,
+            fn=path.relative_to(BASE_PATH),
             url=BASE_CODE_URL)
 
     @env.filter
