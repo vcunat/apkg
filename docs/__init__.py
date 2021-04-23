@@ -28,8 +28,14 @@ def define_env(env):
 
     @env.filter
     def file_link(path):
+        fn = Path(path)
+        try:
+            # full path can be passed (i.e. on Read the Docs)
+            fn = Path(path).relative_to(BASE_PATH)
+        except ValueError:
+            pass
         return "[{fn}]({url}{fn})".format(
-            fn=path.relative_to(BASE_PATH),
+            fn=fn,
             url=BASE_CODE_URL)
 
     @env.filter
