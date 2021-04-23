@@ -24,15 +24,19 @@ unit:
   script:
     - tox -e unit
 
-self:
-  stage: test
-  script:
-    - tox -e self
-
 integration:
   stage: test
   script:
     - tox -e integration
+
+self:
+  stage: test
+  script:
+    # `python3 -m build` causes issues in tox in docker container
+    # use py.test directly
+    - pip3 install -r requirements.txt
+    - python3 setup.py develop --user
+    - py.test-3 tests/self
 
 
 # docs published to GitLab Pages: https://packaging.pages.nic.cz/apkg/

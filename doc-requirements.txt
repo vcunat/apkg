@@ -3,5 +3,4 @@ docopt
 jinja2
 mkdocs
 mkdocs-macros-plugin
-pbr
 toml

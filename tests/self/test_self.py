@@ -14,6 +14,22 @@ APKG_BASE_DIR = Path(__file__).parents[2]
 #             when py3.5 support is dropped
 
 
+def test_import_command_modules():
+    """
+    test importing individual apkg command modules
+
+    py3.5 compat prevents meaningful error handling on ImportError
+    in apkg.cli.run_command right now :(
+    """
+    import apkg.commands.build  # noqa
+    import apkg.commands.build_dep  # noqa
+    import apkg.commands.get_archive  # noqa
+    import apkg.commands.install  # noqa
+    import apkg.commands.make_archive  # noqa
+    import apkg.commands.srcpkg  # noqa
+    import apkg.commands.status  # noqa
+
+
 def test_apkg_make_archive(tmpdir, capsys):
     repo_path = test.init_testing_repo(APKG_BASE_DIR, str(tmpdir))
     repo_dir = str(repo_path)

@@ -5,5 +5,5 @@
 DISTDIR=dist
 
 rm -rf "$DISTDIR"
-python3 setup.py sdist
+python3 -m build --sdist
 ls dist/apkg-*.tar.gz

@@ -93,7 +93,8 @@ def run_command(cargs):
     modname = 'apkg.commands.%s' % cmd2mod(command)
     try:
         mod = __import__(modname, fromlist=[''])
-    except ModuleNotFoundError:
+    # py35 compat: use ModuleNotFoundError once py3.5 support is dropped
+    except ImportError:
         raise ex.InvalidApkgCommand(command=command)
     return mod.run_command(cargs)
 

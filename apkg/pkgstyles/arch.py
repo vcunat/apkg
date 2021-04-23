@@ -68,7 +68,7 @@ def build_packages(
         build_path,
         out_path,
         srcpkg_paths,
-        **kwargs):
+        **_):
     srcpkg_path = srcpkg_paths[0]
     if srcpkg_path.name != 'PKGBUILD':
         raise ex.InvalidSourcePackageFormat(

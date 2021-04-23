@@ -36,6 +36,8 @@ def walk(top, **kwargs):
     return os.walk(str(top), **kwargs)
 
 
+# this function copies upstream arg names 1:1
+# pylint: disable=redefined-builtin
 def unpack_archive(filename, extract_dir=None, format=None):
     # shutil supports pathlib starting with python 3.7
     if extract_dir:
