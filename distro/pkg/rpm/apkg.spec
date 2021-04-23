@@ -27,7 +27,6 @@ Summary:          cross-distro packaging automation tool
 BuildRequires:    python3-devel
 BuildRequires:    python3-setuptools
 
-Requires:         atool
 Requires:         git-core
 Requires:         rpm-build
 

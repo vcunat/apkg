@@ -34,3 +34,10 @@ def rmtree(path, **kwargs):
 
 def walk(top, **kwargs):
     return os.walk(str(top), **kwargs)
+
+
+def unpack_archive(filename, extract_dir=None, format=None):
+    # shutil supports pathlib starting with python 3.7
+    if extract_dir:
+        extract_dir = str(extract_dir)
+    return shutil.unpack_archive(str(filename), extract_dir, format)
