@@ -3,7 +3,6 @@ variables:
 
 stages:
   - test
-  - test-py35
   - deploy
 
 
@@ -34,22 +33,6 @@ integration:
   stage: test
   script:
     - tox -e integration
-
-unit-py35:
-  image: $CI_REGISTRY/packaging/apkg/ci/python-3.5:apkg
-  stage: test-py35
-  script:
-    # use py.test directly to test system packages
-    - python3 setup.py develop --user
-    - py.test-3 tests/unit
-
-self-py35:
-  image: $CI_REGISTRY/packaging/apkg/ci/python-3.5:apkg
-  stage: test-py35
-  script:
-    # use py.test directly to test system packages
-    - python3 setup.py develop --user
-    - py.test-3 tests/self
 
 
 # docs published to GitLab Pages: https://packaging.pages.nic.cz/apkg/
