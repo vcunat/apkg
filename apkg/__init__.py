@@ -1,9 +1,1 @@
-import pbr.version
-
-version_info = pbr.version.VersionInfo('apkg')
-try:
-    __version__ = version_info.version_string()
-except AttributeError:
-    __version__ = None
-
-__all__ = ['__version__']
+from ._version import __version__  # noqa

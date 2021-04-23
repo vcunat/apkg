@@ -4,6 +4,7 @@
 *.egg-info
 /AUTHORS
 /ChangeLog
+/build
 /dist
 /pkg
 /site

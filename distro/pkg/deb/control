@@ -8,7 +8,6 @@ Build-Depends:
  debhelper,
  dh-python,
  python3-all,
- python3-pbr,
  python3-setuptools,
 Build-Depends-Indep:
  python3-blessings
@@ -17,7 +16,6 @@ Homepage: https://gitlab.nic.cz/packaging/apkg
 Package: python3-apkg
 Architecture: all
 Depends:
- python3-pbr,
  python3-docopt,
  python3-blessings,
  python3-jinja2,

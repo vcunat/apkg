@@ -7,8 +7,7 @@ pkgdesc="cross-distro packaging automation tool"
 arch=('any')
 url="https://gitlab.nic.cz/packaging/apkg"
 license=('GPL3')
-depends=('python-pbr'
-         'python-docopt'
+depends=('python-docopt'
          'python-distro'
          'python-toml'
          'python-blessings')
