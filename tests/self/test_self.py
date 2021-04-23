@@ -41,8 +41,8 @@ def test_apkg_make_archive(tmpdir, capsys):
     assert re.match(r"pkg/archives/dev/apkg-.*\.tar\.gz", out)
 
 
-def test_apkg_get_archive(tmpdir, capsys):
-    VERSION = '0.0.1'
+def test_apkg_get_archive_manual(tmpdir, capsys):
+    VERSION = '0.0.2'
     repo_path = test.init_testing_repo(APKG_BASE_DIR, str(tmpdir))
     repo_dir = str(repo_path)
     assert repo_dir.endswith('apkg')
@@ -50,7 +50,17 @@ def test_apkg_get_archive(tmpdir, capsys):
         assert apkg('get-archive', '--version', VERSION) == 0
     out, _ = capsys.readouterr()
     # first stdout line should be downloaded archive
-    assert out.startswith("pkg/archives/upstream/apkg-v%s.tar.gz" % VERSION)
+    assert out.startswith("pkg/archives/upstream/apkg-%s.tar.gz" % VERSION)
+
+
+def test_apkg_get_archive_auto(tmpdir, capsys):
+    # this tests upstream version detection as well
+    repo_path = test.init_testing_repo(APKG_BASE_DIR, str(tmpdir))
+    with cd(repo_path):
+        assert apkg('get-archive') == 0
+    out, _ = capsys.readouterr()
+    # first stdout line should be downloaded archive
+    assert out.startswith("pkg/archives/upstream/apkg-")
 
 
 def test_apkg_srcpkg(tmpdir, capsys):
