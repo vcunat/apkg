@@ -16,11 +16,7 @@ Install following downstream packages using your package manager:
 * `python3-setuptools`
 * `python3-pip`
 
-<<<<<<< HEAD
-* `git` to handle `git` repos
-=======
 Debian/Ubuntu example:
->>>>>>> 1145742 (packaging: refactor and drop pbr)
 
 ```
 apt install python3-setuptools python3-pip
