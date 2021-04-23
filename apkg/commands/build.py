@@ -4,7 +4,7 @@ build packages
 Usage: apkg build [-u] [-s | -a] [<file> | -F <file-list>]...
                   [-v <ver>] [-r <rls>] [-d <distro>]
                   [-O <dir>] [--no-cache]
-                  [-H] [-i]
+                  [-i | -I]
 
 Arguments:
   <file>                  specify input <file>s (when using -s or -a)
@@ -23,10 +23,9 @@ Options:
   -O, --result-dir <dir>  put results into specified dir
                           default: pkg/pkgs/DISTRO/NVR
   --no-cache              disable cache
-  -H, --host-build        build directly on host (!) without isolated env
-                          default: use isolated builder (pbuilder, mock, ...)
-  -i, --install-dep       install build dependencies on host
-                          only works with -H/--host-build
+  -i, --install-dep       install build dependencies on host (build-dep)
+  -I, --isolated          use isolated builder (pbuilder, mock, ...)
+                          default: use direct builder
 """ # noqa
 
 from docopt import docopt
@@ -48,7 +47,7 @@ def run_command(cargs):
         distro=args['--distro'],
         result_dir=args['--result-dir'],
         install_dep=args['--install-dep'],
-        isolated=not args['--host-build'],
+        isolated=args['--isolated'],
         use_cache=not args['--no-cache'])
     common.print_results(results)
     return results

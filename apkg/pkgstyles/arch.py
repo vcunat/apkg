@@ -74,14 +74,10 @@ def build_packages(
         raise ex.InvalidSourcePackageFormat(
             fmt="arch source package format is PKGBUILD but got: %s"
             % srcpkg_path.name)
-    isolated = kwargs.get('isolated')
     log.info("copying source package to build dir: %s", build_path)
     shutil.copytree(srcpkg_path.parent, build_path)
     # build package using makepkg
-    if not isolated:
-        msg = "arch doesn't support direct host build - using isolated"
-        log.warning(msg)
-    log.info("starting isolated arch package build using makepkg")
+    log.info("starting arch package build using makepkg")
     with cd(build_path):
         run('makepkg', direct='auto')
     log.info("copying built packages to result dir: %s", out_path)
