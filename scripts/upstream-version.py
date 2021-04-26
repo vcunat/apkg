@@ -1,14 +1,26 @@
 #!/usr/bin/python3
 """
-example script to get latest upstream version from HTML file listing
-and print it to stdout
+get latest upstream version from PyPI
 
-Such custom script can be used by apkg to check for latest upstream version
+This script can be used by apkg to check for latest upstream version
 using upstream.version_script config option.
 """
-from apkg.util import upstreamversion
+from packaging.version import Version
+import requests
 
 
-url = 'https://secure.nic.cz/files/knot-resolver/'
-v = upstreamversion.version_from_listing(url)
-print(v)
+def version_from_pypi(name):
+    url = 'https://pypi.org/pypi/%s/json' % name
+    r = requests.get(url)
+    if not r.ok:
+        return None
+    data = r.json()
+
+    versions = data['releases'].keys()
+    version = sorted(versions, key=Version)[-1]
+
+    return version
+
+
+# apkg expects last stdout line to contain the upstream version string
+print(version_from_pypi('apkg'))
