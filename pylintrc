@@ -1,6 +1,7 @@
 [MESSAGES CONTROL]
 disable=
     broad-except,
+    consider-using-with,
     duplicate-code, # unevitable with pkgstyle plugin arch
     fixme,
     global-statement,
