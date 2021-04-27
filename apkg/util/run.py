@@ -60,6 +60,8 @@ def run(*cmd, **kwargs):
 
     if _input:
         stdin = subprocess.PIPE
+        if not isinstance(_input, bytes):
+            _input = bytes(_input, 'utf-8')
     else:
         stdin = None
 

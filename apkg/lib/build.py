@@ -7,7 +7,7 @@ from apkg import adistro
 from apkg.cache import file_checksum
 from apkg import ex
 from apkg.lib import srcpkg as _srcpkg
-from apkg.lib import common
+from apkg.lib import common, deps
 from apkg.log import getLogger
 from apkg.project import Project
 import apkg.util.shutil35 as shutil
@@ -74,9 +74,11 @@ def build_package(
         else:
             # install build deps if requested
             try:
-                install_build_deps(
-                    srcpkg=srcpkg_path,
-                    distro=distro)
+                deps.build_dep(
+                    srcpkg=True,
+                    input_files=[srcpkg_path],
+                    distro=distro,
+                    project=proj)
             except ex.DistroNotSupported as e:
                 log.warning("%s - SKIPPING", e)
 
@@ -122,47 +124,3 @@ def build_package(
             cache_name, cache_key, fns)
 
     return pkgs
-
-
-def install_build_deps(
-        srcpkg=None,
-        archive=None,
-        upstream=False,
-        version=None,
-        release=None,
-        distro=None,
-        interactive=False):
-    log.bold('installing build deps')
-
-    proj = Project()
-    distro = adistro.distro_arg(distro)
-    log.info("target distro: %s", distro)
-
-    # fetch pkgstyle (deb, rpm, arch, ...)
-    template = proj.get_template_for_distro(distro)
-    pkgstyle = template.pkgstyle
-
-    if not hasattr(pkgstyle, 'install_build_deps'):
-        msg = "build deps installation isn't supported on distro: %s"
-        raise ex.DistroNotSupported(msg % distro)
-
-    if srcpkg:
-        # use existing source package
-        srcpkg_path = Path(srcpkg)
-        if not srcpkg_path.exists():
-            raise ex.SourcePackageNotFound(
-                srcpkg=srcpkg, type=distro)
-        log.info("using existing source package: %s", srcpkg_path)
-    else:
-        # make source package
-        srcpkg_path = _srcpkg.make_srcpkg(
-            archive=archive,
-            version=version,
-            release=release,
-            distro=distro,
-            upstream=upstream)[0]
-
-    pkgstyle.install_build_deps(
-        srcpkg_path,
-        distro=distro,
-        interactive=interactive)

@@ -1,7 +1,7 @@
 """
-install build dependencies
+install or list build dependencies
 
-Usage: apkg build-dep [-u] [-s | -a] [<file> | -F <file-list>]...
+Usage: apkg build-dep [-l] [-u] [-s] [-a] [<file> | -F <file-list>]...
                       [-d <distro>] [-y]
 
 Arguments:
@@ -10,12 +10,15 @@ Arguments:
                           use '-' to read from stdin
 
 Options:
-  -u, --upstream          use upstream archive / apkg get-archive
-                          default: dev archive / apkg make-archive
-  -s, --srcpkg            use source package <file>s
-  -a, --archive           use archive <files>s
-                          default: use dev archvie / apkg make-source
-  -d, --distro <distro>   set target distro
+  -l, --list              list buid deps only, don't install
+                          default: install deps
+  -u, --upstream          use upstream template / archive / srcpkg
+                          default: use dev template / archive / srcpkg
+  -s, --srcpkg            use source package
+                          default: use template
+  -a, --archive           use template (/build srcpkg) from archive
+                          default: use dev template
+  -d, --distro <distro>   override target distro
                           default: current distro
   -y, --yes               non-interactive mode
                           default: interactive (distro tool defualts)
@@ -23,21 +26,18 @@ Options:
 
 from docopt import docopt
 
-from apkg.lib import build
+from apkg.lib import deps
 
 
 def run_command(cargs):
     args = docopt(__doc__, argv=cargs)
-    # XXX: this will be refactored in following patch, disabling for now
-    # https://gitlab.nic.cz/packaging/apkg/-/issues/34
-    # pylint: disable=unreachable
-    raise NotImplementedError
-    return build.install_build_deps(
+    return deps.build_dep(
+        list_only=args['--list'],
+        upstream=args['--upstream'],
         srcpkg=args['--srcpkg'],
         archive=args['--archive'],
-        upstream=args['--upstream'],
-        version=args['--version'],
-        release=args['--release'],
+        input_files=args['<file>'],
+        input_file_lists=args['--file-list'],
         distro=args['--distro'],
         interactive=not args['--yes'],
         )
