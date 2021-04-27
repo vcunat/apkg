@@ -23,6 +23,7 @@ Options:
 #       A script for updating the __doc__ string here that is run
 #       when dev adds a new command might be a decent compromise.
 
+import importlib
 import sys
 from docopt import docopt
 
@@ -91,11 +92,11 @@ def run_command(cargs):
     """
     command = cargs[0]
     modname = 'apkg.commands.%s' % cmd2mod(command)
-    try:
-        mod = __import__(modname, fromlist=[''])
-    # py35 compat: use ModuleNotFoundError once py3.5 support is dropped
-    except ImportError:
+    spec = importlib.util.find_spec(modname)
+    if not spec:
         raise ex.InvalidApkgCommand(command=command)
+    # import command module
+    mod = __import__(modname, fromlist=[''])
     return mod.run_command(cargs)
 
 
