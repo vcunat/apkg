@@ -85,6 +85,34 @@ def test_apkg_build(tmpdir, capsys):
     assert re.match(r"pkg/pkgs/\S+/apkg\S+", out)
 
 
+def assert_build_deps(deps_text):
+    # make sure build deps contain at least one 'python*' dep
+    for dep in deps_text.splitlines():
+        if dep.startswith('python'):
+            return
+    assert False, "no python build dep detected"
+
+
+def test_apkg_build_dep_tempalte(tmpdir, capsys):
+    # check listing build deps from tempalte works
+    repo_path = test.init_testing_repo(APKG_BASE_DIR, str(tmpdir))
+    with cd(repo_path):
+        assert apkg('build-dep', '-l') == 0
+    out, _ = capsys.readouterr()
+    assert_build_deps(out)
+
+
+def test_apkg_build_dep_srcpkg(tmpdir, capsys):
+    # check listing build deps from srcpkg works
+    # this includes srcpkg dev build
+    repo_path = test.init_testing_repo(APKG_BASE_DIR, str(tmpdir))
+    with cd(repo_path):
+        assert apkg('build-dep', '-s', '-l') == 0
+    out, _ = capsys.readouterr()
+    # check for a common build dep
+    assert_build_deps(out)
+
+
 def test_apkg_cache(tmpdir, caplog):
     repo_path = test.init_testing_repo(APKG_BASE_DIR, str(tmpdir))
     with cd(repo_path):

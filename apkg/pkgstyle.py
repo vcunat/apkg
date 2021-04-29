@@ -5,7 +5,12 @@ dynamically added because apkg.pkgstyles is PEP 420 namespace package.
 import importlib
 import pkgutil
 
+from apkg import ex
+from apkg.log import getLogger
 import apkg.pkgstyles
+
+
+log = getLogger(__name__)
 
 
 def iter_pkgstyles():
@@ -43,6 +48,24 @@ def get_pkgstyle_for_distro(distro):
 
 def get_pkgstyle(style):
     return PKGSTYLES.get(style)
+
+
+def ensure_pkgstyle_fun(pkgstyle, fun):
+    f = getattr(pkgstyle, fun, None)
+    if not f:
+        msg = "%s pkgstyle is missing required function: %s"
+    elif not callable(f):
+        msg = "%s pkgstyle error: not a function: %s"
+    else:
+        return f
+    raise ex.DistroNotSupported(
+        msg % (pkgstyle.__name__, fun))
+
+
+def call_pkgstyle_fun(pkgstyle, fun, *args, **kwargs):
+    f = ensure_pkgstyle_fun(pkgstyle, fun)
+    log.verbose("calling %s function: %s", pkgstyle.__name__, fun)
+    return f(*args, **kwargs)
 
 
 PKGSTYLES = import_pkgstyles()

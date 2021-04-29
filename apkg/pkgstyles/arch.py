@@ -9,9 +9,11 @@ apkg package style for **Arch** linux.
 """
 import glob
 from pathlib import Path
+import sys
 
 from apkg import ex
 from apkg.log import getLogger
+from apkg import pkgtemplate
 from apkg.util.run import cd, run, sudo
 import apkg.util.shutil35 as shutil
 
@@ -33,16 +35,11 @@ def is_valid_template(path):
 
 
 def get_template_name(path):
-    return _parse_pkgbuild(path / 'PKGBUILD', '$pkgname')
+    return parse_pkgbuild_(path / 'PKGBUILD', 'echo "$pkgname"')
 
 
 def get_srcpkg_nvr(path):
-    return _parse_pkgbuild(path, '$pkgname-$pkgver-$pkgrel')
-
-
-def _parse_pkgbuild(pkgbuild, bash):
-    return run('bash', '-c', '. "%s" && echo "%s"'
-               % (pkgbuild, bash), log_cmd=False)
+    return parse_pkgbuild_(path, 'echo "$pkgname-$pkgver-$pkgrel"')
 
 
 def build_srcpkg(
@@ -92,6 +89,17 @@ def build_packages(
     return pkgs
 
 
+def install_distro_packages(
+        packages,
+        **kwargs):
+    interactive = kwargs.get('interactive', False)
+    cmd = ['pacman', '-S']
+    if not interactive:
+        cmd += ['--noconfirm']
+    cmd += packages
+    sudo(*cmd, direct=True)
+
+
 def install_custom_packages(
         packages,
         **kwargs):
@@ -103,12 +111,53 @@ def install_custom_packages(
     sudo(*cmd, direct=True)
 
 
-def install_distro_packages(
-        packages,
+def install_build_deps(
+        deps,
         **kwargs):
-    interactive = kwargs.get('interactive', False)
-    cmd = ['pacman', '-S']
-    if not interactive:
-        cmd += ['--noconfirm']
-    cmd += packages
-    sudo(*cmd, direct=True)
+    # no special handling for build deps on arch
+    install_distro_packages(deps, **kwargs)
+
+
+def get_build_deps_from_template(
+        template_path,
+        **kwargs):
+    """
+    parse depends from packaging template
+    """
+    distro = kwargs.get('distro')
+    # render PKGBUILD
+    this_style = sys.modules[__name__]
+    t = pkgtemplate.PackageTemplate(template_path, style=this_style)
+    env = pkgtemplate.DUMMY_ENV.copy()
+    if distro:
+        env['distro'] = distro
+    pkgbuild_text = t.render_file_content('PKGBUILD', env=env)
+    deps = parse_pkgbuild_content_(
+        pkgbuild_text,
+        'printf \'%s\n\' "${depends[@]}"')
+    return deps.splitlines()
+
+
+def get_build_deps_from_srcpkg(
+        srcpkg_path,
+        **_):
+    """
+    parse depends from source package (PKGBUILD)
+    """
+    deps = parse_pkgbuild_(
+        srcpkg_path,
+        'printf \'%s\n\' "${depends[@]}"')
+    return deps.splitlines()
+
+
+# functions bellow with _ postfix are specific to this pkgstyle
+
+
+def parse_pkgbuild_(pkgbuild, bash):
+    return run('bash', '-c', '. "%s" && %s'
+               % (pkgbuild, bash), log_cmd=False)
+
+
+def parse_pkgbuild_content_(pkgbuild_text, bash):
+    pkgb = '%s\n%s' % (pkgbuild_text, bash)
+    return run('bash', '-s', input=pkgb, log_cmd=False)

@@ -1,6 +1,8 @@
 """
 apkg archive (tarball) utils
 """
+from pathlib import Path
+
 import apkg.util.shutil35 as shutil
 
 from apkg import ex
@@ -14,6 +16,7 @@ def unpack_archive(archive_path, out_path):
 
     return path to extracted root dir
     """
+    out_path = Path(out_path)
     out_path.mkdir(parents=True, exist_ok=True)
     shutil.unpack_archive(archive_path, out_path)
     # parse output and make sure there's only a single root dir

@@ -12,10 +12,13 @@ or `--isolated` using `pbuilder`
 import glob
 from pathlib import Path
 import re
+import sys
+import tempfile
 
 from apkg import ex
 from apkg.log import getLogger
 from apkg import parse
+from apkg import pkgtemplate
 from apkg.util.run import cd, run, sudo
 from apkg.util.archive import unpack_archive
 import apkg.util.shutil35 as shutil
@@ -33,6 +36,15 @@ SUPPORTED_DISTROS = [
 
 
 RE_PKG_NAME = r'Source:\s*(\S+)'
+# orbital regexp cannon to parse Build-Depends from debian/control
+RE_BUILD_DEPENDS = (
+    r'(?:\n|\A)Build-Depends:[ \t]*'  # no whitespace before
+    r'(?:\n[ \t]+)?'  # optional leading newline with whitespace
+    r'((?:[^,\n]+)'   # first build dep
+    r'(?:,(?:[ \t]*'  # comma separator and optional whitespace
+    r'(?:\n[ \t]+)?'  # optional newline starting with whitespace
+    r'[^,\n]+))*)'    # 0-N other build deps
+)
 
 
 def is_valid_template(path):
@@ -57,10 +69,11 @@ def get_srcpkg_nvr(path):
     return nvr
 
 
-def _copy_srcpkg_files(src_path, dst_path):
+def copy_srcpkg_files(src_path, dst_path):
+    # not part of pkgstyle interface yet but probably should be
     for pattern in [
             '*.dsc',
-            '*_source.*',
+            '*_source.*',  # questionable, some tools need these
             '*.debian.tar.*',
             '*.orig.tar.*',
             '*.diff.*']:
@@ -69,13 +82,15 @@ def _copy_srcpkg_files(src_path, dst_path):
             shutil.copyfile(f, dst_path / srcp.name)
 
 
-# pylint: disable=too-many-locals
 def build_srcpkg(
         build_path,
         out_path,
         archive_paths,
         template,
         env):
+    """
+    build debian source package
+    """
     archive_path = archive_paths[0]
     nv, _ = parse.split_archive_ext(archive_path.name)
     source_path = build_path / nv
@@ -109,7 +124,7 @@ def build_srcpkg(
 
     log.info("copying source package to result dir: %s", out_path)
     out_path.mkdir(parents=True)
-    _copy_srcpkg_files(build_path, out_path)
+    copy_srcpkg_files(build_path, out_path)
     fns = glob.glob('%s/*' % out_path)
     # make sure .dsc is first
     for i, fn in enumerate(fns):
@@ -127,6 +142,9 @@ def build_packages(
         out_path,
         srcpkg_paths,
         **kwargs):
+    """
+    build .deb packages from source package
+    """
     srcpkg_path = srcpkg_paths[0]
     build_path.mkdir(parents=True)
     out_path.mkdir(parents=True)
@@ -172,48 +190,6 @@ def build_packages(
     return pkgs
 
 
-def install_build_deps(
-        srcpkg_path,
-        **kwargs):
-    interactive = kwargs.get('interactive', False)
-
-    log.info("installing build deps using apt-get build-dep")
-    cmd = ['apt-get', 'build-dep']
-    env = {}
-    if not interactive:
-        cmd.append('-y')
-        env['DEBIAN_FRONTEND'] = 'noninteractive'
-
-    cmd.append(srcpkg_path.resolve())
-    sudo(*cmd, env=env, direct=True)
-
-
-def install_custom_packages(
-        packages,
-        **kwargs):
-
-    def local_path(pkg):
-        """
-        apt install is able to install local packages
-        as long as they use full path or relative including ./
-        """
-        p = str(pkg)
-        if p[0] not in '/\\.':
-            return "./%s" % p
-        return p
-
-    interactive = kwargs.get('interactive', False)
-
-    cmd = ['apt', 'install']
-    env = {}
-    if not interactive:
-        env['DEBIAN_FRONTEND'] = 'noninteractive'
-        cmd += ['-y']
-
-    cmd += list(map(local_path, packages))
-    sudo(*cmd, env=env, direct=True)
-
-
 def install_distro_packages(
         packages,
         **kwargs):
@@ -227,3 +203,136 @@ def install_distro_packages(
 
     cmd += packages
     sudo(*cmd, env=env, direct=True)
+
+
+def install_custom_packages(
+        packages,
+        **kwargs):
+
+    def local_path(pkg):
+        """
+        apt-get is able to install local packages
+        as long as they use full path or relative including ./
+        """
+        p = str(pkg)
+        if p[0] not in '/\\.':
+            return "./%s" % p
+        return p
+
+    interactive = kwargs.get('interactive', False)
+
+    cmd = ['apt-get', 'install']
+    env = {}
+    if not interactive:
+        env['DEBIAN_FRONTEND'] = 'noninteractive'
+        cmd += ['-y']
+
+    cmd += list(map(local_path, packages))
+    sudo(*cmd, env=env, direct=True)
+
+
+def install_build_deps(
+        deps,
+        **kwargs):
+    """
+    install debian build deps
+
+    Debian Build-Depends can contain strings not handled by
+    `apt-get install` such as "(>= 9~)"
+
+    New `apt-get satisfy` command handles Build-Depends strings fine
+    but it isn't available on current.
+
+    Try to use `apt-get satisfy` if available,
+    otherwise revert to stripping special strings and use `install`.
+    """
+    interactive = kwargs.get('interactive', False)
+
+    if has_aptget_satisfy_():
+        # unlike install, satisfy can handle versioned deps
+        cmd = ['apt-get', 'satisfy']
+        env = {}
+        if not interactive:
+            env['DEBIAN_FRONTEND'] = 'noninteractive'
+            cmd += ['-y']
+        cmd += deps
+        sudo(*cmd, env=env, direct=True)
+    else:
+        # satisfy not available, strip special strings and use install
+        packages = [strip_dep_(d) for d in deps]
+        install_distro_packages(packages, **kwargs)
+
+
+def get_build_deps_from_template(
+        template_path,
+        **kwargs):
+    """
+    parse Build-Depends from packaging template
+    """
+    distro = kwargs.get('distro')
+    # render control file
+    this_style = sys.modules[__name__]
+    t = pkgtemplate.PackageTemplate(template_path, style=this_style)
+    env = pkgtemplate.DUMMY_ENV.copy()
+    if distro:
+        env['distro'] = distro
+    control_text = t.render_file_content('control', env=env)
+    return get_build_deps_from_control_(control_text)
+
+
+def get_build_deps_from_srcpkg(
+        srcpkg_path,
+        **_):
+    """
+    parse Build-Depends from source package
+    """
+    debar_path = get_srcpkg_debian_archive_(srcpkg_path.parent)
+    log.info("unpacking debian archive: %s", debar_path)
+    with tempfile.TemporaryDirectory(prefix='apkg_deb_') as td:
+        unpack_path = unpack_archive(debar_path, td)
+        control_path = unpack_path / 'control'
+        control_text = control_path.open().read()
+    return get_build_deps_from_control_(control_text)
+
+
+# functions bellow with _ postfix are specific to this pkgstyle
+
+
+def get_build_deps_from_control_(control_text):
+    """
+    parse Build-Depends from debian control file contents
+    """
+    m = re.search(RE_BUILD_DEPENDS, control_text)
+    if not m:
+        msg = "unable to parse Build-Depends from control"
+        raise ex.ParsingFailed(msg=msg)
+    deps_raw = m.group(1)
+    deps = re.split(r'\s*,\s*', deps_raw)
+    return deps
+
+
+def get_srcpkg_debian_archive_(path):
+    ars = glob.glob('%s/*.debian.tar.?z' % path)
+    if not ars:
+        msg = "unable to find debian archive in srcpkg: %s" % path
+        raise ex.InvalidInput(msg=msg)
+    if len(ars) > 1:
+        msg = "multiple debian archives found in srcpkg: %s" % path
+        raise ex.InvalidInput(msg=msg)
+    return ars[0]
+
+
+def has_aptget_satisfy_():
+    """
+    is `apt-get satisfy` command available?
+    """
+    o = run('apt-get', '-h', log_cmd=False, fatal=False)
+    return 'satisfy' in o
+
+
+def strip_dep_(dep):
+    """
+    strip special version strings (as found in Build-Depends)
+    in order for dep to be installable through `apt-get install`
+    """
+    return re.split(r'[\s\[\(]', dep)[0]

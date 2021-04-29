@@ -1,5 +1,7 @@
+from contextlib import contextmanager
 from pathlib import Path
 import sys
+import tempfile
 
 from apkg import ex
 from apkg.log import getLogger
@@ -84,6 +86,24 @@ def ensure_input_files(infiles):
         raise ex.InvalidInput(
             fail="no input file(s) specified")
     for f in infiles:
-        if not f.exists():
+        if not f or not f.exists():
             raise ex.InvalidInput(
                 fail="input file not found: %s" % f)
+
+
+@contextmanager
+def text_tempfile(text, prefix='apkg_tmp_'):
+    """
+    write text to a new temporary file and return its path
+
+    file is deleted after use
+    """
+    f = tempfile.NamedTemporaryFile(
+        prefix=prefix, mode='w+t', delete=False)
+    path = Path(f.name)
+    f.write(text)
+    f.close()
+    try:
+        yield path
+    finally:
+        path.unlink()

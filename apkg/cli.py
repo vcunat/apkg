@@ -7,12 +7,12 @@ Usage: apkg <command> [<args>...]
 
 Commands:
   status                      show status of current project
-  make-archive                create dev archive from current project state
+  make-archive                create dev archive from current project
   get-archive                 download upstream source archive
-  srcpkg                      create source package (files to build packages from)
-  build                       build package
-  build-dep                   install build dependencies
-  install                     install packages
+  srcpkg                      create source package (to build packages from)
+  build                       build packages
+  build-dep                   install or list build dependencies
+  install                     install local or distro packages
 
 Options:
   -h --help     show help screen, can be used after a command
