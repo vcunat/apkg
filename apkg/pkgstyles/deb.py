@@ -38,7 +38,7 @@ SUPPORTED_DISTROS = [
 RE_PKG_NAME = r'Source:\s*(\S+)'
 # orbital regexp cannon to parse Build-Depends from debian/control
 RE_BUILD_DEPENDS = (
-    r'(?:\n|\A)Build-Depends:[ \t]*'  # no whitespace before
+    r'(?:\n|\A)Build-Depends(?:-Indep)?:[ \t]*'  # no whitespace before
     r'(?:\n[ \t]+)?'  # optional leading newline with whitespace
     r'((?:[^,\n]+)'   # first build dep
     r'(?:,(?:[ \t]*'  # comma separator and optional whitespace
@@ -302,12 +302,13 @@ def get_build_deps_from_control_(control_text):
     """
     parse Build-Depends from debian control file contents
     """
-    m = re.search(RE_BUILD_DEPENDS, control_text)
+    m = re.findall(RE_BUILD_DEPENDS, control_text)
     if not m:
         msg = "unable to parse Build-Depends from control"
         raise ex.ParsingFailed(msg=msg)
-    deps_raw = m.group(1)
-    deps = re.split(r'\s*,\s*', deps_raw)
+    deps = []
+    for deps_raw in m:
+        deps += re.split(r'\s*,\s*', deps_raw)
     return deps
 
 

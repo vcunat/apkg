@@ -1,5 +1,6 @@
 from pathlib import Path
 import os
+import pytest
 import re
 
 from apkg.util import test
@@ -13,13 +14,16 @@ APKG_BASE_DIR = Path(__file__).parents[2]
 # NOTE(py35): use tmp_path instead of tmpdir
 #             when py3.5 support is dropped
 
+@pytest.fixture(scope="module")
+def repo_path(tmpdir_factory):
+    tmpdir = tmpdir_factory.mktemp("apkg_test_repo_")
+    repo_path = test.init_testing_repo(APKG_BASE_DIR, str(tmpdir))
+    return repo_path
+
 
 def test_import_command_modules():
     """
     test importing individual apkg command modules
-
-    py3.5 compat prevents meaningful error handling on ImportError
-    in apkg.cli.run_command right now :(
     """
     import apkg.commands.build  # noqa
     import apkg.commands.build_dep  # noqa
@@ -30,91 +34,7 @@ def test_import_command_modules():
     import apkg.commands.status  # noqa
 
 
-def test_apkg_make_archive(tmpdir, capsys):
-    repo_path = test.init_testing_repo(APKG_BASE_DIR, str(tmpdir))
-    repo_dir = str(repo_path)
-    assert repo_dir.endswith('apkg')
-    with cd(repo_dir):
-        assert apkg('make-archive') == 0
-    out, _ = capsys.readouterr()
-    # first stdout line should be resulting archive
-    assert re.match(r"pkg/archives/dev/apkg-.*\.tar\.gz", out)
-
-
-def test_apkg_get_archive_manual(tmpdir, capsys):
-    VERSION = '0.0.2'
-    repo_path = test.init_testing_repo(APKG_BASE_DIR, str(tmpdir))
-    repo_dir = str(repo_path)
-    assert repo_dir.endswith('apkg')
-    with cd(repo_dir):
-        assert apkg('get-archive', '--version', VERSION) == 0
-    out, _ = capsys.readouterr()
-    # first stdout line should be downloaded archive
-    assert out.startswith("pkg/archives/upstream/apkg-%s.tar.gz" % VERSION)
-
-
-def test_apkg_get_archive_auto(tmpdir, capsys):
-    # this tests upstream version detection as well
-    repo_path = test.init_testing_repo(APKG_BASE_DIR, str(tmpdir))
-    with cd(repo_path):
-        assert apkg('get-archive') == 0
-    out, _ = capsys.readouterr()
-    # first stdout line should be downloaded archive
-    assert out.startswith("pkg/archives/upstream/apkg-")
-
-
-def test_apkg_srcpkg(tmpdir, capsys):
-    repo_path = test.init_testing_repo(APKG_BASE_DIR, str(tmpdir))
-    repo_dir = str(repo_path)
-    assert repo_dir.endswith('apkg')
-    with cd(repo_dir):
-        assert apkg('srcpkg') == 0
-    out, _ = capsys.readouterr()
-    # first stdout line should be resulting source package
-    assert re.match(r"pkg/srcpkgs/\S+/apkg\S+", out)
-
-
-def test_apkg_build(tmpdir, capsys):
-    repo_path = test.init_testing_repo(APKG_BASE_DIR, str(tmpdir))
-    repo_dir = str(repo_path)
-    assert repo_dir.endswith('apkg')
-    with cd(repo_dir):
-        assert apkg('build') == 0
-    out, _ = capsys.readouterr()
-    # at least one package should be printed
-    assert re.match(r"pkg/pkgs/\S+/apkg\S+", out)
-
-
-def assert_build_deps(deps_text):
-    # make sure build deps contain at least one 'python*' dep
-    for dep in deps_text.splitlines():
-        if dep.startswith('python'):
-            return
-    assert False, "no python build dep detected"
-
-
-def test_apkg_build_dep_tempalte(tmpdir, capsys):
-    # check listing build deps from tempalte works
-    repo_path = test.init_testing_repo(APKG_BASE_DIR, str(tmpdir))
-    with cd(repo_path):
-        assert apkg('build-dep', '-l') == 0
-    out, _ = capsys.readouterr()
-    assert_build_deps(out)
-
-
-def test_apkg_build_dep_srcpkg(tmpdir, capsys):
-    # check listing build deps from srcpkg works
-    # this includes srcpkg dev build
-    repo_path = test.init_testing_repo(APKG_BASE_DIR, str(tmpdir))
-    with cd(repo_path):
-        assert apkg('build-dep', '-s', '-l') == 0
-    out, _ = capsys.readouterr()
-    # check for a common build dep
-    assert_build_deps(out)
-
-
-def test_apkg_cache(tmpdir, caplog):
-    repo_path = test.init_testing_repo(APKG_BASE_DIR, str(tmpdir))
+def test_apkg_make_archive_cache(repo_path, caplog):
     with cd(repo_path):
         cache_path = Path('pkg/.cache.json')
         if cache_path.exists():
@@ -153,3 +73,63 @@ def test_apkg_cache(tmpdir, caplog):
             'reuse',  # 3) should reuse archive from 2)
             'made',  # 4) should create archive due to --no-cache
             ]
+
+
+def test_apkg_get_archive_manual(repo_path, capsys):
+    VERSION = '0.0.2'
+    with cd(repo_path):
+        assert apkg('get-archive', '--version', VERSION) == 0
+    out, _ = capsys.readouterr()
+    # first stdout line should be downloaded archive
+    assert out.startswith("pkg/archives/upstream/apkg-%s.tar.gz" % VERSION)
+
+
+def test_apkg_get_archive_auto(repo_path, capsys):
+    # this tests upstream version detection as well
+    with cd(repo_path):
+        assert apkg('get-archive') == 0
+    out, _ = capsys.readouterr()
+    # first stdout line should be downloaded archive
+    assert out.startswith("pkg/archives/upstream/apkg-")
+
+
+def test_apkg_srcpkg(repo_path, capsys):
+    with cd(repo_path):
+        assert apkg('srcpkg') == 0
+    out, _ = capsys.readouterr()
+    # first stdout line should be resulting source package
+    assert re.match(r"pkg/srcpkgs/\S+/apkg\S+", out)
+
+
+def test_apkg_build(repo_path, capsys):
+    with cd(repo_path):
+        assert apkg('build') == 0
+    out, _ = capsys.readouterr()
+    # at least one package should be printed
+    assert re.match(r"pkg/pkgs/\S+/apkg\S+", out)
+
+
+def assert_build_deps(deps_text):
+    # make sure build deps contain at least one 'python*' dep
+    for dep in deps_text.splitlines():
+        if dep.startswith('python'):
+            return
+    assert False, "no python build dep detected"
+
+
+def test_apkg_build_dep_tempalte(repo_path, capsys):
+    # check listing build deps from tempalte works
+    with cd(repo_path):
+        assert apkg('build-dep', '-l') == 0
+    out, _ = capsys.readouterr()
+    assert_build_deps(out)
+
+
+def test_apkg_build_dep_srcpkg(repo_path, capsys):
+    # check listing build deps from srcpkg works
+    # this includes srcpkg dev build
+    with cd(repo_path):
+        assert apkg('build-dep', '-s', '-l') == 0
+    out, _ = capsys.readouterr()
+    # check for a common build dep
+    assert_build_deps(out)
