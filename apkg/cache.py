@@ -91,6 +91,9 @@ class ProjectCache:
         if not entries:
             return None
         paths = list(map(entry2path_valid, entries))
+        if None in paths:
+            # invalid entry
+            return None
         return paths
 
     def delete(self, cache_name, key):
