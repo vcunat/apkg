@@ -1,7 +1,0 @@
-[project]
-name = "knot-resolver"
-make_archive_script = "scripts/make-dev-archive.sh"
-
-[upstream]
-archive_url = "https://secure.nic.cz/files/knot-resolver/knot-resolver-{{ version }}.tar.xz"
-signature_url = "https://secure.nic.cz/files/knot-resolver/knot-resolver-{{ version }}.tar.xz.asc"
