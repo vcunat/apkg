@@ -23,6 +23,6 @@ def unpack_archive(archive_path, out_path):
     root_files = list(out_path.glob("*"))
     n_root_files = len(root_files)
     if n_root_files != 1:
-        fmt = "Expected a single root dir but insteat got %d files in root"
+        fmt = "Expected a single root dir but instead got %d files in root"
         raise ex.InvalidArchiveFormat(fmt=fmt % n_root_files)
     return root_files[0]
