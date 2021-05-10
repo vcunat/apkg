@@ -1,20 +1,28 @@
 # apkg installation
 
-`apkg` is going to provide various packages of itself soon,
-but for now **please use the source**.
+`apkg` is going to provide native distro packages once mature.
+
+For now you need to
+
+* [install requirements](#requirements) (just `pip` and `setuptools`)
+
+and then choose howto install:
+
+* [install from PyPI](#install-from-pypi-recommended) - **recommended**
+* [install from source](#install-from-source)
 
 
 ## requirements
 
 You need **Python >= 3.6** and `pip`.
 
-Python 3.5 is EOL and unofficially supported on best-effort basis in `apkg`
-until Debian 9 Stretch LTS EOL June 30, 2022.
+**Python 3.5** is EOL but it's unofficially supported on best-effort basis in
+apkg until Debian 9 Stretch LTS EOL June 30, 2022.
 
-Install following downstream packages using your package manager:
+Install following **system packages** using your system's package manager:
 
-* `python3-setuptools`
 * `python3-pip`
+* `python3-setuptools`
 
 Debian/Ubuntu example:
 
@@ -29,9 +37,84 @@ Python modules needed to build `apkg` docs are listed in
 {{ 'doc-requirements.txt' | file_link }}.
 
 
+## install from PyPI (recommended)
+
+In order to support widest variety of distros and their releases while leveraging latest and greatest python modules, `apkg` is
+primarily distributed through
+[Python Package Index (PyPI)](https://pypi.org/project/apkg/)
+using `pip`, `pipx`, or other similar tool of your choice.
+
+Make sure you've installed `python3-pip` using your distro package manager as
+described in [requirements](#requirements).
+
+
+### user install from PyPI
+
+To ensure **any** version of apkg is installed for current user:
+
+```sh
+pip3 install --user apkg
+```
+
+Modern `pip` automatically appends `--user` so `pip3 install apkg` should be fine most of the time.
+
+To ensure **latest** version of apkg is installed for current user use `-U`/`--upgrade`:
+
+```sh
+pip3 install --user --U apkg
+```
+
+If you prefer to install apkg into isolated virtualenv and only expose `apkg` script, consider using `pipx` instead:
+
+```sh
+pip3 install pipx
+pipx install apkg
+```
+
+Depending on your `$PATH`, `apkg` script may be available. If it isn't you can
+always invoke apkg module:
+
+```
+python3 -m apkg build -i
+```
+
+
+### automation / CI / DevOps install from PyPI
+
+For automated usage in CI and other DevOps systems it's recommended to use:
+
+```
+pip3 install apkg
+```
+
+which should generally work in any use case including:
+
+* install as normal system user
+* install as root (containers)
+* install in virtualenv
+
+If you want **latest and greatest apkg**, use `--upgrade`/`-U`:
+
+```
+pip3 install -U apkg
+```
+
+If you prefer to use a **single tested version** of `apkg` and be completely independent on latest releases, you can pin apkg to a specific version, for example:
+
+```
+pip3 install apkg==0.0.4
+```
+
+Depending on your `$PATH`, `apkg` script may be available. If it isn't you can
+always invoke apkg module
+
+```
+python3 -m apkg build -i
+```
+
 ## install from source
 
-Make sure you're in the top `apkg` source dir:
+Make sure [requirements](#requirements) are installed and you're in the top `apkg` source dir:
 
 ```
 git clone https://gitlab.nic.cz/packaging/apkg
@@ -41,7 +124,7 @@ cd apkg
 Then choose one of installation methods below:
 
 
-### user install
+### user install from source
 
 Fastest and recommended way to install from source for CLI usage without affecting the rest of your system is to get
 [pipx](https://pipxproject.github.io/pipx/installation/)
@@ -99,7 +182,7 @@ use it inside disposable container or a VM but I'd never taint my system
 python installation with a global install like that.
 
 
-### virtualenv install
+### virtualenv install from source
 
 If you don't want `apkg` installation to affect your system but don't want
 to/can't use `pipx`, you can use `virtualenv` directly (`python3-venv`
