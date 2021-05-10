@@ -93,12 +93,11 @@ def build_srcpkg(
     """
     archive_path = archive_paths[0]
     nv, _ = parse.split_archive_ext(archive_path.name)
-    source_path = build_path / nv
     log.info("building deb source package: %s", nv)
     log.info("unpacking archive: %s", archive_path)
-    source_path.mkdir(parents=True)
-    unpack_path = unpack_archive(archive_path, build_path)
-    if unpack_path != source_path or not source_path.exists():
+    source_path = unpack_archive(archive_path, build_path)
+    log.verbose("source package root dir: %s", source_path)
+    if not source_path or not source_path.exists():
         msg = "archive unpack didn't result in expected dir: %s" % source_path
         raise ex.UnexpectedCommandOutput(msg=msg)
     # render template
