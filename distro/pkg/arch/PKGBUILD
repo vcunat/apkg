@@ -12,13 +12,11 @@ depends=('python-docopt'
          'python-toml'
          'python-blessings')
 #checkdepends=('python-pytest')
-source=("${pkgname}-${pkgver}.tar.gz")
+source=("${pkgname}-v${pkgver}.tar.gz")
 sha256sums=('SKIP')
 
-export PBR_VERSION=$pkgver
-
 build() {
-  cd apkg-$pkgver
+  cd apkg-v$pkgver
   python setup.py build
 }
 
@@ -28,6 +26,6 @@ build() {
 #}
 
 package() {
-  cd apkg-$pkgver
+  cd apkg-v$pkgver
   python setup.py install --root="$pkgdir" --optimize=1
 }
