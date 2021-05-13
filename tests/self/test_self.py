@@ -76,12 +76,12 @@ def test_apkg_make_archive_cache(repo_path, caplog):
 
 
 def test_apkg_get_archive_manual(repo_path, capsys):
-    VERSION = '0.0.2'
+    VERSION = '0.0.4'
     with cd(repo_path):
         assert apkg('get-archive', '--version', VERSION) == 0
     out, _ = capsys.readouterr()
     # first stdout line should be downloaded archive
-    assert out.startswith("pkg/archives/upstream/apkg-%s.tar.gz" % VERSION)
+    assert out.startswith("pkg/archives/upstream/apkg-v%s.tar.gz" % VERSION)
 
 
 def test_apkg_get_archive_auto(repo_path, capsys):

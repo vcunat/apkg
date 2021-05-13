@@ -5,7 +5,7 @@ Summary:          cross-distro packaging automation tool
 
 License:          GPL 3.0
 URL:              https://gitlab.nic.cz/packaging/apkg
-Source0:          %{name}-%{version}.tar.gz
+Source0:          %{name}-v%{version}.tar.gz
 
 BuildArch:        noarch
 
@@ -45,10 +45,7 @@ This package contains apkg module for Python 3.
 
 
 %prep
-%autosetup -n %{name}-%{version} -S git
-
-# We handle requirements ourselves, pkg_resources only bring pain
-rm -rf requirements.txt test-requirements.txt
+%autosetup -n %{name}-v%{version} -S git
 
 %build
 %py3_build

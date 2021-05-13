@@ -2,6 +2,7 @@
 apkg lib for handling source archives
 """
 from pathlib import Path
+import re
 import requests
 
 from apkg import ex
@@ -108,20 +109,30 @@ def get_archive(
             return cached
 
     log.info('downloading archive: %s', archive_url)
+
+    _, _, archive_fn = archive_url.rpartition('/')
+    if result_dir:
+        ar_base_path = Path(result_dir)
+    else:
+        ar_base_path = proj.upstream_archive_path
+
     r = requests.get(archive_url, allow_redirects=True)
     if r.status_code != 200:
         raise ex.FileDownloadFailed(code=r.status_code, url=archive_url)
-    content_type = r.headers['content-type']
+    content_type = r.headers.get('content-type', '')
     if not content_type.startswith('application/'):
         msg = 'Failed to download archive - invalid content-type "%s":\n\n%s'
         raise ex.FileDownloadFailed(
             msg=msg % (content_type, archive_url))
 
-    if result_dir:
-        ar_base_path = Path(result_dir)
-    else:
-        ar_base_path = proj.upstream_archive_path
-    _, _, archive_fn = archive_url.rpartition('/')
+    content_disp = r.headers.get('content-disposition')
+    if content_disp:
+        m = re.search(r'filename=(.+)', content_disp)
+        if m:
+            archive_fn = m.group(1).strip(' "')
+            log.verbose("archive file name from HTTP Content-Disposition: %s",
+                        archive_fn)
+
     archive_path = ar_base_path / archive_fn
     log.info('saving archive to: %s', archive_path)
     ar_base_path.mkdir(parents=True, exist_ok=True)
