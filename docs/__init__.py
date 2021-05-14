@@ -3,6 +3,7 @@ generate docs from apkg code/docstrings using mkdocs-macros-plugin
 """
 import inspect
 
+from apkg import COMPAT_LEVEL
 from apkg import ex
 from apkg import pkgstyle
 from apkg.cli import cmd2mod
@@ -21,6 +22,7 @@ def define_env(env):
     env.variables.pkgstyles = pkgstyle.PKGSTYLES
     env.variables.new_issue_url = APKG_NEW_ISSUE_URL
     env.variables.exceptions = get_exceptions()
+    env.variables.compat_level = COMPAT_LEVEL
 
     @env.filter
     def relpath(path):

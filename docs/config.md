@@ -4,6 +4,10 @@
 
 Please see {{ 'distro/config/apkg.toml' | file_link }} for up-to-date example.
 
+This document describes apkg
+[compat level](#apkgcompat) **{{ compat_level }}**
+config options.
+
 
 ## [project]
 
@@ -79,3 +83,22 @@ version_script = "scripts/upstream-version.py"
 This option overrides default auto-detection mechanism.
 
 script example: {{ 'scripts/upstream-version.py' | file_link  }}
+
+
+## [apkg]
+
+Config section related to `apkg` configuration and settings.
+
+### apkg.compat
+
+In order to allow config file format changes without breaking compatibility,
+it's **strongly recommended** to include current apkg compatibility level in the config file.
+
+That way `apkg` will be able work with old and new config formats without disruption in the future.
+
+**current apkg compat level: {{ compat_level }}**
+
+```
+[apkg]
+compat = {{ compat_level }}
+```
