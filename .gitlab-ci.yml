@@ -1,46 +1,197 @@
 variables:
   LC_ALL: C.UTF-8
 
+
 stages:
   - test
+  - integration
   - deploy
 
 
-image: $CI_REGISTRY/packaging/apkg/ci/python-current:apkg
+image: $CI_REGISTRY/packaging/apkg/ci/debian-10-full:apkg
 
+
+.setup-git: &setup-git
+  - git config --global user.name CI
+  - git config --global user.email ci@nic
+
+.setup-py-reqs: &setup-py-reqs
+  - pip3 install -r requirements.txt
+
+.setup-py-develop: &setup-py-develop
+  - python3 setup.py develop --user
+
+.setup-project: &setup-project
+  - *setup-git
+  - *setup-py-develop
+
+
+.test: &test
+  stage: test
+
+.integration: &integration
+  stage: integration
+  only:
+    variables:
+      - $INTEGRATION
+  dependencies:
+    - unit
+
+
+# basic tests
 
 flake8:
-  stage: test
+  <<: *test
   script:
     - tox -e flake8
 
 pylint:
-  stage: test
+  <<: *test
   allow_failure: true
   script:
     - tox -e pylint
 
 unit:
-  stage: test
+  <<: *test
   script:
     - tox -e unit
 
-integration:
-  stage: test
-  script:
-    - tox -e integration
-
 self:
-  stage: test
+  <<: *test
   script:
     # `python3 -m build` causes issues in tox in docker container
     # use py.test directly
-    - pip3 install -r requirements.txt
-    - python3 setup.py develop --user
-    - py.test-3 tests/self
+    - *setup-py-reqs
+    - *setup-py-develop
+    - py.test-3 -v tests/self
+
+
+# integration tests
+
+debian-10-kresd:
+  image: $CI_REGISTRY/packaging/apkg/ci/debian-10:apkg
+  <<: *integration
+  script:
+    - *setup-project
+    - py.test-3 -v ci/tests/test_knot_resolver.py
+  # TODO: problems with root build
+  allow_failure: true
+
+ubuntu-18.04-kresd:
+  image: $CI_REGISTRY/packaging/apkg/ci/ubuntu-18.04:apkg
+  <<: *integration
+  script:
+    - *setup-project
+    - py.test-3 -v ci/tests/test_knot_resolver.py
+  # TODO: dpkg: error: PATH is not set
+  allow_failure: true
+
+ubuntu-20.04-kresd:
+  image: $CI_REGISTRY/packaging/apkg/ci/ubuntu-20.04:apkg
+  <<: *integration
+  script:
+    - *setup-project
+    - py.test-3 -v ci/tests/test_knot_resolver.py
+  # TODO: problems with root build
+  allow_failure: true
+
+fedora-33-kresd:
+  image: $CI_REGISTRY/packaging/apkg/ci/fedora-33:apkg
+  <<: *integration
+  script:
+    - *setup-project
+    - py.test-3 -v ci/tests/test_knot_resolver.py
+
+suse-15-kresd:
+  image: $CI_REGISTRY/packaging/apkg/ci/suse-15:apkg
+  <<: *integration
+  script:
+    - *setup-project
+    - py.test3 -v ci/tests/test_knot_resolver.py
+
+
+debian-10-knot:
+  image: $CI_REGISTRY/packaging/apkg/ci/debian-10:apkg
+  <<: *integration
+  script:
+    - *setup-project
+    - py.test-3 -v ci/tests/test_knot_dns.py
+
+ubuntu-18.04-knot:
+  image: $CI_REGISTRY/packaging/apkg/ci/ubuntu-18.04:apkg
+  <<: *integration
+  script:
+    - *setup-project
+    - py.test-3 -v ci/tests/test_knot_dns.py
+  # TODO: dpkg: error: PATH is not set
+  allow_failure: true
+
+ubuntu-20.04-knot:
+  image: $CI_REGISTRY/packaging/apkg/ci/ubuntu-20.04:apkg
+  <<: *integration
+  script:
+    - *setup-project
+    - py.test-3 -v ci/tests/test_knot_dns.py
+
+fedora-33-knot:
+  image: $CI_REGISTRY/packaging/apkg/ci/fedora-33:apkg
+  <<: *integration
+  script:
+    - *setup-project
+    - py.test-3 -v ci/tests/test_knot_dns.py
+
+suse-15-knot:
+  image: $CI_REGISTRY/packaging/apkg/ci/suse-15:apkg
+  <<: *integration
+  script:
+    - *setup-project
+    - py.test3 -v ci/tests/test_knot_dns.py
+
+
+debian-10-bird:
+  image: $CI_REGISTRY/packaging/apkg/ci/debian-10:apkg
+  <<: *integration
+  script:
+    - *setup-project
+    - py.test-3 -v ci/tests/test_bird.py
+
+ubuntu-18.04-bird:
+  image: $CI_REGISTRY/packaging/apkg/ci/ubuntu-18.04:apkg
+  <<: *integration
+  script:
+    - *setup-project
+    - py.test-3 -v ci/tests/test_bird.py
+  # TODO: dpkg: error: PATH is not set
+  allow_failure: true
+
+ubuntu-20.04-bird:
+  image: $CI_REGISTRY/packaging/apkg/ci/ubuntu-20.04:apkg
+  <<: *integration
+  script:
+    - *setup-project
+    - py.test-3 -v ci/tests/test_bird.py
+
+fedora-33-bird:
+  image: $CI_REGISTRY/packaging/apkg/ci/fedora-33:apkg
+  <<: *integration
+  script:
+    - *setup-project
+    - py.test-3 -v ci/tests/test_bird.py
+  # TODO: old autoconf
+  allow_failure: true
+
+suse-15-bird:
+  image: $CI_REGISTRY/packaging/apkg/ci/suse-15:apkg
+  <<: *integration
+  script:
+    - *setup-project
+    - py.test3 -v ci/tests/test_bird.py
+  # TODO: old autoconf
+  allow_failure: true
 
 
 # docs published to GitLab Pages: https://packaging.pages.nic.cz/apkg/
+
 pages:
   stage: deploy
   script:
@@ -51,3 +202,6 @@ pages:
     - public
   only:
     - master
+  except:
+    variables:
+      - $INTEGRATION
