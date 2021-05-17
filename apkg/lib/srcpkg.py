@@ -18,10 +18,10 @@ log = getLogger(__name__)
 
 
 def make_srcpkg(
-        upstream=False,
         archive=False,
         input_files=None,
         input_file_lists=None,
+        upstream=False,
         version=None,
         release=None,
         distro=None,
@@ -34,6 +34,13 @@ def make_srcpkg(
         log.bold('rendering %s source package template', srcpkg_type)
     else:
         log.bold('creating %s source package', srcpkg_type)
+
+    if version:
+        # --version implies --upstream
+        upstream = True
+        if archive:
+            raise ex.InvalidInput(
+                fail="--archive and --version options are mutually exclusive")
 
     proj = project or Project()
     distro = adistro.distro_arg(distro)
@@ -54,13 +61,12 @@ def make_srcpkg(
                 use_cache=use_cache)
         else:
             infiles = ar.make_archive(
-                version=version,
                 project=proj,
                 use_cache=use_cache)
 
     common.ensure_input_files(infiles)
     ar_path = infiles[0]
-    version = ar.get_archive_version(ar_path, version=version)
+    version = ar.get_archive_version(ar_path)
 
     use_cache = proj.cache.enabled(use_cache) and not render_template
     if use_cache:

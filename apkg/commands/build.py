@@ -1,8 +1,8 @@
 """
 build packages
 
-Usage: apkg build [-u] [-s | -a] [<file> | -F <file-list>]...
-                  [-v <ver>] [-r <rls>] [-d <distro>]
+Usage: apkg build [-s | -a] [<file> | -F <file-list>]...
+                  [-u] [-v <ver>] [-r <rls>] [-d <distro>]
                   [-O <dir>] [--no-cache]
                   [-i | -I]
 
@@ -12,12 +12,18 @@ Arguments:
                           use '-' to read from stdin
 
 Options:
-  -u, --upstream          upstream build from archive
-                          default: dev build from project
   -s, --srcpkg            build from source package <file>s
+                          default: use srcpkg
   -a, --archive           build from archive <files>s
-  -v, --version <ver>     set package version
+                          default: use make-archive (or get-archive in --upstream mode)
+  -u, --upstream          build from upstream source package
+                          default: build from dev source package
+  -v, --version <ver>     set upstream archive version to use
+                          implies --upstream, conflicts with --srcpkg and --archive
+                          default: latest upstream version
   -r, --release <rls>     set package release
+                          conflicts with --srcpkg
+                          default: 1
   -d, --distro <distro>   set target distro
                           default: current distro
   -O, --result-dir <dir>  put results into specified dir
@@ -25,7 +31,7 @@ Options:
   --no-cache              disable cache
   -i, --install-dep       install build dependencies on host (build-dep)
   -I, --isolated          use isolated builder (pbuilder, mock, ...)
-                          default: use direct builder
+                          default: use direct builder (rpmbuild, dpkg, makepkg, ...)
 """ # noqa
 
 from docopt import docopt

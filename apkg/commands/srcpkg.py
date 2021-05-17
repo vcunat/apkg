@@ -1,8 +1,8 @@
 """
 create source package (files to build packages from)
 
-Usage: apkg srcpkg [-u] [-a] [<file> | -F <file-list>]...
-                   [-v <ver>] [-r <rls>] [-d <distro>]
+Usage: apkg srcpkg [-a] [<file> | -F <file-list>]...
+                   [-u] [-v <ver>] [-r <rls>] [-d <distro>]
                    [-O <dir>] [--no-cache]
                    [--render-template]
 
@@ -12,12 +12,15 @@ Arguments:
                           use '-' to read from stdin
 
 Options:
-  -u, --upstream          upstream source package from archive
-                          default: dev source package from project
-  -a, --archive           use specified archive <file>s
-                          default: use project template
-  -v, --version <ver>     set package version
+  -a, --archive           use specified input archive <file>s
+                          default: use make-archive (or get-archive in --upstream mode)
+  -u, --upstream          upstream source package from archive templates
+                          default: dev source package from project templates
+  -v, --version <ver>     set upstream archive version to use
+                          implies --upstream, conflicts with --archive
+                          default: latest upstream version
   -r, --release <rls>     set package release
+                          default: 1
   -d, --distro <distro>   set target distro
                           default: current distro
   -O, --result-dir <dir>  put results into specified <dir>

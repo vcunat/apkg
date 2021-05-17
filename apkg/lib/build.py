@@ -37,6 +37,9 @@ def build_package(
     log.info("target distro: %s", distro)
 
     if srcpkg:
+        if version:
+            raise ex.InvalidInput(
+                fail="--srcpkg and --version options are mutually exclusive")
         # use existing source package
         infiles = common.parse_input_files(input_files, input_file_lists)
     else:
@@ -45,10 +48,10 @@ def build_package(
             archive=archive,
             input_files=input_files,
             input_file_lists=input_file_lists,
+            upstream=upstream,
             version=version,
             release=release,
             distro=distro,
-            upstream=upstream,
             project=proj,
             use_cache=use_cache)
 
