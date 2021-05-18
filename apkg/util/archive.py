@@ -18,11 +18,14 @@ def unpack_archive(archive_path, out_path):
     """
     out_path = Path(out_path)
     out_path.mkdir(parents=True, exist_ok=True)
+    root_files_old = set(out_path.glob("*"))
+    # shutil doesn't provide a way to check extracted files :(
+    # pautil has bugs and got last release in 2016...
     shutil.unpack_archive(archive_path, out_path)
-    # parse output and make sure there's only a single root dir
-    root_files = list(out_path.glob("*"))
+    root_files_new = set(out_path.glob("*"))
+    root_files = root_files_new - root_files_old
     n_root_files = len(root_files)
     if n_root_files != 1:
         fmt = "Expected a single root dir but instead got %d files in root"
         raise ex.InvalidArchiveFormat(fmt=fmt % n_root_files)
-    return root_files[0]
+    return root_files.pop()
