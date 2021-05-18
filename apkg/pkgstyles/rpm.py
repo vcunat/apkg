@@ -35,6 +35,10 @@ SUPPORTED_DISTROS = [
     "opensuse",
     "scientific",
 ]
+DISTRO_REQUIRES = {
+    'core': ['rpm-build'],
+    'isolated': ['mock'],
+}
 
 
 RE_PKG_NAME = r'Name:\s*(\S+)'

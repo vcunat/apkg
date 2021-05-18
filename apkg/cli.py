@@ -13,6 +13,7 @@ Commands:
   build                       build packages
   build-dep                   install or list build dependencies
   install                     install local or distro packages
+  system-setup                setup system for packaging
 
 Options:
   -h --help     show help screen, can be used after a command
