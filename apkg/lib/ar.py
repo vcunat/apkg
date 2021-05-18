@@ -18,7 +18,6 @@ log = getLogger(__name__)
 
 
 def make_archive(
-        version=None,
         result_dir=None,
         use_cache=True,
         project=None):
@@ -64,17 +63,11 @@ def make_archive(
     else:
         ar_base_path = proj.dev_archive_path
     archive_fn = in_archive_path.name
-    if version:
-        # specific version requested - rename if needed
-        name, sep, ver, ext = split_archive_fn(archive_fn)
-        if parse_version(ver) != version:
-            archive_fn = name + sep + version + ext
-            msg = "archive renamed to match requested version: %s"
-            log.info(msg, archive_fn)
     archive_path = ar_base_path / archive_fn
-    log.info("copying archive to: %s", archive_path)
-    ar_base_path.mkdir(parents=True, exist_ok=True)
-    shutil.copy(in_archive_path, archive_path)
+    if archive_path != in_archive_path:
+        log.info("copying archive to: %s", archive_path)
+        ar_base_path.mkdir(parents=True, exist_ok=True)
+        shutil.copy(in_archive_path, archive_path)
     log.success("made archive: %s", archive_path)
     results = [archive_path]
     if use_cache:
@@ -190,28 +183,13 @@ def find_archive(archive, upstream=False, project=None):
     return ar_path
 
 
-def get_archive_version(archive_path, version=None):
+def get_archive_version(archive_path):
     """
     return archive version detected from archive name
-
-    if version is specified, ensure it matches archive version
     """
     archive_path = Path(archive_path)
     _, _, ver, _ = split_archive_fn(archive_path.name)
-    ar_ver = parse_version(ver)
-    if version:
-        # optional version check requested
-        if ar_ver == version:
-            log.verbose("archive name matches desired version: %s", version)
-        else:
-            msg = ("archive name doesn't match desired version: %s\n\n"
-                   "desired version: %s\n"
-                   "archive version: %s" % (archive_path.name, version, ver))
-            raise ex.InvalidVersion(msg=msg)
-    else:
-        # no version was requested - use archive version
-        version = ar_ver
-    return version
+    return parse_version(ver)
 
 
 def archive_type(upstream=False):
