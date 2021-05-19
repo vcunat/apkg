@@ -33,6 +33,10 @@ SUPPORTED_DISTROS = [
     "linuxmint",
     "raspbian",
 ]
+DISTRO_REQUIRES = {
+    'core': ['devscripts'],
+    'isolated': ['pbuilder'],
+}
 
 
 RE_PKG_NAME = r'Source:\s*(\S+)'
