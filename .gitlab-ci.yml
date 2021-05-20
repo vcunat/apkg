@@ -4,7 +4,9 @@ variables:
 
 stages:
   - test
-  - integration
+  - bird
+  - knot-dns
+  - knot-resolver
   - deploy
 
 
@@ -29,12 +31,28 @@ image: $CI_REGISTRY/packaging/apkg/ci/debian-10-full:apkg
 .test: &test
   stage: test
 
-.integration: &integration
-  stage: integration
+.bird: &bird
+  stage: bird
   only:
     variables:
       - $INTEGRATION
-  dependencies:
+  needs:
+    - unit
+
+.knot-dns: &knot-dns
+  stage: knot-dns
+  only:
+    variables:
+      - $INTEGRATION
+  needs:
+    - unit
+
+.knot-resolver: &knot-resolver
+  stage: knot-resolver
+  only:
+    variables:
+      - $INTEGRATION
+  needs:
     - unit
 
 
@@ -66,98 +84,18 @@ self:
     - py.test-3 -v tests/self
 
 
-# integration tests
-
-debian-10-kresd:
-  image: $CI_REGISTRY/packaging/apkg/ci/debian-10:apkg
-  <<: *integration
-  script:
-    - *setup-project
-    - py.test-3 -v ci/tests/test_knot_resolver.py
-  # TODO: problems with root build
-  allow_failure: true
-
-ubuntu-18.04-kresd:
-  image: $CI_REGISTRY/packaging/apkg/ci/ubuntu-18.04:apkg
-  <<: *integration
-  script:
-    - *setup-project
-    - py.test-3 -v ci/tests/test_knot_resolver.py
-  # TODO: dpkg: error: PATH is not set
-  allow_failure: true
-
-ubuntu-20.04-kresd:
-  image: $CI_REGISTRY/packaging/apkg/ci/ubuntu-20.04:apkg
-  <<: *integration
-  script:
-    - *setup-project
-    - py.test-3 -v ci/tests/test_knot_resolver.py
-  # TODO: problems with root build
-  allow_failure: true
-
-fedora-33-kresd:
-  image: $CI_REGISTRY/packaging/apkg/ci/fedora-33:apkg
-  <<: *integration
-  script:
-    - *setup-project
-    - py.test-3 -v ci/tests/test_knot_resolver.py
-
-suse-15-kresd:
-  image: $CI_REGISTRY/packaging/apkg/ci/suse-15:apkg
-  <<: *integration
-  script:
-    - *setup-project
-    - py.test3 -v ci/tests/test_knot_resolver.py
-
-
-debian-10-knot:
-  image: $CI_REGISTRY/packaging/apkg/ci/debian-10:apkg
-  <<: *integration
-  script:
-    - *setup-project
-    - py.test-3 -v ci/tests/test_knot_dns.py
-
-ubuntu-18.04-knot:
-  image: $CI_REGISTRY/packaging/apkg/ci/ubuntu-18.04:apkg
-  <<: *integration
-  script:
-    - *setup-project
-    - py.test-3 -v ci/tests/test_knot_dns.py
-  # TODO: dpkg: error: PATH is not set
-  allow_failure: true
-
-ubuntu-20.04-knot:
-  image: $CI_REGISTRY/packaging/apkg/ci/ubuntu-20.04:apkg
-  <<: *integration
-  script:
-    - *setup-project
-    - py.test-3 -v ci/tests/test_knot_dns.py
-
-fedora-33-knot:
-  image: $CI_REGISTRY/packaging/apkg/ci/fedora-33:apkg
-  <<: *integration
-  script:
-    - *setup-project
-    - py.test-3 -v ci/tests/test_knot_dns.py
-
-suse-15-knot:
-  image: $CI_REGISTRY/packaging/apkg/ci/suse-15:apkg
-  <<: *integration
-  script:
-    - *setup-project
-    - py.test3 -v ci/tests/test_knot_dns.py
-
+# integration tests: BIRD
 
 debian-10-bird:
   image: $CI_REGISTRY/packaging/apkg/ci/debian-10:apkg
-  <<: *integration
+  <<: *bird
   script:
     - *setup-project
     - py.test-3 -v ci/tests/test_bird.py
 
 ubuntu-18.04-bird:
   image: $CI_REGISTRY/packaging/apkg/ci/ubuntu-18.04:apkg
-  <<: *integration
+  <<: *bird
   script:
     - *setup-project
     - py.test-3 -v ci/tests/test_bird.py
@@ -166,14 +104,14 @@ ubuntu-18.04-bird:
 
 ubuntu-20.04-bird:
   image: $CI_REGISTRY/packaging/apkg/ci/ubuntu-20.04:apkg
-  <<: *integration
+  <<: *bird
   script:
     - *setup-project
     - py.test-3 -v ci/tests/test_bird.py
 
 fedora-33-bird:
   image: $CI_REGISTRY/packaging/apkg/ci/fedora-33:apkg
-  <<: *integration
+  <<: *bird
   script:
     - *setup-project
     - py.test-3 -v ci/tests/test_bird.py
@@ -182,12 +120,96 @@ fedora-33-bird:
 
 suse-15-bird:
   image: $CI_REGISTRY/packaging/apkg/ci/suse-15:apkg
-  <<: *integration
+  <<: *bird
   script:
     - *setup-project
     - py.test3 -v ci/tests/test_bird.py
   # TODO: old autoconf
   allow_failure: true
+
+
+# integration tests: Knot DNS
+
+debian-10-knot-dns:
+  image: $CI_REGISTRY/packaging/apkg/ci/debian-10:apkg
+  <<: *knot-dns
+  script:
+    - *setup-project
+    - py.test-3 -v ci/tests/test_knot_dns.py
+
+ubuntu-18.04-knot-dns:
+  image: $CI_REGISTRY/packaging/apkg/ci/ubuntu-18.04:apkg
+  <<: *knot-dns
+  script:
+    - *setup-project
+    - py.test-3 -v ci/tests/test_knot_dns.py
+  # TODO: dpkg: error: PATH is not set
+  allow_failure: true
+
+ubuntu-20.04-knot-dns:
+  image: $CI_REGISTRY/packaging/apkg/ci/ubuntu-20.04:apkg
+  <<: *knot-dns
+  script:
+    - *setup-project
+    - py.test-3 -v ci/tests/test_knot_dns.py
+
+fedora-33-knot-dns:
+  image: $CI_REGISTRY/packaging/apkg/ci/fedora-33:apkg
+  <<: *knot-dns
+  script:
+    - *setup-project
+    - py.test-3 -v ci/tests/test_knot_dns.py
+
+suse-15-knot-dns:
+  image: $CI_REGISTRY/packaging/apkg/ci/suse-15:apkg
+  <<: *knot-dns
+  script:
+    - *setup-project
+    - py.test3 -v ci/tests/test_knot_dns.py
+
+
+# integration tests: Knot Resolver
+
+debian-10-knot-resolver:
+  image: $CI_REGISTRY/packaging/apkg/ci/debian-10:apkg
+  <<: *knot-resolver
+  script:
+    - *setup-project
+    - py.test-3 -v ci/tests/test_knot_resolver.py
+  # TODO: problems with root build
+  allow_failure: true
+
+ubuntu-18.04-knot-resolver:
+  image: $CI_REGISTRY/packaging/apkg/ci/ubuntu-18.04:apkg
+  <<: *knot-resolver
+  script:
+    - *setup-project
+    - py.test-3 -v ci/tests/test_knot_resolver.py
+  # TODO: dpkg: error: PATH is not set
+  allow_failure: true
+
+ubuntu-20.04-knot-resolver:
+  image: $CI_REGISTRY/packaging/apkg/ci/ubuntu-20.04:apkg
+  <<: *knot-resolver
+  script:
+    - *setup-project
+    - py.test-3 -v ci/tests/test_knot_resolver.py
+  # TODO: problems with root build
+  allow_failure: true
+
+fedora-33-knot-resolver:
+  image: $CI_REGISTRY/packaging/apkg/ci/fedora-33:apkg
+  <<: *knot-resolver
+  script:
+    - *setup-project
+    - py.test-3 -v ci/tests/test_knot_resolver.py
+
+suse-15-knot-resolver:
+  image: $CI_REGISTRY/packaging/apkg/ci/suse-15:apkg
+  <<: *knot-resolver
+  script:
+    - *setup-project
+    - py.test3 -v ci/tests/test_knot_resolver.py
 
 
 # docs published to GitLab Pages: https://packaging.pages.nic.cz/apkg/
