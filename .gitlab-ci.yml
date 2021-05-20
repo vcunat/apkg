@@ -130,6 +130,13 @@ fedora-33-bird:
     - *setup-project
     - py.test-3 -v ci/tests/test_bird.py
 
+fedora-34-bird:
+  image: $CI_REGISTRY/packaging/apkg/ci/fedora-34:apkg
+  <<: *bird
+  script:
+    - *setup-project
+    - py.test-3 -v ci/tests/test_bird.py
+
 suse-15-bird:
   image: $CI_REGISTRY/packaging/apkg/ci/suse-15:apkg
   <<: *bird
@@ -170,6 +177,13 @@ ubuntu-20.04-libyang:
 
 fedora-33-libyang:
   image: $CI_REGISTRY/packaging/apkg/ci/fedora-33:apkg
+  <<: *libyang
+  script:
+    - *setup-project
+    - py.test-3 -v ci/tests/test_libyang.py
+
+fedora-34-libyang:
+  image: $CI_REGISTRY/packaging/apkg/ci/fedora-34:apkg
   <<: *libyang
   script:
     - *setup-project
@@ -220,6 +234,13 @@ fedora-33-knot-dns:
     - *setup-project
     - py.test-3 -v ci/tests/test_knot_dns.py
 
+fedora-34-knot-dns:
+  image: $CI_REGISTRY/packaging/apkg/ci/fedora-34:apkg
+  <<: *knot-dns
+  script:
+    - *setup-project
+    - py.test-3 -v ci/tests/test_knot_dns.py
+
 suse-15-knot-dns:
   image: $CI_REGISTRY/packaging/apkg/ci/suse-15:apkg
   <<: *knot-dns
@@ -250,6 +271,13 @@ ubuntu-20.04-knot-resolver:
 
 fedora-33-knot-resolver:
   image: $CI_REGISTRY/packaging/apkg/ci/fedora-33:apkg
+  <<: *knot-resolver
+  script:
+    - *setup-project
+    - py.test-3 -v ci/tests/test_knot_resolver.py
+
+fedora-34-knot-resolver:
+  image: $CI_REGISTRY/packaging/apkg/ci/fedora-34:apkg
   <<: *knot-resolver
   script:
     - *setup-project
