@@ -95,6 +95,13 @@ self:
 
 # integration tests: BIRD
 
+debian-9-bird:
+  image: $CI_REGISTRY/packaging/apkg/ci/debian-9:apkg
+  <<: *bird
+  script:
+    - *setup-project
+    - py.test-3 -v ci/tests/test_bird.py
+
 debian-10-bird:
   image: $CI_REGISTRY/packaging/apkg/ci/debian-10:apkg
   <<: *bird
@@ -133,6 +140,13 @@ suse-15-bird:
 
 # integration tests: libyang
 
+debian-9-libyang:
+  image: $CI_REGISTRY/packaging/apkg/ci/debian-9:apkg
+  <<: *libyang
+  script:
+    - *setup-project
+    - py.test-3 -v ci/tests/test_libyang.py
+
 debian-10-libyang:
   image: $CI_REGISTRY/packaging/apkg/ci/debian-10:apkg
   <<: *libyang
@@ -170,6 +184,13 @@ suse-15-libyang:
 
 
 # integration tests: Knot DNS
+
+debian-9-knot-dns:
+  image: $CI_REGISTRY/packaging/apkg/ci/debian-9:apkg
+  <<: *knot-dns
+  script:
+    - *setup-project
+    - py.test-3 -v ci/tests/test_knot_dns.py
 
 debian-10-knot-dns:
   image: $CI_REGISTRY/packaging/apkg/ci/debian-10:apkg

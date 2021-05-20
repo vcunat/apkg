@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-FROM debian:buster
+FROM debian:stretch
 ENV DEBIAN_FRONTEND=noninteractive
 
 WORKDIR /root
@@ -30,8 +30,7 @@ RUN apt-get install -y -qqq \
     python3-setuptools
 # testing deps
 RUN apt-get install -y -qqq \
-    python3-pytest \
-    python3-pytest-sugar
+    python3-pytest
 # basic deps
 RUN apt-get install -y -qqq \
     python3-blessings \
@@ -43,4 +42,6 @@ RUN apt-get install -y -qqq \
 # python deps not available\too old in distro
 RUN pip3 install \
     build \
+    distro \
+    cached_property \
     htmllistparse
