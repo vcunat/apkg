@@ -10,7 +10,7 @@ from apkg.util.git import git
 from apkg.cli import apkg
 
 
-BIRD_REPO_URL = 'https://gitlab.nic.cz/labs/bird'
+BIRD_REPO_URL = 'https://gitlab.nic.cz/labs/bird.git'
 # pylint: disable=redefined-outer-name
 
 

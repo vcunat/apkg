@@ -95,6 +95,13 @@ self:
 
 # integration tests: BIRD
 
+centos-7-bird:
+  image: $CI_REGISTRY/packaging/apkg/ci/centos-7:apkg
+  <<: *bird
+  script:
+    - *setup-project
+    - pytest -v ci/tests/test_bird.py
+
 debian-9-bird:
   image: $CI_REGISTRY/packaging/apkg/ci/debian-9:apkg
   <<: *bird
@@ -146,6 +153,13 @@ suse-15-bird:
 
 
 # integration tests: libyang
+
+centos-7-libyang:
+  image: $CI_REGISTRY/packaging/apkg/ci/centos-7:apkg
+  <<: *libyang
+  script:
+    - *setup-project
+    - pytest -v ci/tests/test_libyang.py
 
 debian-9-libyang:
   image: $CI_REGISTRY/packaging/apkg/ci/debian-9:apkg
@@ -199,6 +213,13 @@ suse-15-libyang:
 
 # integration tests: Knot DNS
 
+centos-7-knot-dns:
+  image: $CI_REGISTRY/packaging/apkg/ci/centos-7:apkg
+  <<: *knot-dns
+  script:
+    - *setup-project
+    - pytest -v ci/tests/test_knot_dns.py
+
 debian-9-knot-dns:
   image: $CI_REGISTRY/packaging/apkg/ci/debian-9:apkg
   <<: *knot-dns
@@ -250,6 +271,13 @@ suse-15-knot-dns:
 
 
 # integration tests: Knot Resolver
+
+centos-7-knot-resolver:
+  image: $CI_REGISTRY/packaging/apkg/ci/centos-7:apkg
+  <<: *knot-resolver
+  script:
+    - *setup-project
+    - pytest -v ci/tests/test_knot_resolver.py
 
 debian-10-knot-resolver:
   image: $CI_REGISTRY/packaging/apkg/ci/debian-10:apkg

@@ -10,7 +10,7 @@ from apkg.util.git import git
 from apkg.cli import apkg
 
 
-KRESD_REPO_URL = 'https://gitlab.nic.cz/knot/knot-resolver'
+KRESD_REPO_URL = 'https://gitlab.nic.cz/knot/knot-resolver.git'
 # pylint: disable=redefined-outer-name
 
 

@@ -10,7 +10,7 @@ from apkg.util.git import git
 from apkg.cli import apkg
 
 
-KNOT_REPO_URL = 'https://gitlab.nic.cz/knot/knot-dns'
+KNOT_REPO_URL = 'https://gitlab.nic.cz/knot/knot-dns.git'
 # pylint: disable=redefined-outer-name
 
 
