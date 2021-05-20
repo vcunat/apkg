@@ -5,6 +5,7 @@ variables:
 stages:
   - test
   - bird
+  - libyang
   - knot-dns
   - knot-resolver
   - deploy
@@ -33,6 +34,14 @@ image: $CI_REGISTRY/packaging/apkg/ci/debian-10-full:apkg
 
 .bird: &bird
   stage: bird
+  only:
+    variables:
+      - $INTEGRATION
+  needs:
+    - unit
+
+.libyang: &libyang
+  stage: libyang
   only:
     variables:
       - $INTEGRATION
@@ -122,6 +131,46 @@ suse-15-bird:
   script:
     - *setup-project
     - py.test3 -v ci/tests/test_bird.py
+
+
+# integration tests: libyang
+
+debian-10-libyang:
+  image: $CI_REGISTRY/packaging/apkg/ci/debian-10:apkg
+  <<: *libyang
+  script:
+    - *setup-project
+    - py.test-3 -v ci/tests/test_libyang.py
+
+ubuntu-18.04-libyang:
+  image: $CI_REGISTRY/packaging/apkg/ci/ubuntu-18.04:apkg
+  <<: *libyang
+  script:
+    - *setup-project
+    - py.test-3 -v ci/tests/test_libyang.py
+  # TODO: dpkg: error: PATH is not set
+  allow_failure: true
+
+ubuntu-20.04-libyang:
+  image: $CI_REGISTRY/packaging/apkg/ci/ubuntu-20.04:apkg
+  <<: *libyang
+  script:
+    - *setup-project
+    - py.test-3 -v ci/tests/test_libyang.py
+
+fedora-33-libyang:
+  image: $CI_REGISTRY/packaging/apkg/ci/fedora-33:apkg
+  <<: *libyang
+  script:
+    - *setup-project
+    - py.test-3 -v ci/tests/test_libyang.py
+
+suse-15-libyang:
+  image: $CI_REGISTRY/packaging/apkg/ci/suse-15:apkg
+  <<: *libyang
+  script:
+    - *setup-project
+    - py.test3 -v ci/tests/test_libyang.py
 
 
 # integration tests: Knot DNS
