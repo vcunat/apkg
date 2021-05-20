@@ -21,8 +21,8 @@ def clone_path(tmpdir_factory):
     """
     tmpd = tmpdir_factory.mktemp("apkg_test_bird_git")
     p = '%s/bird' % tmpd
-    # XXX: using bird-apkg branch for now
-    git('clone', '--recursive', '-b', 'bird-apkg', BIRD_REPO_URL, p)
+    # XXX: using apkg-jru branch for now
+    git('clone', '--recursive', '-b', 'apkg-jru', BIRD_REPO_URL, p)
     return Path(p)
 
 
@@ -33,8 +33,6 @@ def repo_path(clone_path):
     """
     with cd(clone_path):
         assert apkg('build-dep', '-y') == 0
-        # XXX: autoreconf: command not found
-        assert apkg('install', '-y', '-D', 'autoconf') == 0
     return clone_path
 
 
@@ -62,7 +60,7 @@ def test_bird_srcpkg_dev(repo_path, capsys):
 
 def test_bird_build_dev(repo_path, capsys):
     with cd(repo_path):
-        assert apkg('build', '-i') == 0
+        assert apkg('build') == 0
         out, _ = capsys.readouterr()
         for pkg in out.split("\n"):
             assert Path(pkg).exists()
