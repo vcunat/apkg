@@ -218,15 +218,6 @@ debian-10-knot-resolver:
   # TODO: problems with root build
   allow_failure: true
 
-ubuntu-18.04-knot-resolver:
-  image: $CI_REGISTRY/packaging/apkg/ci/ubuntu-18.04:apkg
-  <<: *knot-resolver
-  script:
-    - *setup-project
-    - py.test-3 -v ci/tests/test_knot_resolver.py
-  # TODO: problems with root build
-  allow_failure: true
-
 ubuntu-20.04-knot-resolver:
   image: $CI_REGISTRY/packaging/apkg/ci/ubuntu-20.04:apkg
   <<: *knot-resolver
