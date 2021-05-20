@@ -12,7 +12,7 @@ RUN apt-get update -qqq
 RUN apt-get upgrade -y -qqq
 
 # packaging deps
-RUN apt-get install -y -qqq dpkg-dev debhelper-compat dh-python git python3-all python3-setuptools python3-pip python3-venv
+RUN apt-get install -y -qqq curl dpkg-dev debhelper-compat dh-python git python3-all python3-setuptools python3-pip python3-venv
 # basic deps
 RUN apt-get install -y -qqq python3-jinja2 python3-distro python3-docopt python3-blessings python3-requests python3-toml python3-cached-property
 # deps not available in distro
