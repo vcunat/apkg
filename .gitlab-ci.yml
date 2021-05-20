@@ -108,8 +108,6 @@ ubuntu-18.04-bird:
   script:
     - *setup-project
     - py.test-3 -v ci/tests/test_bird.py
-  # TODO: dpkg: error: PATH is not set
-  allow_failure: true
 
 ubuntu-20.04-bird:
   image: $CI_REGISTRY/packaging/apkg/ci/ubuntu-20.04:apkg
@@ -148,8 +146,6 @@ ubuntu-18.04-libyang:
   script:
     - *setup-project
     - py.test-3 -v ci/tests/test_libyang.py
-  # TODO: dpkg: error: PATH is not set
-  allow_failure: true
 
 ubuntu-20.04-libyang:
   image: $CI_REGISTRY/packaging/apkg/ci/ubuntu-20.04:apkg
@@ -188,8 +184,6 @@ ubuntu-18.04-knot-dns:
   script:
     - *setup-project
     - py.test-3 -v ci/tests/test_knot_dns.py
-  # TODO: dpkg: error: PATH is not set
-  allow_failure: true
 
 ubuntu-20.04-knot-dns:
   image: $CI_REGISTRY/packaging/apkg/ci/ubuntu-20.04:apkg
@@ -230,7 +224,7 @@ ubuntu-18.04-knot-resolver:
   script:
     - *setup-project
     - py.test-3 -v ci/tests/test_knot_resolver.py
-  # TODO: dpkg: error: PATH is not set
+  # TODO: problems with root build
   allow_failure: true
 
 ubuntu-20.04-knot-resolver:

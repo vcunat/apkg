@@ -14,6 +14,7 @@ and its many clones such as Ubuntu or Mint.
  * isolated build: `pbuilder`
 """
 import glob
+import os
 from pathlib import Path
 import re
 import sys
@@ -203,7 +204,7 @@ def install_distro_packages(
     interactive = kwargs.get('interactive', False)
 
     cmd = ['apt-get', 'install']
-    env = {}
+    env = os.environ.copy()
     if not interactive:
         env['DEBIAN_FRONTEND'] = 'noninteractive'
         cmd += ['-y']
@@ -229,7 +230,7 @@ def install_custom_packages(
     interactive = kwargs.get('interactive', False)
 
     cmd = ['apt-get', 'install']
-    env = {}
+    env = os.environ.copy()
     if not interactive:
         env['DEBIAN_FRONTEND'] = 'noninteractive'
         cmd += ['-y']
@@ -258,7 +259,7 @@ def install_build_deps(
     if has_aptget_satisfy_():
         # unlike install, satisfy can handle versioned deps
         cmd = ['apt-get', 'satisfy']
-        env = {}
+        env = os.environ.copy()
         if not interactive:
             env['DEBIAN_FRONTEND'] = 'noninteractive'
             cmd += ['-y']
