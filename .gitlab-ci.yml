@@ -39,6 +39,10 @@ image: $CI_REGISTRY/packaging/apkg/ci/debian-10-full:apkg
       - $INTEGRATION
   needs:
     - unit
+  artifacts:
+    when: always
+    reports:
+      junit: report.xml
 
 .libyang: &libyang
   stage: libyang
@@ -47,6 +51,10 @@ image: $CI_REGISTRY/packaging/apkg/ci/debian-10-full:apkg
       - $INTEGRATION
   needs:
     - unit
+  artifacts:
+    when: always
+    reports:
+      junit: report.xml
 
 .knot-dns: &knot-dns
   stage: knot-dns
@@ -55,6 +63,10 @@ image: $CI_REGISTRY/packaging/apkg/ci/debian-10-full:apkg
       - $INTEGRATION
   needs:
     - unit
+  artifacts:
+    when: always
+    reports:
+      junit: report.xml
 
 .knot-resolver: &knot-resolver
   stage: knot-resolver
@@ -63,6 +75,10 @@ image: $CI_REGISTRY/packaging/apkg/ci/debian-10-full:apkg
       - $INTEGRATION
   needs:
     - unit
+  artifacts:
+    when: always
+    reports:
+      junit: report.xml
 
 
 # basic tests
@@ -90,7 +106,11 @@ self:
     # use py.test directly
     - *setup-py-reqs
     - *setup-py-develop
-    - py.test-3 -v tests/self
+    - py.test-3 -v tests/self --junitxml=report.xml
+  artifacts:
+    when: always
+    reports:
+      junit: report.xml
 
 
 # integration tests: BIRD
@@ -100,56 +120,56 @@ centos-7-bird:
   <<: *bird
   script:
     - *setup-project
-    - pytest -v ci/tests/test_bird.py
+    - pytest -v ci/tests/test_bird.py --junitxml=report.xml
 
 debian-9-bird:
   image: $CI_REGISTRY/packaging/apkg/ci/debian-9:apkg
   <<: *bird
   script:
     - *setup-project
-    - py.test-3 -v ci/tests/test_bird.py
+    - py.test-3 -v ci/tests/test_bird.py --junitxml=report.xml
 
 debian-10-bird:
   image: $CI_REGISTRY/packaging/apkg/ci/debian-10:apkg
   <<: *bird
   script:
     - *setup-project
-    - py.test-3 -v ci/tests/test_bird.py
+    - py.test-3 -v ci/tests/test_bird.py --junitxml=report.xml
 
 ubuntu-18.04-bird:
   image: $CI_REGISTRY/packaging/apkg/ci/ubuntu-18.04:apkg
   <<: *bird
   script:
     - *setup-project
-    - py.test-3 -v ci/tests/test_bird.py
+    - py.test-3 -v ci/tests/test_bird.py --junitxml=report.xml
 
 ubuntu-20.04-bird:
   image: $CI_REGISTRY/packaging/apkg/ci/ubuntu-20.04:apkg
   <<: *bird
   script:
     - *setup-project
-    - py.test-3 -v ci/tests/test_bird.py
+    - py.test-3 -v ci/tests/test_bird.py --junitxml=report.xml
 
 fedora-33-bird:
   image: $CI_REGISTRY/packaging/apkg/ci/fedora-33:apkg
   <<: *bird
   script:
     - *setup-project
-    - py.test-3 -v ci/tests/test_bird.py
+    - py.test-3 -v ci/tests/test_bird.py --junitxml=report.xml
 
 fedora-34-bird:
   image: $CI_REGISTRY/packaging/apkg/ci/fedora-34:apkg
   <<: *bird
   script:
     - *setup-project
-    - py.test-3 -v ci/tests/test_bird.py
+    - py.test-3 -v ci/tests/test_bird.py --junitxml=report.xml
 
 suse-15-bird:
   image: $CI_REGISTRY/packaging/apkg/ci/suse-15:apkg
   <<: *bird
   script:
     - *setup-project
-    - py.test3 -v ci/tests/test_bird.py
+    - py.test3 -v ci/tests/test_bird.py --junitxml=report.xml
 
 
 # integration tests: libyang
@@ -159,56 +179,56 @@ centos-7-libyang:
   <<: *libyang
   script:
     - *setup-project
-    - pytest -v ci/tests/test_libyang.py
+    - pytest -v ci/tests/test_libyang.py --junitxml=report.xml
 
 debian-9-libyang:
   image: $CI_REGISTRY/packaging/apkg/ci/debian-9:apkg
   <<: *libyang
   script:
     - *setup-project
-    - py.test-3 -v ci/tests/test_libyang.py
+    - py.test-3 -v ci/tests/test_libyang.py --junitxml=report.xml
 
 debian-10-libyang:
   image: $CI_REGISTRY/packaging/apkg/ci/debian-10:apkg
   <<: *libyang
   script:
     - *setup-project
-    - py.test-3 -v ci/tests/test_libyang.py
+    - py.test-3 -v ci/tests/test_libyang.py --junitxml=report.xml
 
 ubuntu-18.04-libyang:
   image: $CI_REGISTRY/packaging/apkg/ci/ubuntu-18.04:apkg
   <<: *libyang
   script:
     - *setup-project
-    - py.test-3 -v ci/tests/test_libyang.py
+    - py.test-3 -v ci/tests/test_libyang.py --junitxml=report.xml
 
 ubuntu-20.04-libyang:
   image: $CI_REGISTRY/packaging/apkg/ci/ubuntu-20.04:apkg
   <<: *libyang
   script:
     - *setup-project
-    - py.test-3 -v ci/tests/test_libyang.py
+    - py.test-3 -v ci/tests/test_libyang.py --junitxml=report.xml
 
 fedora-33-libyang:
   image: $CI_REGISTRY/packaging/apkg/ci/fedora-33:apkg
   <<: *libyang
   script:
     - *setup-project
-    - py.test-3 -v ci/tests/test_libyang.py
+    - py.test-3 -v ci/tests/test_libyang.py --junitxml=report.xml
 
 fedora-34-libyang:
   image: $CI_REGISTRY/packaging/apkg/ci/fedora-34:apkg
   <<: *libyang
   script:
     - *setup-project
-    - py.test-3 -v ci/tests/test_libyang.py
+    - py.test-3 -v ci/tests/test_libyang.py --junitxml=report.xml
 
 suse-15-libyang:
   image: $CI_REGISTRY/packaging/apkg/ci/suse-15:apkg
   <<: *libyang
   script:
     - *setup-project
-    - py.test3 -v ci/tests/test_libyang.py
+    - py.test3 -v ci/tests/test_libyang.py --junitxml=report.xml
 
 
 # integration tests: Knot DNS
@@ -218,56 +238,56 @@ centos-7-knot-dns:
   <<: *knot-dns
   script:
     - *setup-project
-    - pytest -v ci/tests/test_knot_dns.py
+    - pytest -v ci/tests/test_knot_dns.py --junitxml=report.xml
 
 debian-9-knot-dns:
   image: $CI_REGISTRY/packaging/apkg/ci/debian-9:apkg
   <<: *knot-dns
   script:
     - *setup-project
-    - py.test-3 -v ci/tests/test_knot_dns.py
+    - py.test-3 -v ci/tests/test_knot_dns.py --junitxml=report.xml
 
 debian-10-knot-dns:
   image: $CI_REGISTRY/packaging/apkg/ci/debian-10:apkg
   <<: *knot-dns
   script:
     - *setup-project
-    - py.test-3 -v ci/tests/test_knot_dns.py
+    - py.test-3 -v ci/tests/test_knot_dns.py --junitxml=report.xml
 
 ubuntu-18.04-knot-dns:
   image: $CI_REGISTRY/packaging/apkg/ci/ubuntu-18.04:apkg
   <<: *knot-dns
   script:
     - *setup-project
-    - py.test-3 -v ci/tests/test_knot_dns.py
+    - py.test-3 -v ci/tests/test_knot_dns.py --junitxml=report.xml
 
 ubuntu-20.04-knot-dns:
   image: $CI_REGISTRY/packaging/apkg/ci/ubuntu-20.04:apkg
   <<: *knot-dns
   script:
     - *setup-project
-    - py.test-3 -v ci/tests/test_knot_dns.py
+    - py.test-3 -v ci/tests/test_knot_dns.py --junitxml=report.xml
 
 fedora-33-knot-dns:
   image: $CI_REGISTRY/packaging/apkg/ci/fedora-33:apkg
   <<: *knot-dns
   script:
     - *setup-project
-    - py.test-3 -v ci/tests/test_knot_dns.py
+    - py.test-3 -v ci/tests/test_knot_dns.py --junitxml=report.xml
 
 fedora-34-knot-dns:
   image: $CI_REGISTRY/packaging/apkg/ci/fedora-34:apkg
   <<: *knot-dns
   script:
     - *setup-project
-    - py.test-3 -v ci/tests/test_knot_dns.py
+    - py.test-3 -v ci/tests/test_knot_dns.py --junitxml=report.xml
 
 suse-15-knot-dns:
   image: $CI_REGISTRY/packaging/apkg/ci/suse-15:apkg
   <<: *knot-dns
   script:
     - *setup-project
-    - py.test3 -v ci/tests/test_knot_dns.py
+    - py.test3 -v ci/tests/test_knot_dns.py --junitxml=report.xml
 
 
 # integration tests: Knot Resolver
@@ -277,14 +297,14 @@ centos-7-knot-resolver:
   <<: *knot-resolver
   script:
     - *setup-project
-    - pytest -v ci/tests/test_knot_resolver.py
+    - pytest -v ci/tests/test_knot_resolver.py --junitxml=report.xml
 
 debian-10-knot-resolver:
   image: $CI_REGISTRY/packaging/apkg/ci/debian-10:apkg
   <<: *knot-resolver
   script:
     - *setup-project
-    - py.test-3 -v ci/tests/test_knot_resolver.py
+    - py.test-3 -v ci/tests/test_knot_resolver.py --junitxml=report.xml
   # TODO: problems with root build
   allow_failure: true
 
@@ -293,7 +313,7 @@ ubuntu-20.04-knot-resolver:
   <<: *knot-resolver
   script:
     - *setup-project
-    - py.test-3 -v ci/tests/test_knot_resolver.py
+    - py.test-3 -v ci/tests/test_knot_resolver.py --junitxml=report.xml
   # TODO: problems with root build
   allow_failure: true
 
@@ -302,21 +322,21 @@ fedora-33-knot-resolver:
   <<: *knot-resolver
   script:
     - *setup-project
-    - py.test-3 -v ci/tests/test_knot_resolver.py
+    - py.test-3 -v ci/tests/test_knot_resolver.py --junitxml=report.xml
 
 fedora-34-knot-resolver:
   image: $CI_REGISTRY/packaging/apkg/ci/fedora-34:apkg
   <<: *knot-resolver
   script:
     - *setup-project
-    - py.test-3 -v ci/tests/test_knot_resolver.py
+    - py.test-3 -v ci/tests/test_knot_resolver.py --junitxml=report.xml
 
 suse-15-knot-resolver:
   image: $CI_REGISTRY/packaging/apkg/ci/suse-15:apkg
   <<: *knot-resolver
   script:
     - *setup-project
-    - py.test3 -v ci/tests/test_knot_resolver.py
+    - py.test3 -v ci/tests/test_knot_resolver.py --junitxml=report.xml
 
 
 # docs published to GitLab Pages: https://packaging.pages.nic.cz/apkg/
