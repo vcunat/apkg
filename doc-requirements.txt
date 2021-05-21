@@ -2,5 +2,6 @@ cached_property
 docopt
 jinja2
 mkdocs
+mkdocs-material
 mkdocs-macros-plugin
 toml

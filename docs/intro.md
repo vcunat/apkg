@@ -118,3 +118,6 @@ this structure has following advantages:
 * individual dirs or even entire `pkg/` can be safely deleted
 
 Any successful `apkg` operation on a repo should result in a clean repo.
+
+
+You're ready to dive into [Packaging Guide](guide.md) 📦

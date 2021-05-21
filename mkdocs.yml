@@ -1,7 +1,8 @@
 site_name: apkg
-theme: readthedocs
+repo_url: https://gitlab.nic.cz/packaging/apkg
+edit_uri: ""
 nav:
-  - README.md
+  - index.md
   - intro.md
   - install.md
   - guide.md
@@ -10,11 +11,18 @@ nav:
   - pkgstyles.md
   - templates.md
   - errors.md
+
 markdown_extensions:
   - admonition
+  - pymdownx.superfences
+  - pymdownx.tabbed
   - toc:
       permalink: True
+
 plugins:
-  - search
   - macros:
       module_name: docs
+
+theme:
+  name: material
+  logo: img/apkg.png

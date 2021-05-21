@@ -6,18 +6,89 @@ This guide assumes you have:
 * [installed apkg](install.md)
 
 
+## apkg packaging workflow
+
+``` text
+
+                        apkg packaging workflow
+
+ +------------------------------+    +------------------------------------+
+ |                              |    |                                    |
+ |     $ apkg make-archive      |    |     $ apkg get-archive [-v 1.2.3]  |
+ |                              |    |                                    |
+ |   in: current project state  | OR |   in: archive hosted online        |
+ |                              |    |                                    |
+ |  out: pkg/archives/dev/*.xz  |    |  out: pkg/archives/upstream/*.xz   |
+ |                              |    |                                    |
+ +---------------+--------------+    +----------------+-------------------+
+                 |                                    |
+                 |                                    |
+                 |                                    |
+                 v                                    v
+      +----------+------------------------------------+-------------+
+      |                                                             |
+      |     $ apkg srcpkg                                           |
+      |                                                             |
+      |   in: distro/pkg/$TEMPLATE/  (package template)             |
+      |       pkg/archives/*/*.xz    (archive)                      |
+      |                                                             |
+      |  out: pkg/srcpkgs/$DISTRO/$SRCPKG         (source package)  |
+      |       pkg/build/srcpkgs/$DISTRO/$SRCPKG/  (build dir)       |
+      |                                                             |
+      +------------------------------+------------------------------+
+                                     |
+                                     |
+                                     |
+                                     v
+      +------------------------------+------------------------------+
+      |                                                             |
+      |     $ apkg build                                            |
+      |                                                             |
+      |   in: pkg/srcpkgs/$DISTRO/$SRCPKG  (source package)         |
+      |                                                             |
+      |  out: pkg/pkgs/$DISTRO/$PKG        (package)                |
+      |       pkg/build/pkgs/$DISTRO/$PKG  (build dir)              |
+      |                                                             |
+      +-------------------------------------------------------------+
+```
+
+
+## usage
+
+To get a summary of available [commands](commands.md) simply run `apkg` without parameters.
+
+Use `--help`/`-h` after a command to get help for that particular command instead:
+
+``` text
+$> apkg build -h
+```
+
+Detailed description of each command is available in [commands docs](commands.md).
+
+You can control `apkg` output format and verbosity using following global options:
+
+* `--debug`: print everything; include source file, line number, and function name
+* `--verbose`: print more things; include module name and function
+* `--brief`: only print important things like success, errors, and command output
+* `--quiet`: suppress all logging output, only print command results
+
+!!! tip
+    `--verbose` and `--debug` options can be **very helpful** when debugging, try adding one to your failing `apkg` command to gain more insight.
+
+
+
 ## project setup
 
 All `apkg` input files reside in top-level `distro/` directory by convention.
 
 In order to use `apkg` in your project you need to provide it with:
 
-* project metadata stored in `distro/config/apkg.toml`
+* configuration in `distro/config/apkg.toml`
 * package templates in individual directories of `distro/pkg/`
 
 Let's start by entering top level project dir and creating `distro/` there:
 
-``` shell
+```
 cd project
 mkdir distro
 ```
@@ -65,34 +136,40 @@ pkg/archives/dev/apkg-0.0.2.tar.gz
 
 If you run into issues, consider appending `--verbose` or `--debug` to `apkg` command in question to print more detailed information.
 
-!!! TODO
-    `apkg make-archive` isn't finished yet, include it here once it is.
-
 Great, you're now able to create archives required to create packages!
 
 
 ### package templates
 
-Next we need to create individual [package templates](templates.md) to contain all files needed to create source package using one of supported [packaging styles](pkgstyles.md).
+Next we need to create individual [package templates](templates.md) to contain
+all files needed to create source package using one of supported
+[packaging styles](pkgstyles.md).
 
 Each directory in `distro/pkg/` is considered a template.
 
 {% raw %}
-Version string should be replaced with `{{ version }}` macro in relevant files and such templating is available for all files present in a template - you can reference ``{{ project.name }}`` and more.
+Version string should be replaced with `{{ version }}` macro in relevant files
+and such templating is available for all files present in a template - you can
+reference `{{ project.name }}` and more.
 {% endraw %}
 
 This is best demonstrated on `apkg` itself:
 
 * `arch` template: {{ 'distro/pkg/arch' | file_link }}
 * `deb` template: {{ 'distro/pkg/deb' | file_link }}
+* `rpm` template: {{ 'distro/pkg/rpm' | file_link }}
 
 {% raw %}
-!!! Note
-    `apkg` doesn't provide means to create new templates as that's handled on
-    distro level. Just use standard way of creating packages on the target platform
-    and put the resulting packaging source files into template dir and adjust
-    `{{ version }}`. Use target distro's packaging docs and use similar
-    packages already in distro repos as a reference.
+!!! TIP
+    `apkg` doesn't provide means to create new templates automatically as that's
+    handled on distro level.
+
+    Just use standard way of creating packages on the
+    target platform, put the resulting files into template dir and adjust
+    `{{ version }}`.
+
+    Use target distro's packaging docs and use similar packages
+    already in distro repos as a reference.
 {% endraw %}
 
 Please consult [package template docs](templates.md) alongside target distro
@@ -115,86 +192,6 @@ current distro: arch / Arch Linux
     package style: arch
     package template: distro/pkg/arch
 ```
-
-
-## apkg workflow overview
-
-``` text
-
-                        apkg packaging workflow
-
- +------------------------------+    +------------------------------------+
- |                              |    |                                    |
- |     $ apkg make-archive      |    |     $ apkg get-archive [-v 1.2.3]  |
- |                              |    |                                    |
- |   in: current project state  | OR |   in: archive hosted online        |
- |                              |    |                                    |
- |  out: pkg/archives/dev/*.xz  |    |  out: pkg/archives/upstream/*.xz   |
- |                              |    |                                    |
- +---------------+--------------+    +----------------+-------------------+
-                 |                                    |
-                 |                                    |
-                 |                                    |
-                 v                                    v
-      +----------+------------------------------------+-------------+
-      |                                                             |
-      |     $ apkg srcpkg                                           |
-      |                                                             |
-      |   in: distro/pkg/$TEMPLATE/  (package template)             |
-      |       pkg/archives/*/*.xz    (archive)                      |
-      |                                                             |
-      |  out: pkg/srcpkgs/$DISTRO/$SRCPKG         (source package)  |
-      |       pkg/build/srcpkgs/$DISTRO/$SRCPKG/  (build dir)       |
-      |                                                             |
-      +------------------------------+------------------------------+
-                                     |
-                                     |
-                                     |
-                                     v
-      +------------------------------+------------------------------+
-      |                                                             |
-      |     $ apkg build                                            |
-      |                                                             |
-      |   in: pkg/srcpkgs/$DISTRO/$SRCPKG  (source package)         |
-      |                                                             |
-      |  out: pkg/pkgs/$DISTRO/$PKG        (package)                |
-      |       pkg/build/pkgs/$DISTRO/$PKG  (build dir)              |
-      |                                                             |
-      +-------------------------------------------------------------+
-```
-
-`srcpkg` uses `get-archive` to create `dev` archive by default but it can
-also download upstream archive using `get-archive` when `--upstream` is
-passed or use local archive directly using `--archive`.
-
-Similarly, `build` uses `srcpkg` to create source package by default but it
-can be directly specified using `--srcpkg` option.
-
-This provides convenience of high level commands reusing lower level ones as
-needed but also flexibility to run each individual step manually.
-
-
-## usage
-
-To get a summary of available [commands](commands.md) simply run `apkg` without parameters.
-
-Use `--help`/`-h` after a command to get help for that particular command instead:
-
-``` text
-$> apkg build -h
-```
-
-Detailed description of each command is available in [commands docs](commands.md).
-
-You can control `apkg` output format and verbosity using following global options:
-
-* `--debug`: print everything; include source file, line number, and function name
-* `--verbose`: print more things; include module name and function
-* `--brief`: only print important things like success, errors, and command output
-* `--quiet`: suppress all logging output, only print command results
-
-!!! tip
-    `--verbose` and `--debug` options can be **very helpful** when debugging, try adding one to your failing `apkg` command to gain more insight.
 
 
 ## build packages
@@ -248,4 +245,4 @@ pkg/pkgs/debian-unstable/apkg_0.0.2-1/python3-apkg_0.0.2-1_all.deb
 
 
 !!! TODO
-    this guide is a **Work in Progress**
+    This guide deserves more content ✍🏽
