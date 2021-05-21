@@ -6,8 +6,12 @@ and its many clones such as Ubuntu or Mint.
 
 **source package:** `*.dsc` + archives
 
-**packages:** `*.deb` built directly using `dpkg-buildpackage`
-or `--isolated` using `pbuilder`
+**packages:** `*.deb`
+
+**required distro packages**:
+
+ * core: `devscripts`
+ * isolated build: `pbuilder`
 """
 import glob
 from pathlib import Path

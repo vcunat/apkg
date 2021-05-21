@@ -2,12 +2,16 @@
 apkg package style for RPM-based distros
 such as Fedora, CentOS, SUSE, RHEL.
 
-**source template**: `*.spec`
+**source template**: `*.spec` and friends
 
 **source package:** `*.src.rpm`
 
-**packages:** `*.rpm` built directly using `rpmbuild`
-or `--isolated` using `mock`
+**packages:** `*.rpm`
+
+**required distro packages**:
+
+ * core: `rpm-build`
+ * isolated build: `mock`
 """
 import glob
 from pathlib import Path

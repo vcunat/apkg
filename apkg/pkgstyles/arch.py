@@ -5,7 +5,7 @@ apkg package style for **Arch** linux.
 
 **source package:** `PKGBUILD`
 
-**packages:** `*.zst` built using `makepkg`
+**packages:** `*.zst`
 """
 import glob
 from pathlib import Path
