@@ -80,7 +80,7 @@ Modern `pip` automatically appends `--user` so `pip3 install apkg` should be fin
 To ensure **latest** version of apkg is installed for current user use `-U`/`--upgrade`:
 
 ```
-pip3 install --user --U apkg
+pip3 install --user -U apkg
 ```
 
 If you prefer to install apkg into isolated virtualenv and only expose `apkg` script, consider using `pipx` instead:
