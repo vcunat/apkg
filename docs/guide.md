@@ -76,6 +76,17 @@ You can control `apkg` output format and verbosity using following global option
     `--verbose` and `--debug` options can be **very helpful** when debugging, try adding one to your failing `apkg` command to gain more insight.
 
 
+## system setup
+
+In order to setup a system for packaging with apkg, run:
+
+```
+apkg system-setup
+```
+
+This will install required system packages depending on current distro
+such as `rpm-build` on Fedora or `devscripts` on Debian.
+
 
 ## project setup
 
@@ -194,14 +205,32 @@ current distro: arch / Arch Linux
 ```
 
 
+## build dependencies
+
+`apkg` is able to parse and install build requires directly from
+[templates](templates.md) as well as from source packages.
+
+To install project build deps for current distro:
+
+```
+apkg build-dep
+```
+
+Alternatively, you can only list build deps and install/process them as you see fit:
+
+```
+apkg build-dep -l
+```
+
+
 ## build packages
 
 `apkg build` is a primary `apkg` command used to build packages that should
 cover vast majority of use cases.
 
 Try running `apkg build` and see what it says. `apkg` should explain clearly
-if something is wrong, if that's not the case please do open a [new issue]({{
-new_issue_url }}) as that's a serious usability problem.
+if something is wrong, if that's not the case please do open a
+[new issue]({{ new_issue_url }}) as that's a serious usability problem.
 
 Here is an example of successful `apkg build` run on Arch linux (with
 output filtered using `--brief` option to success/error messages only):
@@ -230,7 +259,6 @@ To minimize waiting time, `apkg` automatically caches and reuses
 archives/source packages/packages produced by individual commands as long
 as project is managed by VCS (`git`) and `--no-cache` wasn't supplied.
 
-
 Re-running the command without changes to project source code results in
 `apkg` reusing cached files from previous run:
 
@@ -243,6 +271,13 @@ debian$> apkg build
 pkg/pkgs/debian-unstable/apkg_0.0.2-1/python3-apkg_0.0.2-1_all.deb
 ```
 
+## output directory pkg/
+
+You've probably noticed by now that `apkg` outputs all files
+into `pkg/` directory as described in [intro output section](intro.md#output).
+
+**You can delete entire `pkg/` directory** at any time as it only contains
+output that can be re-created by re-running apkg commands.
 
 !!! TODO
     This guide deserves more content ✍🏽
