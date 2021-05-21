@@ -25,12 +25,11 @@ RUN apt-get install -y -qqq \
 # testing deps
 RUN apt-get install -y -qqq \
     python3-pytest \
-    python3-pytest-sugar \
-    tox
+    python3-pytest-sugar
 # linting deps
-RUN apt-get install -y -qqq \
-    python3-flake8 \
-    pylint3
+RUN pip3 install \
+    flake8 \
+    pylint
 # basic deps
 RUN apt-get install -y -qqq \
     python3-blessings \
@@ -43,6 +42,7 @@ RUN apt-get install -y -qqq \
 # python deps not available\too old in distro
 RUN pip3 install \
     build \
+    distro \
     htmllistparse
 # doc deps
 RUN pip3 install \

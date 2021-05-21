@@ -30,8 +30,7 @@ RUN apt-get install -y -qqq \
     python3-setuptools
 # testing deps
 RUN apt-get install -y -qqq \
-    python3-pytest \
-    tox
+    python3-pytest
 # basic deps
 RUN apt-get install -y -qqq \
     python3-blessings \

@@ -31,8 +31,7 @@ RUN apt-get install -y -qqq \
 # testing deps
 RUN apt-get install -y -qqq \
     python3-pytest \
-    python3-pytest-sugar \
-    tox
+    python3-pytest-sugar
 # basic deps
 RUN apt-get install -y -qqq \
     python3-blessings \

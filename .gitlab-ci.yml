@@ -86,24 +86,27 @@ image: $CI_REGISTRY/packaging/apkg/ci/debian-10-full:apkg
 flake8:
   <<: *test
   script:
-    - tox -e flake8
+    - flake8
 
 pylint:
   <<: *test
-  allow_failure: true
   script:
-    - tox -e pylint
+    - pylint apkg
+  allow_failure: true
 
 unit:
   <<: *test
   script:
-    - tox -e unit
+    - *setup-py-develop
+    - py.test-3 -v --junitxml=report.xml
+  artifacts:
+    when: always
+    reports:
+      junit: report.xml
 
 self:
   <<: *test
   script:
-    # `python3 -m build` causes issues in tox in docker container
-    # use py.test directly
     - *setup-py-reqs
     - *setup-py-develop
     - py.test-3 -v tests/self --junitxml=report.xml
