@@ -24,11 +24,30 @@ Install following **system packages** using your system's package manager:
 * `python3-pip`
 * `python3-setuptools`
 
-Debian/Ubuntu example:
+=== "Debian, Ubuntu"
+    ```
+    apt-get install -y python3-pip python3-setuptools
+    ```
 
-```
-apt install python3-setuptools python3-pip
-```
+=== "Fedora, CentOS 8+"
+    ```
+    dnf install -y python3-pip python3-setuptools
+    ```
+
+=== "CentOS 7"
+    ```
+    yum install -y python3-pip python3-setuptools
+    ```
+
+=== "openSUSE"
+    ```
+    zypper install -y python3-pip python3-setuptools
+    ```
+
+=== "Arch"
+    ```
+    pacman -Sy python-pip python-setuptools
+    ```
 
 Other python requirements should be **handled automatically**, they are
 listed and briefly explained in {{ 'requirements.txt' | file_link }}.
@@ -52,7 +71,7 @@ described in [requirements](#requirements).
 
 To ensure **any** version of apkg is installed for current user:
 
-```sh
+```
 pip3 install --user apkg
 ```
 
@@ -60,13 +79,13 @@ Modern `pip` automatically appends `--user` so `pip3 install apkg` should be fin
 
 To ensure **latest** version of apkg is installed for current user use `-U`/`--upgrade`:
 
-```sh
+```
 pip3 install --user --U apkg
 ```
 
 If you prefer to install apkg into isolated virtualenv and only expose `apkg` script, consider using `pipx` instead:
 
-```sh
+```
 pip3 install pipx
 pipx install apkg
 ```
@@ -126,11 +145,12 @@ Then choose one of installation methods below:
 
 ### user install from source
 
-Fastest and recommended way to install from source for CLI usage without affecting the rest of your system is to get
-[pipx](https://pipxproject.github.io/pipx/installation/)
-and then simply run:
+Fastest and recommended way to install from source for CLI usage without
+affecting the rest of your system is to use
+[pipx](https://pipxproject.github.io/pipx/installation/):
 
 ```
+pip3 install pipx
 pipx install .
 ```
 
@@ -143,7 +163,7 @@ If you're using `apkg` python module or you don't want to use `pipx`, you can
 use local user `pip install`:
 
 ```
-pip install --user .
+pip3 install --user .
 ```
 
 Or the old-fashioned equivalent through `setup.py` but that's using
@@ -173,10 +193,11 @@ and also installs `apkg` script into `~/.local/bin` so make sure you have
 When you need CLI only, it's recommended to use `pipx` instead in `--editable` mode:
 
 ```
+pip3 install pipx
 pipx install -e .
 ```
 
-Upstream python discussions recommend `pip install --editable .` but that has
+Upstream python discussions recommend `pip3 install --editable .` but that has
 the fatal flaw of currently not working with local `--user` install. You can
 use it inside disposable container or a VM but I'd never taint my system
 python installation with a global install like that.
@@ -202,3 +223,6 @@ You can enter the `venv` later/from other terminals by
 ```
 source apkg/venv/bin/activate
 ```
+
+
+With `apkg` installed, check out [packaging guide](guide.md) 📑

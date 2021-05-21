@@ -1,15 +1,15 @@
-# apkg the packaging automation tool
+# apkg overview
 
-apkg is **going to be** Free and Open Source minimalist cross-distro packaging
-automation tool aimed at producing **high quality native packages** for many
-different OS distributions/packaging systems with minimum overhead.
+**apkg** is a free and open source minimalist cross-distro **upstream packaging
+automation tool** aimed at producing high quality native packages for many
+different OS distributions/packaging systems directly from upstream sources with
+minimum overhead while respecting individual distro's standards and policies.
 
 **[apkg intro](intro.md)**
 
 ## status
 
-**early development, approaching
-[v0.1](https://gitlab.nic.cz/packaging/apkg/-/milestones/1)**
+**first beta release [v0.1](https://gitlab.nic.cz/packaging/apkg/-/milestones/1) is very close ✨**
 
 * [source code](https://gitlab.nic.cz/packaging/apkg)
 * [merge requests](https://gitlab.nic.cz/packaging/apkg/-/merge_requests)
