@@ -37,7 +37,7 @@ Options:
 from docopt import docopt
 
 from apkg.lib import build
-from apkg.lib import common
+from apkg.util import common
 
 
 def run_command(cargs):

@@ -6,10 +6,11 @@ from pathlib import Path
 from apkg import adistro
 from apkg.cache import file_checksum
 from apkg import ex
+from apkg.lib import deps
 from apkg.lib import srcpkg as _srcpkg
-from apkg.lib import common, deps
 from apkg.log import getLogger
 from apkg.project import Project
+from apkg.util import common
 import apkg.util.shutil35 as shutil
 
 

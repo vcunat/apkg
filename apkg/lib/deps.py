@@ -4,7 +4,7 @@ apkg lib for handling (build) dependencies
 from apkg import adistro
 from apkg.pkgstyle import call_pkgstyle_fun
 from apkg.lib.get_archive import get_archive
-from apkg.lib import common
+from apkg.util import common
 from apkg.lib import srcpkg as _srcpkg
 from apkg.log import getLogger
 from apkg.project import Project

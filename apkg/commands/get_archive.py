@@ -24,7 +24,7 @@ Options:
 from docopt import docopt
 
 from apkg.lib.get_archive import get_archive
-from apkg.lib import common
+from apkg.util import common
 
 
 def run_command(cargs):

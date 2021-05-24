@@ -6,7 +6,7 @@ from pathlib import Path
 from apkg import adistro
 from apkg.cache import file_checksum
 from apkg import ex
-from apkg.lib import common
+from apkg.util import common
 from apkg.lib.get_archive import get_archive
 from apkg.lib.make_archive import make_archive
 from apkg.log import getLogger

@@ -4,7 +4,7 @@ apkg lib for handling dev source archive creation
 from pathlib import Path
 
 from apkg import ex
-from apkg.lib import common
+from apkg.util import common
 from apkg.log import getLogger
 from apkg.project import Project
 from apkg.util.run import run

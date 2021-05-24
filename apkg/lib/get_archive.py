@@ -6,7 +6,7 @@ import re
 import requests
 
 from apkg import ex
-from apkg.lib import common
+from apkg.util import common
 from apkg.log import getLogger
 from apkg.project import Project
 
