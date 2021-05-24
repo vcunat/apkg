@@ -1,7 +1,6 @@
-"""
-apkg lib for handling source archives
-"""
 from pathlib import Path
+
+import click
 
 from apkg import adistro
 from apkg.cache import file_checksum
@@ -18,7 +17,41 @@ import apkg.util.shutil35 as shutil
 log = getLogger(__name__)
 
 
-def make_srcpkg(
+@click.command(name="srcpkg")
+@click.argument('input_files', nargs=-1)
+@click.option('-a', '--archive', is_flag=True,
+              help="source package from speficied archive file(s)")
+@click.option('-u', '--upstream', is_flag=True,
+              help="upstream source package from archive templates")
+@click.option('-v', '--version',
+              help=("upstream archive version to use"
+                    ", implies --upstream, exclusive with --archive"))
+@click.option('-r', '--release',
+              help="set packagge release  [default: 1]")
+@click.option('-d', '--distro',
+              help="set target distro  [default: current]")
+@click.option('-O', '--result-dir',
+              help=("put results into specified dir"
+                    "  [default: pkg/srcpkg/DISTRO/NVR]"))
+@click.option('--render-template', is_flag=True,
+              help="only render source package template")
+@click.option('--cache/--no-cache', default=True, show_default=True,
+              help="enable/disable cache")
+@click.option('-F', '--file-list', 'input_file_lists', multiple=True,
+              help=("specify text file listing one input file per line"
+                    ", use '-' to read from stdin"))
+@click.help_option('-h', '--help',
+                   help="show this help message")
+def cli_srcpkg(*args, **kwargs):
+    """
+    create source package (files to build packages from)
+    """
+    results = srcpkg(*args, **kwargs)
+    common.print_results(results)
+    return results
+
+
+def srcpkg(
         archive=False,
         input_files=None,
         input_file_lists=None,
@@ -27,9 +60,12 @@ def make_srcpkg(
         release=None,
         distro=None,
         result_dir=None,
-        use_cache=True,
         render_template=False,
+        cache=True,
         project=None):
+    """
+    create source package
+    """
     srcpkg_type = 'upstream' if upstream else 'dev'
     if render_template:
         log.bold('rendering %s source package template', srcpkg_type)
@@ -46,6 +82,7 @@ def make_srcpkg(
     proj = project or Project()
     distro = adistro.distro_arg(distro)
     log.info("target distro: %s", distro)
+    use_cache = proj.cache.enabled(cache)
 
     if not release:
         release = '1'
@@ -58,12 +95,12 @@ def make_srcpkg(
         if upstream:
             infiles = get_archive(
                 version=version,
-                project=proj,
-                use_cache=use_cache)
+                cache=use_cache,
+                project=proj)
         else:
             infiles = make_archive(
-                project=proj,
-                use_cache=use_cache)
+                cache=use_cache,
+                project=proj)
 
     common.ensure_input_files(infiles)
     ar_path = infiles[0]
@@ -163,3 +200,6 @@ def make_srcpkg(
             cache_name, cache_key, results)
 
     return results
+
+
+APKG_CLI_COMMANDS = [cli_srcpkg]

@@ -24,8 +24,8 @@ RUN yum install -y \
 RUN pip3 install \
     blessings \
     cached-property \
+    click \
     distro \
-    docopt \
     htmllistparse \
     jinja2 \
     packaging \

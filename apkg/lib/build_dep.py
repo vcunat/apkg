@@ -1,11 +1,11 @@
-"""
-apkg lib for handling build dependencies
-"""
+import click
+
 from apkg import adistro
+from apkg.cli import cli
 from apkg.pkgstyle import call_pkgstyle_fun
 from apkg.lib.get_archive import get_archive
+from apkg.lib.srcpkg import srcpkg as make_srcpkg
 from apkg.util import common
-from apkg.lib import srcpkg as _srcpkg
 from apkg.log import getLogger
 from apkg.project import Project
 from apkg.util.archive import unpack_archive
@@ -14,17 +14,57 @@ from apkg.util.archive import unpack_archive
 log = getLogger(__name__)
 
 
+@cli.command(name="build-dep", aliases=['builddep'])
+@click.argument('input_files', nargs=-1)
+@click.option('-l', '--list', 'install', default=True, flag_value=False,
+              help="list build deps only, don't install")
+@click.option('-u', '--upstream', is_flag=True,
+              help="use upstream template / archive / srcpkg")
+@click.option('-s', '--srcpkg', is_flag=True,
+              help="use source package")
+@click.option('-a', '--archive', is_flag=True,
+              help="use template (/build srcpkg) from archive")
+@click.option('-d', '--distro',
+              help="override target distro  [default: current]")
+@click.option('-F', '--file-list', 'input_file_lists', multiple=True,
+              help=("specify text file listing one input file per line"
+                    ", use '-' to read from stdin"))
+@click.option('--ask/--no-ask', 'interactive',
+              default=False, show_default=True,
+              help="enable/disable interactive mode")
+# TODO: once py3.5 is dropped, add hidden=True
+@click.option('-y', '--yes', 'interactive', flag_value=False,
+              help="compat alias for --no-ask")
+@click.help_option('-h', '--help',
+                   help="show this help message")
+def cli_build_dep(*args, **kwargs):
+
+    """
+    install or list build dependencies
+    """
+    deps = build_dep(*args, **kwargs)
+    if not kwargs.get('install', True):
+        common.print_results(deps)
+
+
 def build_dep(
         upstream=False,
         srcpkg=False,
         archive=False,
         input_files=None,
         input_file_lists=None,
-        list_only=False,
+        install=True,
         distro=None,
         interactive=False,
         project=None):
-    action = 'listing' if list_only else 'installing'
+    """
+    parse and optionally install build dependencies
+
+    pass install=False to only get list of deps without install
+
+    returns list of build deps
+    """
+    action = 'installing' if install else 'listing'
     log.bold('%s build deps', action)
 
     proj = project or Project()
@@ -41,7 +81,7 @@ def build_dep(
         # use source package to determine deps
         if archive or not infiles:
             # build source package
-            srcpkg_files = _srcpkg.make_srcpkg(
+            srcpkg_files = make_srcpkg(
                 archive=archive,
                 distro=distro,
                 input_files=input_files,
@@ -84,14 +124,15 @@ def build_dep(
             pkgstyle, 'get_build_deps_from_template',
             template.path, distro=distro)
 
-    if list_only:
-        for dep in deps:
-            print(dep)
-        return deps
+    if install:
+        log.info("installing %s build deps...", len(deps))
+        call_pkgstyle_fun(
+            pkgstyle, 'install_build_deps',
+            deps,
+            distro=distro,
+            interactive=interactive)
 
-    log.info("installing %s build deps...", len(deps))
-    return call_pkgstyle_fun(
-        pkgstyle, 'install_build_deps',
-        deps,
-        distro=distro,
-        interactive=interactive)
+    return deps
+
+
+APKG_CLI_COMMANDS = [cli_build_dep]

@@ -25,11 +25,8 @@ class ApkgException(Exception):
 
 
 # 10-29: Invalid
-class InvalidApkgCommand(ApkgException):
-    msg_fmt = (
-        "Invalid apkg command: %(command)s\n\n"
-        "Run `apkg -h` to list supported commands."
-    )
+class InvalidUsage(ApkgException):
+    msg_fmt = "Invalid usage: %(fail)s"
     exit_code = 10
 
 

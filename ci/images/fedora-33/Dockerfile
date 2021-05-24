@@ -17,8 +17,8 @@ RUN dnf install -y \
 RUN dnf install -y \
     python3-blessings \
     python3-cached-property \
+    python3-click \
     python3-distro \
-    python3-docopt \
     python3-jinja2 \
     python3-packaging \
     python3-requests \

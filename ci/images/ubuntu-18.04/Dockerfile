@@ -34,7 +34,7 @@ RUN apt-get install -y -qqq \
 # basic deps
 RUN apt-get install -y -qqq \
     python3-blessings \
-    python3-docopt \
+    python3-click \
     python3-jinja2 \
     python3-packaging \
     python3-toml

@@ -1,9 +1,8 @@
-"""
-apkg lib for handling (upstream) source archive download
-"""
 from pathlib import Path
 import re
 import requests
+
+import click
 
 from apkg import ex
 from apkg.util import common
@@ -14,13 +13,40 @@ from apkg.project import Project
 log = getLogger(__name__)
 
 
+@click.command(name='get-archive')
+@click.option('-v', '--version',
+              help='version of archive to download')
+@click.option('-O', '--result-dir',
+              help="put results into specified dir")
+@click.option('--cache/--no-cache', default=True, show_default=True,
+              help="enable/distable cache")
+@click.help_option('-h', '--help', help='show this help')
+def cli_get_archive(*args, **kwargs):
+    """
+    download upstream archive for current project
+    """
+    results = get_archive(*args, **kwargs)
+    common.print_results(results)
+    return results
+
+
 def get_archive(
         version=None,
         result_dir=None,
-        use_cache=True,
+        cache=True,
         project=None):
     """
-    download archive for current project
+    download upstream archive for current project
+
+    upstream.archive_url config option specifies archive to download.
+
+    If upstream.signature_url config option is provided,
+    target signature file is downloaded alongside the archive.
+
+    When no --version is specified, apkg tries to detect latest version:
+
+    1) using upstream.version_script if set
+    2) from HTML listing if upstream.archive_url is set
     """
     proj = project or Project()
     if not version:
@@ -29,7 +55,7 @@ def get_archive(
             raise ex.UnableToDetectUpstreamVersion()
     archive_url = proj.upstream_archive_url(version)
 
-    use_cache = proj.cache.enabled(use_cache)
+    use_cache = proj.cache.enabled(cache)
     if use_cache:
         cache_name = 'archive/upstream'
         cache_key = archive_url
@@ -94,3 +120,6 @@ def get_archive(
             cache_name, cache_key, results)
 
     return results
+
+
+APKG_CLI_COMMANDS = [cli_get_archive]

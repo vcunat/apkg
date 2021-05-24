@@ -1,13 +1,12 @@
-"""
-apkg lib for handling package builds
-"""
 from pathlib import Path
+
+import click
 
 from apkg import adistro
 from apkg.cache import file_checksum
 from apkg import ex
 from apkg.lib.build_dep import build_dep
-from apkg.lib import srcpkg as _srcpkg
+from apkg.lib.srcpkg import srcpkg as make_srcpkg
 from apkg.log import getLogger
 from apkg.project import Project
 from apkg.util import common
@@ -17,10 +16,49 @@ import apkg.util.shutil35 as shutil
 log = getLogger(__name__)
 
 
-def build_package(
-        upstream=False,
+@click.command(name="build")
+@click.argument('input_files', nargs=-1)
+@click.option('-s', '--srcpkg', is_flag=True,
+              help="use source package")
+@click.option('-a', '--archive', is_flag=True,
+              help="use template (/build srcpkg) from archive")
+@click.option('-u', '--upstream', is_flag=True,
+              help="use upstream template / archive / srcpkg")
+@click.option('-v', '--version',
+              help=("upstream archive version to use"
+                    ", implies --upstream"
+                    ", exclusive with --srcpkg and --archive"))
+@click.option('-r', '--release',
+              help="set packagge release  [default: 1]")
+@click.option('-d', '--distro',
+              help="override target distro  [default: current]")
+@click.option('-O', '--result-dir',
+              help=("put results into specified dir"
+                    "  [default: pkg/srcpkg/DISTRO/NVR]"))
+@click.option('--cache/--no-cache', default=True, show_default=True,
+              help="enable/disable cache")
+@click.option('-F', '--file-list', 'input_file_lists', multiple=True,
+              help=("specify text file listing one input file per line"
+                    ", use '-' to read from stdin"))
+@click.option('-i', '--install-dep', is_flag=True,
+              help="install build dependencies on host (build-dep)")
+@click.option('-I', '--isolated', is_flag=True,
+              help="use isolated builder (pbuilder, mock, ...)")
+@click.help_option('-h', '--help',
+                   help="show this help message")
+def cli_build(*args, **kwargs):
+    """
+    build packages
+    """
+    results = build(*args, **kwargs)
+    common.print_results(results)
+    return results
+
+
+def build(
         srcpkg=False,
         archive=False,
+        upstream=False,
         input_files=None,
         input_file_lists=None,
         version=None,
@@ -29,13 +67,17 @@ def build_package(
         result_dir=None,
         install_dep=False,
         isolated=False,
-        use_cache=True,
+        cache=True,
         project=None):
-    log.bold('building package')
+    """
+    build packages
+    """
+    log.bold('building packages')
 
     proj = project or Project()
     distro = adistro.distro_arg(distro)
     log.info("target distro: %s", distro)
+    use_cache = proj.cache.enabled(cache)
 
     if srcpkg:
         if version:
@@ -45,7 +87,7 @@ def build_package(
         infiles = common.parse_input_files(input_files, input_file_lists)
     else:
         # make source package
-        infiles = _srcpkg.make_srcpkg(
+        infiles = make_srcpkg(
             archive=archive,
             input_files=input_files,
             input_file_lists=input_file_lists,
@@ -54,7 +96,7 @@ def build_package(
             release=release,
             distro=distro,
             project=proj,
-            use_cache=use_cache)
+            cache=use_cache)
 
     common.ensure_input_files(infiles)
     srcpkg_path = infiles[0]
@@ -128,3 +170,6 @@ def build_package(
             cache_name, cache_key, fns)
 
     return pkgs
+
+
+APKG_CLI_COMMANDS = [cli_build]

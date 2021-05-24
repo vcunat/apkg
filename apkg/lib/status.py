@@ -1,8 +1,6 @@
-"""
-show status of current project
-"""
-
 import os
+
+import click
 
 from apkg import adistro
 from apkg.log import getLogger, T
@@ -12,7 +10,19 @@ from apkg.project import Project
 log = getLogger(__name__)
 
 
+@click.command(name='status')
+@click.help_option('-h', '--help', help='show this help')
+def cli_status():
+    """
+    show status of current project
+    """
+    status()
+
+
 def status():
+    """
+    show status of current project
+    """
     proj = Project()
 
     msg = "project name:            {t.bold}{name}{t.normal}"
@@ -70,3 +80,6 @@ def status():
     else:
         msg += "{t.warn}unsupported{t.normal}"
     print(msg.format(t=T))
+
+
+APKG_CLI_COMMANDS = [cli_status]

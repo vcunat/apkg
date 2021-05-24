@@ -1,9 +1,9 @@
-"""
-apkg lib for handling dev source archive creation
-"""
 from pathlib import Path
 
+import click
+
 from apkg import ex
+from apkg.cli import cli
 from apkg.util import common
 from apkg.log import getLogger
 from apkg.project import Project
@@ -14,17 +14,34 @@ import apkg.util.shutil35 as shutil
 log = getLogger(__name__)
 
 
+@cli.command(name='make-archive', aliases=['ar'])
+@click.option('-O', '--result-dir',
+              help="put results into specified dir")
+@click.option('--cache/--no-cache', default=True, show_default=True,
+              help="enable/distable cache")
+@click.help_option('-h', '--help', help='show this help')
+def cli_make_archive(*args, **kwargs):
+    """
+    create dev archive from current project state
+    """
+    results = make_archive(*args, **kwargs)
+    common.print_results(results)
+    return results
+
+
 def make_archive(
         result_dir=None,
-        use_cache=True,
+        cache=True,
         project=None):
     """
-    create archive from current project state
+    create dev archive from current project state
+
+    Use script specified by project.make_archive_script config option.
     """
     log.bold("creating dev archive")
     proj = project or Project()
 
-    use_cache = proj.cache.enabled(use_cache)
+    use_cache = proj.cache.enabled(cache)
     if use_cache:
         cache_name = 'archive/dev'
         cache_key = proj.checksum
@@ -71,3 +88,6 @@ def make_archive(
         proj.cache.update(
             cache_name, cache_key, results)
     return results
+
+
+APKG_CLI_COMMANDS = [cli_make_archive]
