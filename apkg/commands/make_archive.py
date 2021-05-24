@@ -14,13 +14,13 @@ Options:
 
 from docopt import docopt
 
-from apkg.lib import ar
+from apkg.lib.make_archive import make_archive
 from apkg.lib import common
 
 
 def run_command(cargs):
     args = docopt(__doc__, argv=cargs)
-    results = ar.make_archive(
+    results = make_archive(
         result_dir=args['--result-dir'],
         use_cache=not args['--no-cache'])
     common.print_results(results)

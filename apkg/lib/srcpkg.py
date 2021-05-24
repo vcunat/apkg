@@ -6,11 +6,12 @@ from pathlib import Path
 from apkg import adistro
 from apkg.cache import file_checksum
 from apkg import ex
-from apkg.lib import ar
 from apkg.lib import common
+from apkg.lib.get_archive import get_archive
+from apkg.lib.make_archive import make_archive
 from apkg.log import getLogger
 from apkg.project import Project
-from apkg.util.archive import unpack_archive
+from apkg.util.archive import unpack_archive, get_archive_version
 import apkg.util.shutil35 as shutil
 
 
@@ -55,18 +56,18 @@ def make_srcpkg(
     else:
         # archive not specified - use make_archive or get_archive
         if upstream:
-            infiles = ar.get_archive(
+            infiles = get_archive(
                 version=version,
                 project=proj,
                 use_cache=use_cache)
         else:
-            infiles = ar.make_archive(
+            infiles = make_archive(
                 project=proj,
                 use_cache=use_cache)
 
     common.ensure_input_files(infiles)
     ar_path = infiles[0]
-    version = ar.get_archive_version(ar_path)
+    version = get_archive_version(ar_path)
 
     use_cache = proj.cache.enabled(use_cache) and not render_template
     if use_cache:

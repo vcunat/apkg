@@ -3,7 +3,7 @@ apkg lib for handling (build) dependencies
 """
 from apkg import adistro
 from apkg.pkgstyle import call_pkgstyle_fun
-from apkg.lib import ar
+from apkg.lib.get_archive import get_archive
 from apkg.lib import common
 from apkg.lib import srcpkg as _srcpkg
 from apkg.log import getLogger
@@ -66,7 +66,7 @@ def build_dep(
 
         if upstream:
             archive = True
-            archive_files = ar.get_archive(project=proj)
+            archive_files = get_archive(project=proj)
 
         if archive:
             common.ensure_input_files(archive_files)

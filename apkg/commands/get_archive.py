@@ -23,13 +23,13 @@ Options:
 
 from docopt import docopt
 
-from apkg.lib import ar
+from apkg.lib.get_archive import get_archive
 from apkg.lib import common
 
 
 def run_command(cargs):
     args = docopt(__doc__, argv=cargs)
-    results = ar.get_archive(
+    results = get_archive(
         version=args['--version'],
         result_dir=args['--result-dir'],
         use_cache=not args['--no-cache'])
