@@ -16,12 +16,12 @@ Options:
 
 from docopt import docopt
 
-from apkg.lib import system
+from apkg.lib.system_setup import system_setup
 
 
 def run_command(cargs):
     args = docopt(__doc__, argv=cargs)
-    return system.system_setup(
+    return system_setup(
         isolated=args['--isolated'],
         distro=args['--distro'],
         interactive=not args['--yes'],
