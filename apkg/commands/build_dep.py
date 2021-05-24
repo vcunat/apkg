@@ -26,12 +26,12 @@ Options:
 
 from docopt import docopt
 
-from apkg.lib import deps
+from apkg.lib.build_dep import build_dep
 
 
 def run_command(cargs):
     args = docopt(__doc__, argv=cargs)
-    return deps.build_dep(
+    return build_dep(
         list_only=args['--list'],
         upstream=args['--upstream'],
         srcpkg=args['--srcpkg'],

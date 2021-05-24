@@ -6,7 +6,7 @@ from pathlib import Path
 from apkg import adistro
 from apkg.cache import file_checksum
 from apkg import ex
-from apkg.lib import deps
+from apkg.lib.build_dep import build_dep
 from apkg.lib import srcpkg as _srcpkg
 from apkg.log import getLogger
 from apkg.project import Project
@@ -78,7 +78,7 @@ def build_package(
         else:
             # install build deps if requested
             try:
-                deps.build_dep(
+                build_dep(
                     srcpkg=True,
                     input_files=[srcpkg_path],
                     distro=distro,

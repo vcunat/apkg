@@ -1,5 +1,5 @@
 """
-apkg lib for handling (build) dependencies
+apkg lib for handling build dependencies
 """
 from apkg import adistro
 from apkg.pkgstyle import call_pkgstyle_fun
