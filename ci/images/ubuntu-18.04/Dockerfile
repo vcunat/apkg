@@ -1,16 +1,13 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-FROM ubuntu:bionic
-MAINTAINER Jakub Ružička <jakub.ruzicka@nic.cz>
+FROM ubuntu:18.04
 ENV DEBIAN_FRONTEND=noninteractive
-ENV PATH="/usr/bin:${PATH}"
 
 WORKDIR /root
 CMD ["/bin/bash"]
 
-
-RUN apt-get update -qqq
 # upgrade system to latest
+RUN apt-get update -qqq
 RUN apt-get upgrade -y -qqq
 
 # install add-apt-repository
@@ -21,10 +18,29 @@ RUN add-apt-repository ppa:cz.nic-labs/knot-dns-latest
 RUN apt-get update -qqq
 
 # packaging deps
-RUN apt-get install -y -qqq apt-utils dpkg-dev debhelper dh-python git python3-all python3-pip
-# basic deps
-RUN apt-get install -y -qqq python3-jinja2 python3-docopt python3-blessings python3-toml python3-packaging
-# deps not available/too old in distro
-RUN pip3 install distro cached_property htmllistparse
+RUN apt-get install -y -qqq \
+    apt-utils \
+    build-essential \
+    debhelper \
+    dh-python \
+    dpkg-dev \
+    git \
+    python3-all \
+    python3-pip \
+    python3-setuptools
 # testing deps
-RUN apt-get install -y -qqq tox python3-pytest python3-pytest-cov
+RUN apt-get install -y -qqq \
+    python3-pytest
+# basic deps
+RUN apt-get install -y -qqq \
+    python3-blessings \
+    python3-docopt \
+    python3-jinja2 \
+    python3-packaging \
+    python3-toml
+# python deps not available\too old in distro
+RUN pip3 install \
+    build \
+    distro \
+    cached_property \
+    htmllistparse

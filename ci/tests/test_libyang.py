@@ -1,5 +1,5 @@
 """
-integration tests for Knot DNS
+integration tests for libyang
 """
 import glob
 from pathlib import Path
@@ -10,7 +10,7 @@ from apkg.util.git import git
 from apkg.cli import apkg
 
 
-KNOT_REPO_URL = 'https://gitlab.nic.cz/knot/knot-dns.git'
+LIBYANG_REPO_URL = 'https://github.com/CESNET/libyang'
 # pylint: disable=redefined-outer-name
 
 
@@ -19,10 +19,10 @@ def clone_path(tmpdir_factory):
     """
     clone project repo once on module load and reuse it in individual tests
     """
-    tmpd = tmpdir_factory.mktemp("apkg_test_knot_git")
-    p = '%s/knot-dns' % tmpd
-    # XXX: using apkg branch for now
-    git('clone', '--recursive', '-b', 'apkg', KNOT_REPO_URL, p)
+    tmpd = tmpdir_factory.mktemp("apkg_test_libyang_git")
+    p = '%s/libyang' % tmpd
+    # libyang v2 lives in libyang2 branch, master is v1
+    git('clone', '--recursive', '-b', 'libyang2', LIBYANG_REPO_URL, p)
     return Path(p)
 
 
@@ -36,21 +36,21 @@ def repo_path(clone_path):
     return clone_path
 
 
-def test_knot_make_archive(repo_path, capsys):
+def test_libyang_make_archive(repo_path, capsys):
     with cd(repo_path):
         assert apkg('make-archive') == 0
-        ar_files = glob.glob('pkg/archives/dev/knot*')
+        ar_files = glob.glob('pkg/archives/dev/libyang*')
     assert ar_files
 
 
-def test_knot_get_archive(repo_path, capsys):
+def test_libyang_get_archive(repo_path, capsys):
     with cd(repo_path):
         assert apkg('get-archive') == 0
-        ar_files = glob.glob('pkg/archives/upstream/knot*')
+        ar_files = glob.glob('pkg/archives/upstream/libyang*')
     assert ar_files
 
 
-def test_knot_srcpkg_dev(repo_path, capsys):
+def test_libyang_srcpkg_dev(repo_path, capsys):
     with cd(repo_path):
         assert apkg('srcpkg') == 0
         out, _ = capsys.readouterr()
@@ -58,9 +58,9 @@ def test_knot_srcpkg_dev(repo_path, capsys):
             assert Path(srcpkg).exists()
 
 
-def test_knot_build_dev(repo_path, capsys):
+def test_libyang_build_dev(repo_path, capsys):
     with cd(repo_path):
-        assert apkg('build', '-i') == 0
+        assert apkg('build') == 0
         out, _ = capsys.readouterr()
         for pkg in out.split("\n"):
             assert Path(pkg).exists()
