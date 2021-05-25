@@ -65,15 +65,22 @@ $> apkg build -h
 
 Detailed description of each command is available in [commands docs](commands.md).
 
-You can control `apkg` output format and verbosity using following global options:
+You can control `apkg` output format and verbosity using `-L`/`--log-level` option:
 
-* `--debug`: print everything; include source file, line number, and function name
-* `--verbose`: print more things; include module name and function
-* `--brief`: only print important things like success, errors, and command output
-* `--quiet`: suppress all logging output, only print command results
+* `-L debug`: print everything; include source file, line number, and function name
+* `-L verbose`: print more things; include module name and function
+* `-L info`: print normal amount of things - default
+* `-L brief`: only print important things like success, errors, and command output
+* `-L quiet`: suppress all logging output, only print command results
+
+Please note that the option must be specified **before apkg sub-command**, i.e.:
+
+```
+apkg -L verbose build -i
+```
 
 !!! tip
-    `--verbose` and `--debug` options can be **very helpful** when debugging, try adding one to your failing `apkg` command to gain more insight.
+    `-L verbose` and `-L debug` options can be **very helpful** when debugging, try adding one before your failing `apkg` command to gain more insight.
 
 
 ## system setup
@@ -145,7 +152,9 @@ I copying archive to: pkg/archives/dev/apkg-0.0.2.tar.gz
 pkg/archives/dev/apkg-0.0.2.tar.gz
 ```
 
-If you run into issues, consider appending `--verbose` or `--debug` to `apkg` command in question to print more detailed information.
+!!! tip
+    If you run into issues, consider inserting `-L verbose` or `-L debug` before
+    the failing command to print more detailed information.
 
 Great, you're now able to create archives required to create packages!
 

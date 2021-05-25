@@ -2,11 +2,11 @@
 generate docs from apkg code/docstrings using mkdocs-macros-plugin
 """
 import inspect
+import subprocess
 
 from apkg import COMPAT_LEVEL
 from apkg import ex
 from apkg import pkgstyle
-from apkg.cli import cmd2mod
 from pathlib import Path
 
 
@@ -19,10 +19,10 @@ def define_env(env):
     """
     this is available in docs using jinja2 templates
     """
-    env.variables.pkgstyles = pkgstyle.PKGSTYLES
-    env.variables.new_issue_url = APKG_NEW_ISSUE_URL
-    env.variables.exceptions = get_exceptions()
     env.variables.compat_level = COMPAT_LEVEL
+    env.variables.exceptions = get_exceptions()
+    env.variables.new_issue_url = APKG_NEW_ISSUE_URL
+    env.variables.pkgstyles = pkgstyle.PKGSTYLES
 
     @env.filter
     def relpath(path):
@@ -51,10 +51,15 @@ def define_env(env):
         return mod.__doc__.strip()
 
     @env.filter
+    def run(cmd):
+        out = subprocess.getoutput(cmd)
+        return "``` text\n$> %s\n\n%s\n```" % (
+            cmd, out)
+
+    @env.filter
     def cmd_help(cmd):
-        modname = 'apkg.commands.%s' % cmd2mod(cmd)
-        return "``` text\n$> apkg %s --help\n\n%s\n```" % (
-            cmd, mod_doc(modname))
+        c = 'apkg %s --help' % cmd
+        return run(c)
 
 
 def get_exceptions():

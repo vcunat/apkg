@@ -2,16 +2,12 @@
 
 To get a summary of available `apkg` commands, simply run it without parameters:
 
-``` text
-$> apkg
-
-{{ 'apkg.cli' | mod_doc }}
-```
+{{ 'apkg' | run }}
 
 Use `--help`/`-h` after a command to get help for that particular command instead:
 
-``` text
-$> apkg command -h
+```
+$> apkg command --help
 ```
 
 ## status
@@ -20,7 +16,7 @@ $> apkg command -h
 
 Example:
 
-``` text
+```
 $> apkg status
 
 project name:            apkg
@@ -37,6 +33,12 @@ current distro: arch / Arch Linux
     package style: arch
     package template: distro/pkg/arch
 ```
+
+
+## system-setup
+
+{{ 'system-setup' | cmd_help }}
+
 
 ## make-archive
 
@@ -60,7 +62,7 @@ Resulting archive is copied to `pkg/archives/dev/` or to `--result-dir`.
 `get-archive` requires
 [upstream.archive_url](config.md#upstreamarchive_url)
 config option to be set with additional options available in
-[upstream config section](config.md#upstream)
+[upstream config section](config.md#upstream).
 
 This command will only succeed when it managed to download specified archive.
 
@@ -75,8 +77,6 @@ i.e. `apkg get-archive -v 1.2.3`
 
 {{ 'srcpkg' | cmd_help }}
 
-!!! TODO
-    this and all following commands require proper explanation
 
 ## build
 
@@ -86,3 +86,8 @@ i.e. `apkg get-archive -v 1.2.3`
 ## build-dep
 
 {{ 'build-dep' | cmd_help }}
+
+
+## install
+
+{{ 'install' | cmd_help }}
