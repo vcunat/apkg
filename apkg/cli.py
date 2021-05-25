@@ -8,7 +8,7 @@ import sys
 import click
 
 from apkg import __version__
-import apkg.lib as commands
+from apkg import commands
 from apkg import ex
 from apkg.log import getLogger, T
 import apkg.log as _log
@@ -154,7 +154,7 @@ def __load_commands():
     """
     pkgpath = os.path.dirname(commands.__file__)
     for _, modname, _ in pkgutil.iter_modules([pkgpath]):
-        modpath = "apkg.lib.%s" % (modname)
+        modpath = "apkg.commands.%s" % (modname)
         mod = __import__(modpath, fromlist=[''])
         cmds = getattr(mod, 'APKG_CLI_COMMANDS', None)
         if not cmds:

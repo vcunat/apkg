@@ -5,8 +5,8 @@ import click
 from apkg import adistro
 from apkg.cache import file_checksum
 from apkg import ex
-from apkg.lib.build_dep import build_dep
-from apkg.lib.srcpkg import srcpkg as make_srcpkg
+from apkg.commands.build_dep import build_dep
+from apkg.commands.srcpkg import srcpkg as make_srcpkg
 from apkg.log import getLogger
 from apkg.project import Project
 from apkg.util import common

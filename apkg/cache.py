@@ -108,7 +108,7 @@ class ProjectCache:
         helper to tell and log if caching is enabled and supported
 
         optional use_cache argument provided for shared
-        argument parsing and logging from apkg.lib
+        argument parsing and logging from apkg.commands
         """
         if use_cache:
             vcs = self.project.vcs

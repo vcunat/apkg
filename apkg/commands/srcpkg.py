@@ -6,8 +6,8 @@ from apkg import adistro
 from apkg.cache import file_checksum
 from apkg import ex
 from apkg.util import common
-from apkg.lib.get_archive import get_archive
-from apkg.lib.make_archive import make_archive
+from apkg.commands.get_archive import get_archive
+from apkg.commands.make_archive import make_archive
 from apkg.log import getLogger
 from apkg.project import Project
 from apkg.util.archive import unpack_archive, get_archive_version

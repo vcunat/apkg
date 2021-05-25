@@ -25,13 +25,13 @@ def test_import_command_modules():
     """
     test importing individual apkg command modules
     """
-    import apkg.lib.build  # noqa
-    import apkg.lib.build_dep  # noqa
-    import apkg.lib.get_archive  # noqa
-    import apkg.lib.install  # noqa
-    import apkg.lib.make_archive  # noqa
-    import apkg.lib.srcpkg  # noqa
-    import apkg.lib.status  # noqa
+    import apkg.commands.build  # noqa
+    import apkg.commands.build_dep  # noqa
+    import apkg.commands.get_archive  # noqa
+    import apkg.commands.install  # noqa
+    import apkg.commands.make_archive  # noqa
+    import apkg.commands.srcpkg  # noqa
+    import apkg.commands.status  # noqa
 
 
 def test_apkg_make_archive_cache(repo_path, caplog):

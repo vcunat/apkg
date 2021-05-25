@@ -3,8 +3,8 @@ import click
 from apkg import adistro
 from apkg.cli import cli
 from apkg.pkgstyle import call_pkgstyle_fun
-from apkg.lib.get_archive import get_archive
-from apkg.lib.srcpkg import srcpkg as make_srcpkg
+from apkg.commands.get_archive import get_archive
+from apkg.commands.srcpkg import srcpkg as make_srcpkg
 from apkg.util import common
 from apkg.log import getLogger
 from apkg.project import Project
