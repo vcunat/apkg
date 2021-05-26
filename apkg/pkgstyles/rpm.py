@@ -20,7 +20,7 @@ import subprocess
 import sys
 
 from apkg import ex
-from apkg.lib import common
+from apkg.util import common
 from apkg.log import getLogger
 from apkg import pkgtemplate
 from apkg.util.run import run, sudo

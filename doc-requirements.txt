@@ -1,5 +1,5 @@
 cached_property
-docopt
+click
 jinja2
 mkdocs
 mkdocs-material

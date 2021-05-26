@@ -30,8 +30,8 @@ BuildRequires:    python3-setuptools
 Requires:         git-core
 Requires:         rpm-build
 
+Requires:         python3-click
 Requires:         python3-distro
-Requires:         python3-docopt
 Requires:         python3-jinja2
 Requires:         python3-requests
 Requires:         python3-toml

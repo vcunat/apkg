@@ -3,6 +3,7 @@ apkg archive (tarball) utils
 """
 from pathlib import Path
 
+from apkg.parse import split_archive_fn, parse_version
 import apkg.util.shutil35 as shutil
 
 from apkg import ex
@@ -29,3 +30,12 @@ def unpack_archive(archive_path, out_path):
         fmt = "Expected a single root dir but instead got %d files in root"
         raise ex.InvalidArchiveFormat(fmt=fmt % n_root_files)
     return root_files.pop()
+
+
+def get_archive_version(archive_path):
+    """
+    return archive version detected from archive name
+    """
+    archive_path = Path(archive_path)
+    _, _, ver, _ = split_archive_fn(archive_path.name)
+    return parse_version(ver)

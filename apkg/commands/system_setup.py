@@ -1,28 +1,61 @@
-"""
-setup system for packaging
+import click
 
-Install native distro packages required for packaging.
-
-Usage: apkg system-setup [-I] [-d <distro>] [-y]
-
-Options:
-  -I, --isolated          also install packages for isolated build
-                          default: install core packages only
-  -d, --distro <distro>   override target distro
-                          default: current distro
-  -y, --yes               non-interactive mode
-                          default: interactive (distro tool defualts)
-""" # noqa
-
-from docopt import docopt
-
-from apkg.lib import system
+from apkg import adistro
+from apkg import ex
+from apkg.log import getLogger
+from apkg import pkgstyle
 
 
-def run_command(cargs):
-    args = docopt(__doc__, argv=cargs)
-    return system.system_setup(
-        isolated=args['--isolated'],
-        distro=args['--distro'],
-        interactive=not args['--yes'],
-        )
+log = getLogger(__name__)
+
+
+@click.command(name='system-setup')
+@click.option('-I', '--isolated', is_flag=True,
+              help="also install packages for isolated build")
+@click.option('-d', '--distro',
+              help="override target distro  [default: current]")
+@click.option('--ask/--no-ask', 'interactive',
+              default=False, show_default=True,
+              help="enable/disable interactive mode")
+def cli_system_setup(*args, **kwargs):
+    """
+    setup system for packaging
+    """
+    return system_setup(*args, **kwargs)
+
+
+def system_setup(
+        isolated=False,
+        distro=None,
+        interactive=False):
+    """
+    setup system for packaging
+
+    Install native distro packages required for packaging.
+    """
+    log.bold("system setup for packaging")
+
+    distro = adistro.distro_arg(distro)
+    log.info("target distro: %s", distro)
+
+    style = pkgstyle.get_pkgstyle_for_distro(distro)
+    if not style:
+        raise ex.DistroNotSupported(distro=distro)
+    log.info("target pkgstyle: %s", style.name)
+
+    distro_reqs = getattr(style, 'DISTRO_REQUIRES', {})
+    reqs = distro_reqs.get('core', [])
+    if isolated:
+        reqs += distro_reqs.get('isolated', [])
+    if reqs:
+        pkgstyle.call_pkgstyle_fun(
+            style, 'install_distro_packages',
+            reqs,
+            interactive=interactive)
+    else:
+        log.info("no distro packages required")
+
+    log.success("system ready for packaging")
+
+
+APKG_CLI_COMMANDS = [cli_system_setup]

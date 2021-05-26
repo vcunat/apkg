@@ -1,44 +1,81 @@
-"""
-install packages using native distro package manager
+import sys
 
-Supply one or more <package> to install and/or use -F <file-list>
-to read packages from specified file, one package per line.
+import click
 
-Use "-F -" to read packages from standard input, i.e.
-
-    apkg build | apkg install -F -
-
-
-Usage: apkg install (<package> | -F <file-list>)...
-                    [-D] [-d <distro>] [-y]
-
-Arguments:
-  <package>...            one or more packages to install
-  -F, --file-list <fl>    file containing list of packages to install
-                          "-" for stdin (implies -y/--yes)
-
-Options:
-  -D, --distro-pkgs       install packages from distro repos
-                          default: install packages from package files
-  -d, --distro <distro>   set target distro
-                          default: current distro
-  -y, --yes               non-interactive mode
-                          default: interactive (distro tool defualts)
-
-""" # noqa
-
-from docopt import docopt
-
-from apkg.lib import install
+from apkg import adistro
+from apkg import ex
+from apkg.log import getLogger
+from apkg import pkgstyle
 
 
-def run_command(cargs):
-    args = docopt(__doc__, argv=cargs)
-    results = install.install_packages(
-        packages=args['<package>'],
-        file_list=args['--file-list'],
-        distro_pkgs=args['--distro-pkgs'],
-        distro=args['--distro'],
-        interactive=not args['--yes'],
-    )
-    return results
+log = getLogger(__name__)
+
+
+@click.command(name="install")
+@click.argument('packages', nargs=-1)
+@click.option('-D', '--distro-pkgs', is_flag=True,
+              help="install packages from distro repos")
+@click.option('-d', '--distro',
+              help="override target distro  [default: current]")
+@click.option('--ask/--no-ask', 'interactive',
+              default=False, show_default=True,
+              help="enable/disable interactive mode")
+# TODO: once py3.5 is dropped, add hidden=True
+@click.option('-y', '--yes', 'interactive', flag_value=False,
+              help="compat alias for --no-ask")
+@click.option('-F', '--file-list', 'input_file_lists', multiple=True,
+              help=("specify text file listing one input package per line"
+                    ", use '-' to read from stdin"))
+@click.help_option('-h', '--help',
+                   help="show this help message")
+def cli_install(*args, **kwargs):
+    """
+    install packages using native package manager
+
+    Supply one or more package to install and/or use -F <file-list>
+    to read packages from specified file, one package per line.
+    """
+    return install(*args, **kwargs)
+
+
+def install(
+        packages=None,
+        input_file_lists=None,
+        distro_pkgs=False,
+        distro=None,
+        interactive=False):
+    """
+    install packages using native package manager
+    """
+    log.bold("installing packages")
+
+    distro = adistro.distro_arg(distro)
+    log.info("target distro: %s", distro)
+    pkgs = packages
+    for fn in input_file_lists:
+        if fn == '-':
+            f = sys.stdin
+            # unable to get interactive input when piping stdin
+            interactive = False
+        else:
+            f = open(fn)
+        pkgs = pkgs + list(map(str.strip, f.readlines()))
+
+    ps = pkgstyle.get_pkgstyle_for_distro(distro)
+    if not ps:
+        raise ex.DistroNotSupported(distro=distro)
+    log.info("target pkgstyle: %s", ps.name)
+
+    if distro_pkgs:
+        result = ps.install_distro_packages(
+            pkgs, distro=distro, interactive=interactive)
+    else:
+        result = ps.install_custom_packages(
+            pkgs, distro=distro, interactive=interactive)
+
+    log.success("installed %s packages", len(pkgs))
+
+    return result
+
+
+APKG_CLI_COMMANDS = [cli_install]

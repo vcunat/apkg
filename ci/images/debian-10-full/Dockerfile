@@ -33,7 +33,7 @@ RUN pip3 install \
 # basic deps
 RUN apt-get install -y -qqq \
     python3-blessings \
-    python3-docopt \
+    python3-click \
     python3-cached-property \
     python3-jinja2 \
     python3-packaging \

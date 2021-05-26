@@ -2,6 +2,7 @@
 .*
 *.egg
 *.egg-info
+*.tar.gz
 /AUTHORS
 /ChangeLog
 /build

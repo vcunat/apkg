@@ -16,8 +16,8 @@ Homepage: https://gitlab.nic.cz/packaging/apkg
 Package: python3-apkg
 Architecture: all
 Depends:
- python3-docopt,
  python3-blessings,
+ python3-click,
  python3-jinja2,
  ${misc:Depends},
  ${python3:Depends},
