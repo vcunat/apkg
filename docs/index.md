@@ -9,7 +9,7 @@ minimum overhead while respecting individual distro's standards and policies.
 
 ## status
 
-**first beta release [v0.1](https://gitlab.nic.cz/packaging/apkg/-/milestones/1) is very close ✨**
+apkg is in **BETA** since [v0.1.0](https://gitlab.nic.cz/packaging/apkg/-/releases/v0.1.0) 🥳
 
 * [source code](https://gitlab.nic.cz/packaging/apkg)
 * [merge requests](https://gitlab.nic.cz/packaging/apkg/-/merge_requests)
