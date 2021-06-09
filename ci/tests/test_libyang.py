@@ -21,8 +21,7 @@ def clone_path(tmpdir_factory):
     """
     tmpd = tmpdir_factory.mktemp("apkg_test_libyang_git")
     p = '%s/libyang' % tmpd
-    # libyang v2 lives in libyang2 branch, master is v1
-    git('clone', '--recursive', '-b', 'libyang2', LIBYANG_REPO_URL, p)
+    git('clone', '--recursive', LIBYANG_REPO_URL, p)
     return Path(p)
 
 
