@@ -134,11 +134,15 @@ def cd(newdir):
     Temporarily change current directory.
     """
     olddir = os.getcwd()
-    os.chdir(os.path.expanduser(str(newdir)))
+    oldpwd = os.environ['PWD']
+    newpath = os.path.abspath(os.path.expanduser(str(newdir)))
+    os.chdir(newpath)
+    os.environ['PWD'] = newpath
     try:
         yield
     finally:
         os.chdir(olddir)
+        os.environ['PWD'] = oldpwd
 
 
 class ShellCommand:

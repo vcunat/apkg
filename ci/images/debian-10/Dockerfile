@@ -10,10 +10,10 @@ CMD ["/bin/bash"]
 RUN apt-get update -qqq
 RUN apt-get upgrade -y -qqq
 
-# enable Knot DNS (required for Knot Resolver integration)
-RUN apt-get -y -qqq install apt-transport-https lsb-release ca-certificates wget
-RUN wget -O /etc/apt/trusted.gpg.d/knot-latest.gpg https://deb.knot-dns.cz/knot-latest/apt.gpg
-RUN sh -c 'echo "deb https://deb.knot-dns.cz/knot-latest/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/knot-latest.list'
+# configure repository with Knot Resolver dependencies
+RUN apt-get -y -qqq install apt-transport-https lsb-release ca-certificates wget curl gnupg2
+RUN sh -c 'echo "deb http://download.opensuse.org/repositories/home:/CZ-NIC:/knot-resolver-build/Debian_10/ /" > /etc/apt/sources.list.d/home:CZ-NIC:knot-resolver-build.list'
+RUN sh -c 'curl -fsSL https://download.opensuse.org/repositories/home:CZ-NIC:knot-resolver-build/Debian_10/Release.key | gpg --dearmor > /etc/apt/trusted.gpg.d/home_CZ-NIC_knot-resolver-build.gpg'
 RUN apt-get update -qqq
 
 # packaging deps
