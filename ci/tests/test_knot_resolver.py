@@ -21,8 +21,7 @@ def clone_path(tmpdir_factory):
     """
     tmpd = tmpdir_factory.mktemp("apkg_test_kresd_git")
     p = '%s/knot-resolver' % tmpd
-    # XXX: using apkg branch for now
-    git('clone', '--recursive', '-b', 'apkg', KRESD_REPO_URL, p)
+    git('clone', '--recursive', KRESD_REPO_URL, p)
     return Path(p)
 
 
