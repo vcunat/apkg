@@ -5,6 +5,7 @@ edit_uri: ""
 nav:
   - index.md
   - intro.md
+  - news.md
   - install.md
   - guide.md
   - commands.md
