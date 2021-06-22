@@ -33,10 +33,11 @@ log = getLogger(__name__)
 SUPPORTED_DISTROS = [
     "fedora",
     "centos",
+    "rocky",
     "rhel",
+    "opensuse",
     "oracle",
     "pidora",
-    "opensuse",
     "scientific",
 ]
 DISTRO_REQUIRES = {
