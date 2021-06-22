@@ -350,6 +350,7 @@ suse-15-knot-resolver:
 pages:
   stage: deploy
   script:
+    - *setup-project
     - mkdocs build
     - mv site public
   artifacts:
