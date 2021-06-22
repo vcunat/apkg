@@ -125,6 +125,13 @@ centos-7-bird:
     - *setup-project
     - pytest -v ci/tests/test_bird.py --junitxml=report.xml
 
+rocky-8-bird:
+  image: $CI_REGISTRY/packaging/apkg/ci/rocky-8:apkg
+  <<: *bird
+  script:
+    - *setup-project
+    - pytest -v ci/tests/test_bird.py --junitxml=report.xml
+
 debian-9-bird:
   image: $CI_REGISTRY/packaging/apkg/ci/debian-9:apkg
   <<: *bird
@@ -179,6 +186,13 @@ suse-15-bird:
 
 centos-7-libyang:
   image: $CI_REGISTRY/packaging/apkg/ci/centos-7:apkg
+  <<: *libyang
+  script:
+    - *setup-project
+    - pytest -v ci/tests/test_libyang.py --junitxml=report.xml
+
+rocky-8-libyang:
+  image: $CI_REGISTRY/packaging/apkg/ci/rocky-8:apkg
   <<: *libyang
   script:
     - *setup-project
@@ -243,6 +257,13 @@ centos-7-knot-dns:
     - *setup-project
     - pytest -v ci/tests/test_knot_dns.py --junitxml=report.xml
 
+rocky-8-knot-dns:
+  image: $CI_REGISTRY/packaging/apkg/ci/rocky-8:apkg
+  <<: *knot-dns
+  script:
+    - *setup-project
+    - pytest -v ci/tests/test_knot_dns.py --junitxml=report.xml
+
 debian-9-knot-dns:
   image: $CI_REGISTRY/packaging/apkg/ci/debian-9:apkg
   <<: *knot-dns
@@ -297,6 +318,13 @@ suse-15-knot-dns:
 
 centos-7-knot-resolver:
   image: $CI_REGISTRY/packaging/apkg/ci/centos-7:apkg
+  <<: *knot-resolver
+  script:
+    - *setup-project
+    - pytest -v ci/tests/test_knot_resolver.py --junitxml=report.xml
+
+rocky-8-knot-resolver:
+  image: $CI_REGISTRY/packaging/apkg/ci/rocky-8:apkg
   <<: *knot-resolver
   script:
     - *setup-project
