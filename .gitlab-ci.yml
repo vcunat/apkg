@@ -22,7 +22,7 @@ image: $CI_REGISTRY/packaging/apkg/ci/debian-10-full:apkg
   - pip3 install -r requirements.txt
 
 .setup-py-develop: &setup-py-develop
-  - python3 setup.py develop --user
+  - python3 setup.py develop
 
 .setup-project: &setup-project
   - *setup-git
