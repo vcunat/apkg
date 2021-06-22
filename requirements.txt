@@ -1,12 +1,10 @@
-# CORE REQUIREMENTS
+blessings        # terminal colors
+build            # apkg distribution
 cached_property  # @cached_property for python <= 3.7
 click            # nice CLI framework
 distro           # current distro detection
+htmllistparse    # upstream version detection
 jinja2           # templating
 packaging        # version parsing
 requests         # HTTP for humans™
 toml             # config files
-# OPTIONAL REQUIREMENTS
-blessings        # terminal colors - recommended!
-build            # apkg distribution
-htmllistparse    # upstream version detection
