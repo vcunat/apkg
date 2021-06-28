@@ -9,10 +9,11 @@ apkg package style for **Nix** (NixOS.org).
 
 **source package:** the same, just with templates substituted
 
-**packages:** symlink(s) to your local nix store (see TODO)
+**packages:** symlink to your local nix store (for the primary package output)
 """
-import re
 import hashlib
+import os
+import re
 
 from apkg import ex
 from apkg.log import getLogger
@@ -33,13 +34,16 @@ def fname_(path):
 def is_valid_template(path):
     return (path / "default.nix").exists() and (path / "top-level.nix").exists()
 
-def get_template_name(path): # TODO: use `nix repl` instead?
+def get_template_name(path):
+    # I'd like to simply use nix directly, e.g.:
+    #   return run("nix", "eval", "--file", path / "top-level.nix", "pname", "--raw")
+    # but that would require substituting the templates first.
+    # So we use a hacky regexp instead :-/
     expr = fname_(path)
     for line in expr.open():
         m = re.match(r'\s*pname\s*=\s*"(\S+)";', line)
         if m:
             return m.group(1)
-
     raise ex.ParsingFailed(
         msg="unable to determine Name from: %s" % expr)
 
@@ -73,18 +77,35 @@ def build_srcpkg(
     shutil.copytree(build_path, out_path)
     shutil.copyfile(archive_path, out_archive)
     return [out_path / 'top-level.nix', out_path / 'default.nix', out_archive]
-    # FIXME: list everything in the directory or what?
+    # TODO: maybe list everything in the directory?  (e.g. local patches might be there)
 
 def build_packages(
         build_path,
         out_path,
         srcpkg_paths,
         **_):
-    srcpkg_path = srcpkg_paths[0]
-    result_path = out_path / 'result'
     log.info("building using nix (silent unless fail)") # TODO: perhaps without -L and shown?
-    run('nix', 'build', '-f' , srcpkg_path, '-o', result_path,
-            '-L', # get full logs shown on failure
+    run('nix', 'build', '--file' , srcpkg_paths[0], '--out-link', out_path / 'result',
+            '--print-build-logs', # get full logs shown on failure
             '--keep-failed', # and keep the nix build dir for inspection
         )
-    return [result_path]
+    return list(out_path.glob('result*'))
+
+def install_custom_packages(
+        packages,
+        **kwargs):
+
+    cmd = ['nix-env', '--install']
+
+    dry_run = kwargs.get('interactive', False) # there's no real "interactive" mode
+    if dry_run:
+        cmd += ['--dry-run']
+
+    if not len(packages) > 0: # otherwise it might try installing everything :-)
+        raise ex.InvalidInput(msg="no packages to install")
+    # We don't check that `packages` are really custom packages;
+    # they could be parameters, distro package names, etc.
+    cmd += packages
+
+    run(*cmd, env=os.environ.copy(), direct=True)
+
