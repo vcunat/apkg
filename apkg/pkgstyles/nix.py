@@ -81,12 +81,10 @@ def build_packages(
         srcpkg_paths,
         **_):
     srcpkg_path = srcpkg_paths[0]
-    log.info("building using nix (silent unless fails)") # TODO: perhaps without -L and shown?
-    run('nix', 'build', '-f' , srcpkg_paths[0], '-o', out_path / 'result',
+    result_path = out_path / 'result'
+    log.info("building using nix (silent unless fail)") # TODO: perhaps without -L and shown?
+    run('nix', 'build', '-f' , srcpkg_path, '-o', result_path,
             '-L', # get full logs shown on failure
             '--keep-failed', # and keep the nix build dir for inspection
         )
-    return [ ]
-    # TODO: I'd use [ 'result' ] but that's (a symlink to) a directory and that breaks cache;
-    # is there a point in producing some file?
-
+    return [result_path]
