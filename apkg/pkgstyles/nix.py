@@ -43,8 +43,9 @@ def get_template_name(path): # TODO: use `nix repl` instead?
     raise ex.ParsingFailed(
         msg="unable to determine Name from: %s" % expr)
 
-def get_srcpkg_nvr(path): # TODO: probably remove after build.py is fixed
-    return "."
+def get_srcpkg_nvr(path):
+    # use source package parent dir as NVR
+    return path.resolve().parent.name
 
 # https://stackoverflow.com/a/44873382/587396
 def sha256sum(filename):
