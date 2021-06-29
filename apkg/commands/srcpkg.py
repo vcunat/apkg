@@ -87,11 +87,15 @@ def srcpkg(
     if not release:
         release = '1'
 
-    if archive:
-        # use existing archive
-        infiles = common.parse_input_files(input_files, input_file_lists)
-    else:
+    infiles = common.parse_input_files(input_files, input_file_lists)
+
+    if not archive:
         # archive not specified - use make_archive or get_archive
+        if infiles:
+            instr = ", ".join([str(i) for i in infiles])
+            raise ex.InvalidInput(
+                fail="unexpected input file(s): %s" % instr)
+
         if upstream:
             infiles = get_archive(
                 version=version,
