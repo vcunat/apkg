@@ -63,3 +63,8 @@ def test_libyang_build_dev(repo_path, capsys):
         out, _ = capsys.readouterr()
         for pkg in out.split("\n"):
             assert Path(pkg).exists()
+
+
+def test_libyang_install_dev(repo_path):
+    with cd(repo_path):
+        assert apkg('install') == 0

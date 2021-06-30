@@ -184,12 +184,14 @@ def install_custom_packages(
         packages,
         **kwargs):
     # dnf/zypper install handles local packages
+    kwargs['allow_unsigned'] = True
     install_distro_packages(packages, **kwargs)
 
 
 def install_distro_packages(
         packages,
         **kwargs):
+    allow_unsigned = kwargs.get('allow_unsigned', False)
     interactive = kwargs.get('interactive', False)
     distro = kwargs.get('distro')
     pm = get_package_manager_(distro)
@@ -198,6 +200,8 @@ def install_distro_packages(
     if pm == 'zypper':
         # use zypper capabilities
         cmd += ['-C']
+        if allow_unsigned:
+            cmd += ['--allow-unsigned-rpm']
     if not interactive:
         cmd += ['-y']
     cmd += packages

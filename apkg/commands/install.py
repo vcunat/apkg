@@ -1,48 +1,77 @@
-import sys
-
 import click
 
 from apkg import adistro
+from apkg.commands.build import build
 from apkg import ex
 from apkg.log import getLogger
 from apkg import pkgstyle
+from apkg.util import common
 
 
 log = getLogger(__name__)
 
 
 @click.command(name="install")
-@click.argument('packages', nargs=-1)
+@click.argument('input_files', nargs=-1)
+@click.option('-C', '--custom-pkgs', is_flag=True,
+              help="install custom packages (no build)")
 @click.option('-D', '--distro-pkgs', is_flag=True,
-              help="install packages from distro repos")
+              help="install packages from distro repos (no build)")
+@click.option('-s', '--srcpkg', is_flag=True,
+              help="build and install packages from srcpkg")
+@click.option('-a', '--archive', is_flag=True,
+              help="build and install packages from archive")
+@click.option('-u', '--upstream', is_flag=True,
+              help="build and install upstream packages")
+@click.option('-v', '--version',
+              help=("upstream archive version to use"
+                    ", implies --upstream"))
+@click.option('-r', '--release',
+              help="set release for built packages  [default: 1]")
+@click.option('-b', '--build-dep', is_flag=True,
+              help="install build deps on host (apkg build-dep)")
 @click.option('-d', '--distro',
               help="override target distro  [default: current]")
+@click.option('--cache/--no-cache', default=True, show_default=True,
+              help="enable/disable cache")
 @click.option('--ask/--no-ask', 'interactive',
               default=False, show_default=True,
               help="enable/disable interactive mode")
+@click.option('-F', '--file-list', 'input_file_lists', multiple=True,
+              help=("specify text file listing one input file per line"
+                    ", use '-' to read from stdin"))
 # TODO: once py3.5 is dropped, add hidden=True
 @click.option('-y', '--yes', 'interactive', flag_value=False,
-              help="compat alias for --no-ask")
-@click.option('-F', '--file-list', 'input_file_lists', multiple=True,
-              help=("specify text file listing one input package per line"
-                    ", use '-' to read from stdin"))
+              help="[DEPRECATED] compat alias for --no-ask")
 @click.help_option('-h', '--help',
                    help="show this help message")
 def cli_install(*args, **kwargs):
     """
     install packages using native package manager
 
-    Supply one or more package to install and/or use -F <file-list>
-    to read packages from specified file, one package per line.
+    Default: build packages and install them
+
+    `apkg build` options are available
+
+    you can supply a list of --custom-pkgs or --distro-pkgs to install
+    specified custom/distro packages directly without any build
     """
     return install(*args, **kwargs)
 
 
 def install(
-        packages=None,
-        input_file_lists=None,
+        custom_pkgs=False,
         distro_pkgs=False,
+        srcpkg=False,
+        archive=False,
+        upstream=False,
+        input_files=None,
+        input_file_lists=None,
+        version=None,
+        release=None,
         distro=None,
+        build_dep=False,
+        cache=True,
         interactive=False):
     """
     install packages using native package manager
@@ -51,27 +80,54 @@ def install(
 
     distro = adistro.distro_arg(distro)
     log.info("target distro: %s", distro)
-    pkgs = packages
-    for fn in input_file_lists:
-        if fn == '-':
-            f = sys.stdin
-            # unable to get interactive input when piping stdin
-            interactive = False
-        else:
-            f = open(fn)
-        pkgs = pkgs + list(map(str.strip, f.readlines()))
 
     ps = pkgstyle.get_pkgstyle_for_distro(distro)
     if not ps:
         raise ex.DistroNotSupported(distro=distro)
     log.info("target pkgstyle: %s", ps.name)
 
-    if distro_pkgs:
-        result = ps.install_distro_packages(
-            pkgs, distro=distro, interactive=interactive)
+    infiles = common.parse_input_files(input_files, input_file_lists)
+
+    pkgs = []
+    result = None
+
+    if custom_pkgs:
+        if distro_pkgs:
+            raise ex.InvalidInput(
+                fail=("--custom-pkgs and --distro-pkgs options"
+                      " are mutually exclusive"))
+
+        pkgs = infiles
+        result = pkgstyle.call_pkgstyle_fun(
+            ps, 'install_custom_packages',
+            pkgs,
+            distro=distro,
+            interactive=interactive)
+    elif distro_pkgs:
+        pkgs = infiles
+        result = pkgstyle.call_pkgstyle_fun(
+            ps, 'install_distro_packages',
+            pkgs,
+            distro=distro,
+            interactive=interactive)
     else:
-        result = ps.install_custom_packages(
-            pkgs, distro=distro, interactive=interactive)
+        # default: use build to get packages
+        pkgs = build(
+            srcpkg=srcpkg,
+            archive=archive,
+            upstream=upstream,
+            input_files=infiles,
+            version=version,
+            release=release,
+            distro=distro,
+            build_dep=build_dep,
+            cache=cache)
+
+        result = pkgstyle.call_pkgstyle_fun(
+            ps, 'install_custom_packages',
+            pkgs,
+            distro=distro,
+            interactive=interactive)
 
     log.success("installed %s packages", len(pkgs))
 
