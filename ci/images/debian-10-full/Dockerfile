@@ -47,4 +47,6 @@ RUN pip3 install \
 # doc deps
 RUN pip3 install \
     mkdocs \
-    mkdocs-macros-plugin
+    mkdocs-material \
+    mkdocs-macros-plugin \
+    pymdown-extensions
