@@ -120,7 +120,8 @@ def hash_file(filename, algo='sha256'):
     h = getattr(hashlib, algo)()
     b = bytearray(128*1024)
     mv = memoryview(b)
-    with open(filename, 'rb', buffering=0) as f:
+    # NOTE(py35): explicit Path -> str conversion for python 3.5
+    with open(str(filename), 'rb', buffering=0) as f:
         for n in iter(lambda: f.readinto(mv), 0):
             h.update(mv[:n])
     return h
