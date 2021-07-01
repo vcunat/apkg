@@ -1,5 +1,6 @@
 from contextlib import contextmanager
 from pathlib import Path
+import hashlib
 import sys
 import tempfile
 
@@ -107,3 +108,19 @@ def text_tempfile(text, prefix='apkg_tmp_'):
         yield path
     finally:
         path.unlink()
+
+
+def hash_file(filename, algo='sha256'):
+    """
+    return hashlib's hash computed over the contents of the specified file
+
+    typical use case: `file_hash('/path').hexdigest()`
+    """
+    # Code taken from https://stackoverflow.com/a/44873382/587396
+    h = getattr(hashlib, algo)()
+    b = bytearray(128*1024)
+    mv = memoryview(b)
+    with open(filename, 'rb', buffering=0) as f:
+        for n in iter(lambda: f.readinto(mv), 0):
+            h.update(mv[:n])
+    return h

@@ -2,22 +2,18 @@
 apkg packaging file cache
 """
 
-import hashlib
 import json
 from pathlib import Path
 
 from apkg.log import getLogger
+from apkg.util.common import hash_file
 
 
 log = getLogger(__name__)
 
 
 def file_checksum(path):
-    chsum = hashlib.sha256()
-    with Path(path).open("rb") as f:
-        for chunk in iter(lambda: f.read(4096), b""):
-            chsum.update(chunk)
-    return chsum.hexdigest()[:20]
+    return hash_file(path).hexdigest()[:20]
 
 
 class ProjectCache:

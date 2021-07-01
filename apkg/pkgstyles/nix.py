@@ -11,7 +11,6 @@ apkg package style for **Nix** (NixOS.org).
 
 **packages:** symlink to your local nix store (for the primary package output)
 """
-import hashlib
 import os
 import re
 
@@ -19,7 +18,7 @@ from apkg import ex
 from apkg.log import getLogger
 from apkg.util.run import run
 import apkg.util.shutil35 as shutil
-
+from apkg.util.common import hash_file
 
 log = getLogger(__name__)
 
@@ -58,17 +57,6 @@ def get_srcpkg_nvr(path):
     return path.resolve().parent.name
 
 
-# https://stackoverflow.com/a/44873382/587396
-def sha256sum(filename):
-    h = hashlib.sha256()
-    b = bytearray(128*1024)
-    mv = memoryview(b)
-    with open(filename, 'rb', buffering=0) as f:
-        for n in iter(lambda: f.readinto(mv), 0):
-            h.update(mv[:n])
-    return h.hexdigest()
-
-
 def build_srcpkg(
         build_path,
         out_path,
@@ -77,7 +65,7 @@ def build_srcpkg(
         env):
     archive_path = archive_paths[0]
     env = env or {}
-    env['src_hash'] = sha256sum(archive_path)
+    env['src_hash'] = hash_file(archive_path).hexdigest()
     out_archive = out_path / archive_path.name
     log.info("applying templates")
     template.render(build_path, env or {})
