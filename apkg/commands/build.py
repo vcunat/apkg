@@ -168,9 +168,11 @@ def build(
     log.success("built %s packages in: %s", len(pkgs), result_path)
 
     if use_cache and not upstream:
-        fns = list(map(str, pkgs))
-        proj.cache.update(
-            cache_name, cache_key, fns)
+        unfiles = [p for p in pkgs if not p.is_file()]
+        if not unfiles:
+            # only cache regular files for now
+            proj.cache.update(
+                cache_name, cache_key, pkgs)
 
     return pkgs
 
