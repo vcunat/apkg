@@ -4,6 +4,7 @@ variables:
 
 stages:
   - test
+  - apkg
   - bird
   - libyang
   - knot-dns
@@ -31,6 +32,18 @@ image: $CI_REGISTRY/packaging/apkg/ci/debian-10-full:apkg
 
 .test: &test
   stage: test
+
+.apkg: &apkg
+  stage: apkg
+  only:
+    variables:
+      - $INTEGRATION
+  needs:
+    - unit
+  artifacts:
+    when: always
+    reports:
+      junit: report.xml
 
 .bird: &bird
   stage: bird
@@ -114,6 +127,65 @@ self:
     when: always
     reports:
       junit: report.xml
+
+
+# integration tests: apkg
+
+rocky-8-apkg:
+  image: $CI_REGISTRY/packaging/apkg/ci/rocky-8:apkg
+  <<: *apkg
+  script:
+    - *setup-project
+    - pytest -v ci/tests/test_apkg.py --junitxml=report.xml
+
+debian-9-apkg:
+  image: $CI_REGISTRY/packaging/apkg/ci/debian-9:apkg
+  <<: *apkg
+  script:
+    - *setup-project
+    - py.test-3 -v ci/tests/test_apkg.py --junitxml=report.xml
+
+debian-10-apkg:
+  image: $CI_REGISTRY/packaging/apkg/ci/debian-10:apkg
+  <<: *apkg
+  script:
+    - *setup-project
+    - py.test-3 -v ci/tests/test_apkg.py --junitxml=report.xml
+
+ubuntu-18.04-apkg:
+  image: $CI_REGISTRY/packaging/apkg/ci/ubuntu-18.04:apkg
+  <<: *apkg
+  script:
+    - *setup-project
+    - py.test-3 -v ci/tests/test_apkg.py --junitxml=report.xml
+
+ubuntu-20.04-apkg:
+  image: $CI_REGISTRY/packaging/apkg/ci/ubuntu-20.04:apkg
+  <<: *apkg
+  script:
+    - *setup-project
+    - py.test-3 -v ci/tests/test_apkg.py --junitxml=report.xml
+
+fedora-33-apkg:
+  image: $CI_REGISTRY/packaging/apkg/ci/fedora-33:apkg
+  <<: *apkg
+  script:
+    - *setup-project
+    - py.test-3 -v ci/tests/test_apkg.py --junitxml=report.xml
+
+fedora-34-apkg:
+  image: $CI_REGISTRY/packaging/apkg/ci/fedora-34:apkg
+  <<: *apkg
+  script:
+    - *setup-project
+    - py.test-3 -v ci/tests/test_apkg.py --junitxml=report.xml
+
+suse-15-apkg:
+  image: $CI_REGISTRY/packaging/apkg/ci/suse-15:apkg
+  <<: *apkg
+  script:
+    - *setup-project
+    - py.test3 -v ci/tests/test_apkg.py --junitxml=report.xml
 
 
 # integration tests: BIRD
