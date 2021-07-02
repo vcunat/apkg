@@ -57,6 +57,19 @@ def get_srcpkg_nvr(path):
     return path.resolve().parent.name
 
 
+def get_build_deps_from_template(  # pylint: disable=unused-argument
+        template_path,
+        **kwargs):
+    # With nix it doesn't make so much sense to care about build deps.
+    return []
+
+
+def install_build_deps(  # pylint: disable=unused-argument
+        deps,
+        **kwargs):
+    return
+
+
 def build_srcpkg(
         build_path,
         out_path,
