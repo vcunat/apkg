@@ -41,10 +41,10 @@ Include such script in your project and then point to it using `make_archive_scr
 
 ```
 [project]
-make_archive_script = "scripts/make-dev-archive.sh"
+make_archive_script = "scripts/make-archive.sh"
 ```
 
-script example: {{ 'scripts/make-dev-archive.sh' | file_link  }}
+script example: {{ 'scripts/make-archive.sh' | file_link  }}
 
 ## [upstream]
 
