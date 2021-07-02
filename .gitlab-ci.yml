@@ -372,6 +372,30 @@ suse-15-knot-resolver:
     - *setup-project
     - py.test3 -v ci/tests/test_knot_resolver.py --junitxml=report.xml
 
+nixos-unstable-knot-resolver:
+  <<: *knot-resolver
+  only: # FIXME: temporary
+  tags:
+    - docker
+    - linux
+    - amd64
+  image: nixos/nix
+  variables:
+    NIX_PATH: nixpkgs=https://github.com/nixos/nixpkgs/archive/nixos-unstable.tar.gz:apkg_boot=https://gitlab.nic.cz/packaging/apkg/-/archive/nix-tmp/apkg-nix-tmp.tar.gz
+  script:
+    - nix-env -iA nixpkgs.gitMinimal
+    - *setup-git
+    # The image auto-detects as alpine distro, and tests don't allow overriding easily :-/
+    - echo 'ID=nixos' > /etc/os-release
+    # Some archive scripts need /bin/bash
+    - nix build nixpkgs.bash && ln -s "$(realpath ./result/bin/bash)" /bin/bash
+    #TODO: improve the bootstrapping?  Submitting apkg into NixPkgs would simplify this.
+    - echo 'import <apkg_boot/pkg/srcpkgs/nixos-21.05/apkg-0.1.1.dev6+g12ae2a2-1/top-level.nix>' > ./apkg-boot.nix
+    - apkg_boot=$(nix-build ./apkg-boot.nix)/bin/apkg
+    - nix-shell ./apkg-boot.nix --run "$apkg_boot make-archive"
+    # Knot Resolver's make-archive needs basically all build-time dependencies (meson dist),
+    # so we add them on top of the normal apkg's development shell - and run the tests.
+    - nix-shell "$($apkg_boot srcpkg | head -n 1)" --argstr extraDepsFor knot-resolver --run 'py.test -v ci/tests/test_knot_resolver.py --junitxml=report.xml'
 
 # docs published to GitLab Pages: https://packaging.pages.nic.cz/apkg/
 
