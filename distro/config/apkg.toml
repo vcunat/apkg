@@ -2,7 +2,7 @@
 # recommended - guessed from project dir name by default
 name = "apkg"
 # recommended - script to create project archive, needed for make-archive
-make_archive_script = "scripts/make-dev-archive.sh"
+make_archive_script = "scripts/make-archive.sh"
 
 [upstream]
 # optional - needed for get-archive

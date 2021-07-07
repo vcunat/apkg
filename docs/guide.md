@@ -145,7 +145,7 @@ Test `project.make_archive_script` option using `apkg make-archive`:
 $> apkg make-archive
 
 I creating dev archive
-I running make_archive_script: scripts/make-dev-archive.sh
+I running make_archive_script: scripts/make-archive.sh
 I archive created: dist/apkg-0.0.2.tar.gz
 I copying archive to: pkg/archives/dev/apkg-0.0.2.tar.gz
 ✓ made archive: pkg/archives/dev/apkg-0.0.2.tar.gz
