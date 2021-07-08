@@ -34,6 +34,7 @@ RUN apt-get install -y -qqq \
     python3-pytest-sugar
 # basic deps
 RUN apt-get install -y -qqq \
+    python3-beautifulsoup4 \
     python3-blessings \
     python3-click \
     python3-jinja2 \
@@ -42,5 +43,4 @@ RUN apt-get install -y -qqq \
     python3-toml
 # python deps not available\too old in distro
 RUN pip3 install \
-    build \
-    htmllistparse
+    build

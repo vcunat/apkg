@@ -32,6 +32,7 @@ RUN pip3 install \
     pylint
 # basic deps
 RUN apt-get install -y -qqq \
+    python3-beautifulsoup4 \
     python3-blessings \
     python3-click \
     python3-cached-property \
@@ -42,8 +43,7 @@ RUN apt-get install -y -qqq \
 # python deps not available\too old in distro
 RUN pip3 install \
     build \
-    distro \
-    htmllistparse
+    distro
 # doc deps
 RUN pip3 install \
     mkdocs \

@@ -15,6 +15,7 @@ RUN dnf install -y \
     python3-pip
 # basic deps
 RUN dnf install -y \
+    python3-beautifulsoup4 \
     python3-blessings \
     python3-cached-property \
     python3-click \
@@ -23,9 +24,6 @@ RUN dnf install -y \
     python3-packaging \
     python3-requests \
     python3-toml
-# deps not available in distro
-RUN pip3 install \
-    htmllistparse
 # testing deps
 RUN dnf install -y \
     python3-pytest \

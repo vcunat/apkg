@@ -40,7 +40,7 @@ RUN apt-get install -y -qqq \
     python3-toml
 # python deps not available\too old in distro
 RUN pip3 install \
+    beautifulsoup4 \
     build \
     distro \
-    cached_property \
-    htmllistparse
+    cached_property

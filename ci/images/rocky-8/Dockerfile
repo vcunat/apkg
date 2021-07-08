@@ -24,11 +24,11 @@ RUN dnf install -y \
     python3-pip
 # basic deps
 RUN pip3 install \
+    beautifulsoup4 \
     blessings \
     cached-property \
     click \
     distro \
-    htmllistparse \
     jinja2 \
     packaging \
     requests \

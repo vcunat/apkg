@@ -1,7 +1,10 @@
 # -*- encoding: utf-8 -*-
 
 import re
+
+import bs4
 from packaging import version
+import requests
 
 from apkg.log import getLogger
 from apkg.util.run import run
@@ -10,32 +13,21 @@ from apkg.util.run import run
 log = getLogger(__name__)
 
 
-HTMLLISTPARSE_ERROR = None
-try:
-    import htmllistparse
-except Exception as e:
-    HTMLLISTPARSE_ERROR = e
-
-
-RE_ARCHIVE_VERSION = r'[^\d]+-(.+)\.tar\..*'
+RE_ARCHIVE_VERSION = r'[\w-]+-(\d[^-]+)\.tar\..*'
 
 
 def version_from_listing(html_listing_url):
     """
     get latest version from HTML listing
     """
-    if HTMLLISTPARSE_ERROR:
-        log.warning("unable to get upstream version from HTML listing: %s",
-                    HTMLLISTPARSE_ERROR)
-        return None
     log.verbose("getting upstream version from HTML listing: %s",
                 html_listing_url)
     found = False
     v_max = version.parse('0')
-    _, listing = htmllistparse.fetch_listing(
-        html_listing_url, timeout=5)
-    for f in listing:
-        m = re.match(RE_ARCHIVE_VERSION, f.name)
+    r = requests.get(html_listing_url)
+    soup = bs4.BeautifulSoup(r.content, 'html.parser')
+    for a in soup.find_all('a'):
+        m = re.match(RE_ARCHIVE_VERSION, a.string)
         if not m:
             continue
         v = version.parse(m.group(1))
