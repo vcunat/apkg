@@ -1,7 +1,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 FROM opensuse/leap
-MAINTAINER Jakub Ružička <jakub.ruzicka@nic.cz>
 
 WORKDIR /root
 CMD ["/bin/bash"]
@@ -13,8 +12,6 @@ RUN zypper addrepo -G -f https://download.opensuse.org/repositories/home:CZ-NIC:
 # packaging deps
 RUN zypper install -y curl git rpm-build python3-pip
 # basic deps
-RUN zypper install -y python3-setuptools python3-Jinja2 python3-click python3-distro python3-blessings python3-requests python3-toml python3-cached-property
-# deps not available in distro
-RUN pip3 install htmllistparse
+RUN zypper install -y python3-beautifulsoup4 python3-setuptools python3-Jinja2 python3-click python3-distro python3-blessings python3-requests python3-toml python3-cached-property
 # testing deps
 RUN zypper install -y python3-pytest python3-pytest-sugar

@@ -130,8 +130,7 @@ class UnableToDetectUpstreamVersion(ApkgException):
     msg_fmt = (
         "Unable to detect upstream version.\n\n"
         "Please consider one of following:\n\n"
-        "1) set upstream.archive_url "
-        "(requires htmllistparse module)\n"
+        "1) set upstream.archive_url\n"
         "2) set upstream.version_script to custom script\n"
         "3) manually supply version using -v/--version option")
     exit_code = 84

@@ -16,12 +16,12 @@ python3Packages.buildPythonApplication rec {
 
   propagatedBuildInputs = with python3Packages; [
     # copy&pasted requirements.txt (almost exactly)
+    beautifulsoup4   # upstream version detection
     blessings        # terminal colors
     build            # apkg distribution
     cached-property  # for python <= 3.7; but pip complains even with 3.8
     click            # nice CLI framework
     distro           # current distro detection
-    htmllistparse    # upstream version detection
     jinja2           # templating
     packaging        # version parsing
     requests         # HTTP for humans™
