@@ -32,7 +32,11 @@ Requires:         rpm-build
 
 Requires:         python3-click
 Requires:         python3-distro
+%if "x%{?suse_version}" == "x"
 Requires:         python3-jinja2
+%else
+Requires:         python3-Jinja2
+%endif
 Requires:         python3-requests
 Requires:         python3-toml
 
