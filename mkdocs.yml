@@ -1,4 +1,5 @@
 site_name: apkg
+site_url: https://pkg.labs.nic.cz/pages/apkg/
 repo_url: https://gitlab.nic.cz/packaging/apkg
 edit_uri: ""
 nav:
