@@ -1,7 +1,7 @@
 # apkg news
 
 
-## apkg 0.2.0 (2021-07-??)
+## apkg 0.2.0 (2021-07-13)
 
 ### Improvements
 
