@@ -1,16 +1,19 @@
-{ extraDepsFor ? null }:
+{ extraDepsFor ? null, extraDeps ? "" }:
 with import <nixpkgs> {};
+with lib;
 
 (callPackage ./. { }).overridePythonAttrs (attrs:
   {
     src = ./apkg-v{{ version }}.tar.gz;
   }
   # We need extra tweaks in apkg CI:
-  // lib.optionalAttrs (extraDepsFor != null) {
+  // {
     buildInputs = attrs.buildInputs or []
-      ++ pkgs.${extraDepsFor}.buildInputs or [];
-    nativeBuildInputs = attrs.nativeBuildInputs or [] ++ [ gitMinimal ]
-      ++ pkgs.${extraDepsFor}.nativeBuildInputs or [];
-    }
+      ++ optionals (extraDepsFor != null) (pkgs.${extraDepsFor}.buildInputs or [])
+      ++ map (pn: pkgs.${pn}) (if extraDeps != "" then splitString " " extraDeps else []);
+    nativeBuildInputs = attrs.nativeBuildInputs or []
+      ++ [ gitMinimal ] # I guess (almost) every make-archive needs it
+      ++ optionals (extraDepsFor != null) (pkgs.${extraDepsFor}.nativeBuildInputs or []);
+  }
 )
 
