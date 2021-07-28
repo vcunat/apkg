@@ -197,7 +197,13 @@ def srcpkg(
             msg = ("source package build reported success but result is "
                    "missing:\n\n%s" % p)
             raise ex.UnexpectedCommandOutput(msg=msg)
-    log.success("made source package: %s", results[0])
+
+    # first line of output is a source package by convention
+    srcpkg_path, *rest = results
+    # sort additional srcpkg files for determinism
+    results = [srcpkg_path] + sorted(rest)
+
+    log.success("made source package: %s", srcpkg_path)
 
     if use_cache:
         proj.cache.update(

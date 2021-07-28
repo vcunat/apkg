@@ -120,6 +120,9 @@ def build_srcpkg(
     if not srcpkgs:
         raise ex.ParsingFailed(
             msg="unable to parse rpmbuild results")
+    if len(srcpkgs) > 1:
+        raise ex.UnexpectedCommandOutput(
+            msg="rpmbuild produced multiple .src.rpm files")
     return srcpkgs
 
 

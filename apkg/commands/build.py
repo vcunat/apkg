@@ -167,6 +167,9 @@ def build(
         raise ex.UnexpectedCommandOutput(msg=msg)
     log.success("built %s packages in: %s", len(pkgs), result_path)
 
+    # sort output for determinism
+    pkgs.sort()
+
     if use_cache and not upstream:
         unfiles = [p for p in pkgs if not p.is_file()]
         if not unfiles:
