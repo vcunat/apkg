@@ -34,7 +34,7 @@ RUN apt-get install -y -qqq \
     python3-pytest-sugar
 # basic deps
 RUN apt-get install -y -qqq \
-    python3-beautifulsoup4 \
+    python3-bs4 \
     python3-blessings \
     python3-click \
     python3-jinja2 \
