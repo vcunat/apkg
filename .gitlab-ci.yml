@@ -168,6 +168,7 @@ debian-10-apkg:
   image: $CI_REGISTRY/packaging/apkg/ci/debian-10:apkg
   <<: *apkg
   script:
+    - apt update
     - *setup-project
     - py.test-3 -v ci/tests/test_apkg.py --junitxml=report.xml
 
@@ -175,6 +176,7 @@ ubuntu-18.04-apkg:
   image: $CI_REGISTRY/packaging/apkg/ci/ubuntu-18.04:apkg
   <<: *apkg
   script:
+    - apt update
     - *setup-project
     - py.test-3 -v ci/tests/test_apkg.py --junitxml=report.xml
 
@@ -182,6 +184,7 @@ ubuntu-20.04-apkg:
   image: $CI_REGISTRY/packaging/apkg/ci/ubuntu-20.04:apkg
   <<: *apkg
   script:
+    - apt update
     - *setup-project
     - py.test-3 -v ci/tests/test_apkg.py --junitxml=report.xml
 
@@ -244,6 +247,7 @@ debian-10-bird:
   image: $CI_REGISTRY/packaging/apkg/ci/debian-10:apkg
   <<: *bird
   script:
+    - apt update
     - *setup-project
     - py.test-3 -v ci/tests/test_bird.py --junitxml=report.xml
 
@@ -251,6 +255,7 @@ ubuntu-18.04-bird:
   image: $CI_REGISTRY/packaging/apkg/ci/ubuntu-18.04:apkg
   <<: *bird
   script:
+    - apt update
     - *setup-project
     - py.test-3 -v ci/tests/test_bird.py --junitxml=report.xml
 
@@ -258,6 +263,7 @@ ubuntu-20.04-bird:
   image: $CI_REGISTRY/packaging/apkg/ci/ubuntu-20.04:apkg
   <<: *bird
   script:
+    - apt update
     - *setup-project
     - py.test-3 -v ci/tests/test_bird.py --junitxml=report.xml
 
@@ -310,6 +316,7 @@ debian-10-libyang:
   image: $CI_REGISTRY/packaging/apkg/ci/debian-10:apkg
   <<: *libyang
   script:
+    - apt update
     - *setup-project
     - py.test-3 -v ci/tests/test_libyang.py --junitxml=report.xml
 
@@ -317,6 +324,7 @@ ubuntu-18.04-libyang:
   image: $CI_REGISTRY/packaging/apkg/ci/ubuntu-18.04:apkg
   <<: *libyang
   script:
+    - apt update
     - *setup-project
     - py.test-3 -v ci/tests/test_libyang.py --junitxml=report.xml
 
@@ -324,6 +332,7 @@ ubuntu-20.04-libyang:
   image: $CI_REGISTRY/packaging/apkg/ci/ubuntu-20.04:apkg
   <<: *libyang
   script:
+    - apt update
     - *setup-project
     - py.test-3 -v ci/tests/test_libyang.py --junitxml=report.xml
 
@@ -376,6 +385,7 @@ debian-10-knot-dns:
   image: $CI_REGISTRY/packaging/apkg/ci/debian-10:apkg
   <<: *knot-dns
   script:
+    - apt update
     - *setup-project
     - py.test-3 -v ci/tests/test_knot_dns.py --junitxml=report.xml
 
@@ -383,6 +393,7 @@ ubuntu-18.04-knot-dns:
   image: $CI_REGISTRY/packaging/apkg/ci/ubuntu-18.04:apkg
   <<: *knot-dns
   script:
+    - apt update
     - *setup-project
     - py.test-3 -v ci/tests/test_knot_dns.py --junitxml=report.xml
 
@@ -390,6 +401,7 @@ ubuntu-20.04-knot-dns:
   image: $CI_REGISTRY/packaging/apkg/ci/ubuntu-20.04:apkg
   <<: *knot-dns
   script:
+    - apt update
     - *setup-project
     - py.test-3 -v ci/tests/test_knot_dns.py --junitxml=report.xml
 
@@ -450,6 +462,7 @@ debian-10-knot-resolver:
   image: $CI_REGISTRY/packaging/apkg/ci/debian-10:apkg
   <<: *knot-resolver
   script:
+    - apt update
     - *setup-project
     - py.test-3 -v ci/tests/test_knot_resolver.py --junitxml=report.xml
 
@@ -457,6 +470,7 @@ ubuntu-20.04-knot-resolver:
   image: $CI_REGISTRY/packaging/apkg/ci/ubuntu-20.04:apkg
   <<: *knot-resolver
   script:
+    - apt update
     - *setup-project
     - py.test-3 -v ci/tests/test_knot_resolver.py --junitxml=report.xml
 
