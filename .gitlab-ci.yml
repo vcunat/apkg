@@ -93,6 +93,25 @@ image: $CI_REGISTRY/packaging/apkg/ci/debian-10-full:apkg
     reports:
       junit: report.xml
 
+.nixos: &nixos
+  tags:
+    - docker
+    - linux
+    - amd64
+  image: nixos/nix
+  variables:
+    #NIX_PATH: nixpkgs=https://github.com/nixos/nixpkgs/archive/nixos-unstable.tar.gz
+    NIX_PATH: nixpkgs=https://github.com/vcunat/nixpkgs/archive/p/apkg.tar.gz
+  before_script:
+    - nix-env -f '<nixpkgs>' -iA gitMinimal
+    - *setup-git
+    # The image auto-detects as alpine distro, and tests don't allow overriding easily :-/
+    - echo 'ID=nixos' > /etc/os-release
+    # Some archive scripts need /bin/bash
+    - nix build nixpkgs.bash && ln -s "$(realpath ./result/bin/bash)" /bin/bash
+    # Use bootstrap apkg to install itself from the current commit
+    - nix-shell '<nixpkgs>' -p apkg --run 'apkg install'
+
 
 # basic tests
 
@@ -186,25 +205,6 @@ suse-15-apkg:
   script:
     - *setup-project
     - py.test3 -v ci/tests/test_apkg.py --junitxml=report.xml
-
-.nixos: &nixos
-  tags:
-    - docker
-    - linux
-    - amd64
-  image: nixos/nix
-  variables:
-    #NIX_PATH: nixpkgs=https://github.com/nixos/nixpkgs/archive/nixos-unstable.tar.gz
-    NIX_PATH: nixpkgs=https://github.com/vcunat/nixpkgs/archive/p/apkg.tar.gz
-  before_script:
-    - nix-env -f '<nixpkgs>' -iA gitMinimal
-    - *setup-git
-    # The image auto-detects as alpine distro, and tests don't allow overriding easily :-/
-    - echo 'ID=nixos' > /etc/os-release
-    # Some archive scripts need /bin/bash
-    - nix build nixpkgs.bash && ln -s "$(realpath ./result/bin/bash)" /bin/bash
-    # Use bootstrap apkg to install itself from the current commit
-    - nix-shell '<nixpkgs>' -p apkg --run 'apkg install'
 
 nixos-unstable-apkg:
   <<: *apkg
